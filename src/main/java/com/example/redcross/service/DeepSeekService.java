@@ -33,7 +33,7 @@ public class DeepSeekService {
     @Value("${deepseek.api.url:https://api.deepseek.com/chat/completions}")
     private String apiUrl;
 
-    @Value("${deepseek.api.model:deepseek-chat}")
+    @Value("${deepseek.api.model:deepseek-v4-pro}")
     private String model;
 
     public DeepSeekService(RestTemplate restTemplate, ObjectMapper objectMapper) {
