@@ -215,12 +215,33 @@ const { checkinCount } = useCheckinStore()
   }
 
   .nav-item {
-    padding: 10px 16px;
-    font-size: 14px;
+    padding: 10px 14px;
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    min-width: 16px;
+    max-width: 36px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .main-content {
     padding: 20px 16px;
+  }
+}
+
+@media (max-width: 400px) {
+  .nav-item {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .nav-item .badge {
+    display: none;
   }
 }
 </style>

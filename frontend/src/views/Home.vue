@@ -1103,6 +1103,13 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   .hero { padding: 40px 24px 60px; border-radius: 16px; }
   .hero-title { font-size: 30px; }
   .hero-subtitle { font-size: 24px; }
+  .hero-stats { padding: 18px 20px; gap: 14px; }
+  .stat-number { font-size: 28px; }
+  .stat-label { font-size: 12px; }
+  .stat-divider { height: 32px; }
+  .hero-description { font-size: 15px; }
+  .hero-actions { flex-direction: column; gap: 12px; }
+  .btn { width: 100%; justify-content: center; }
   .section { padding: 40px 20px; }
   .section-title { font-size: 28px; }
   .figure-card {
@@ -1115,5 +1122,15 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   .locations-grid { grid-template-columns: 1fr; }
   .hero-glow-bg { display: none; }
   .particle:nth-child(n+7) { display: none; }
+}
+
+@media (max-width: 375px) {
+  .hero { padding: 32px 16px 48px; }
+  .hero-title { font-size: 26px; }
+  .hero-subtitle { font-size: 20px; }
+  .hero-badge { font-size: 12px; padding: 8px 18px; }
+  .hero-stats { padding: 16px; gap: 10px; }
+  .stat-number { font-size: 24px; }
+  .stat-divider { height: 28px; }
 }
 </style>

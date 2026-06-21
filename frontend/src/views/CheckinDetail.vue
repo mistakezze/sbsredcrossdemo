@@ -709,11 +709,35 @@ const saveNote = () => {
 }
 
 @media (max-width: 768px) {
-  .hero-section { padding: 32px 24px; }
+  .hero-section { padding: 32px 20px; }
   .hero-title { font-size: 26px; }
-  .info-section { padding: 24px 20px; }
-  .note-section { padding: 24px 20px; }
+  .info-section { padding: 22px 18px; }
+  .note-section { padding: 22px 18px; }
   .info-grid { grid-template-columns: 1fr; }
+  .note-actions { flex-direction: column; }
+  .note-btn { width: 100%; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .hero-section { padding: 24px 16px; border-radius: 16px; }
+  .hero-title { font-size: 22px; }
+  .hero-category { font-size: 11px; padding: 6px 14px; }
+  .hero-place { font-size: 14px; }
+  .checkin-badge { font-size: 11px; padding: 6px 14px; }
+  .checkin-date { font-size: 13px; }
+  .back-btn { padding: 8px 16px; font-size: 13px; margin-bottom: 18px; }
+  .info-section { padding: 18px 16px; }
+  .note-section { padding: 18px 16px; }
+  .section-title { font-size: 16px; }
+  .section-text { font-size: 14px; }
+  .note-input { font-size: 14px; }
+}
+
+@media (max-width: 375px) {
+  .hero-section { padding: 20px 14px; }
+  .hero-title { font-size: 20px; }
+  .info-item { padding: 14px 16px; }
+  .info-value { font-size: 14px; }
 }
 
 </style>

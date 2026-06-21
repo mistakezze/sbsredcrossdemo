@@ -2388,9 +2388,85 @@ const clearAnswer = () => {
   .tab-btn { padding: 10px 18px; font-size: 14px; }
 }
 
+@media (max-width: 768px) {
+  .page-title { font-size: 32px; }
+  .page-subtitle { font-size: 14px; }
+  .loc-card {
+    padding: 20px 16px;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .loc-number { width: 40px; height: 40px; font-size: 18px; }
+  .loc-icon { width: 56px; height: 56px; }
+  .cross-outer { width: 40px; height: 40px; }
+  .cross-h { width: 34px; height: 9px; }
+  .cross-v { width: 9px; height: 34px; }
+  .loc-name { font-size: 17px; }
+  .loc-desc { font-size: 13px; margin-bottom: 12px; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+  .loc-tags { gap: 6px; }
+  .loc-tag { font-size: 11px; padding: 4px 10px; }
+  .loc-status { font-size: 12px; padding: 8px 14px; }
+  .route-info { padding: 24px 16px; }
+  .step-item { padding: 14px 16px; gap: 12px; }
+  .step-number { width: 32px; height: 32px; font-size: 14px; }
+  .step-name { font-size: 14px; }
+  .step-place { font-size: 12px; }
+  .modal-body { padding: 24px 18px; }
+  .modal-footer { padding: 18px 18px 24px; }
+  .modal-title { font-size: 22px; }
+  .ai-card { padding: 20px 16px; }
+  .ai-card-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+  .ai-title { font-size: 18px; }
+  .ai-subtitle { font-size: 13px; }
+  .tab-btn { padding: 10px 16px; font-size: 13px; }
+  .tab-text { display: none; }
+  .tabs-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tabs { min-width: max-content; }
+  /* AI 步骤卡片移动端 */
+  .ai-step-item { padding: 18px 16px; gap: 14px; }
+  .ai-step-index { width: 38px; height: 38px; font-size: 18px; }
+  .ai-step-name { font-size: 15px; }
+  .ai-step-desc { font-size: 13px; }
+  .preset-questions { grid-template-columns: 1fr; gap: 10px; }
+  .preset-item { padding: 14px 16px; }
+  .preset-label { font-size: 13px; }
+  .preset-emoji { font-size: 22px; }
+  /* 交通区块移动端 */
+  .transit-head { gap: 8px; }
+  .transit-text { font-size: 12px; }
+  .transit-hint { flex-direction: column; gap: 4px; }
+  .hint-arrow { display: none; }
+  /* 实用贴士/亮点列表缩小 */
+  .highlights-list li, .practical-list li { font-size: 12px; }
+  .item-value { font-size: 12px; }
+}
+
 @media (max-width: 480px) {
   .tabs { width: 100%; }
-  .tab-btn { flex: 1; justify-content: center; padding: 12px 16px; }
-  .page-title { font-size: 28px; }
+  .tab-btn { flex: 1; justify-content: center; padding: 12px 14px; }
+  .tab-text { display: inline; }
+  .tab-icon { display: none; }
+  .page-title { font-size: 26px; }
+  /* 时间/门票、美食/拍照点 改为单列 */
+  .time-ticket-row { grid-template-columns: 1fr; }
+  .food-photo-row { grid-template-columns: 1fr; }
+  /* 自定义提问区 */
+  .custom-ask-input { flex-direction: column; }
+  .btn-ask-submit { width: 100%; min-width: unset; padding: 14px; }
+  .ask-textarea { min-height: 80px; }
+  /* 步骤列表改为单列 */
+  .info-steps { grid-template-columns: 1fr; }
+  /* 统计卡片 */
+  .header-stats-card { min-width: unset; padding: 20px 28px; }
+  .stats-number { font-size: 36px; }
 }
-</style>
+
+@media (max-width: 375px) {
+  .loc-card { padding: 16px 14px; }
+  .loc-icon { display: none; }
+  .loc-name { font-size: 16px; }
+  .loc-meta { font-size: 12px; }
+  .page-title { font-size: 22px; }
+  .ai-step-item { padding: 16px 14px; }
+  .ai-step-meta { font-size: 11px; }
+}

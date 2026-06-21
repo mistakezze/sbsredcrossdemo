@@ -844,5 +844,28 @@ const confirmDelete = () => {
   .card-info { flex-direction: column; gap: 8px; }
   .card-footer { flex-direction: column; gap: 12px; align-items: stretch; }
   .delete-btn { width: 100%; }
+  .timeline-dot { width: 34px; height: 34px; font-size: 13px; }
+  .timeline-left { width: 34px; }
+}
+
+@media (max-width: 480px) {
+  .page-title { font-size: 24px; }
+  .page-stats-card { padding: 16px 20px; }
+  .stats-number { font-size: 36px; }
+  .timeline-item { gap: 14px; }
+  .timeline-card { padding: 14px; }
+  .card-location { font-size: 15px; }
+  .confirm-box { padding: 28px 24px; }
+  .confirm-actions { flex-direction: column; }
+  .confirm-btn { width: 100%; text-align: center; }
+}
+
+@media (max-width: 375px) {
+  .page-header { padding: 28px 16px; }
+  .checkin-list { padding: 20px 14px; }
+  .timeline-left { width: 30px; flex-shrink: 0; }
+  .timeline-dot { width: 30px; height: 30px; font-size: 12px; }
+  .timeline-card { padding: 12px 14px; }
+  .card-footer { padding-top: 10px; }
 }
 </style>
