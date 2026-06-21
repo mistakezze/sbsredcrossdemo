@@ -164,7 +164,7 @@
           <span class="disclaimer-text">路线中的交通方式由 AI 基于地点所在行政区推断生成，仅作游览参考。实际出行请以地图导航（高德/百度地图）提供的实时线路为准。</span>
         </div>
 
-        <!-- 路线步骤卡片 -->
+        <!-- 路线步骤卡片（详细版） -->
         <div v-if="aiAnswer.steps && aiAnswer.steps.length > 0" class="ai-steps">
           <div
             v-for="(step, idx) in aiAnswer.steps"
@@ -176,9 +176,70 @@
               <h4 class="ai-step-name">{{ step.name }}</h4>
               <div class="ai-step-meta">{{ step.meta }}</div>
               <p class="ai-step-desc">{{ step.desc }}</p>
+
+              <!-- 历史背景 -->
+              <div v-if="step.history" class="ai-step-section history-section">
+                <div class="section-label">📜 历史故事</div>
+                <p class="section-text">{{ step.history }}</p>
+              </div>
+
+              <!-- 参观亮点 -->
+              <div v-if="step.highlights && step.highlights.length > 0" class="ai-step-section highlights-section">
+                <div class="section-label">⭐ 参观亮点</div>
+                <ul class="highlights-list">
+                  <li v-for="(h, hi) in step.highlights" :key="hi">{{ h }}</li>
+                </ul>
+              </div>
+
+              <!-- 最佳时间 & 门票 -->
+              <div class="time-ticket-row">
+                <div v-if="step.best_time || step.bestTime" class="time-ticket-item">
+                  <span class="item-icon">🕐</span>
+                  <div class="item-content">
+                    <div class="item-label">最佳时间</div>
+                    <div class="item-value">{{ step.best_time || step.bestTime }}</div>
+                  </div>
+                </div>
+                <div v-if="step.ticket" class="time-ticket-item">
+                  <span class="item-icon">🎟️</span>
+                  <div class="item-content">
+                    <div class="item-label">门票预约</div>
+                    <div class="item-value">{{ step.ticket }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 附近餐饮 & 打卡点 -->
+              <div class="food-photo-row">
+                <div v-if="step.nearby_food || step.nearbyFood" class="food-photo-item food-item">
+                  <span class="item-icon">🍜</span>
+                  <div class="item-content">
+                    <div class="item-label">附近餐饮</div>
+                    <div class="item-value">{{ step.nearby_food || step.nearbyFood }}</div>
+                  </div>
+                </div>
+                <div v-if="step.photo_spots && step.photo_spots.length > 0" class="food-photo-item photo-item">
+                  <span class="item-icon">📷</span>
+                  <div class="item-content">
+                    <div class="item-label">拍照打卡点</div>
+                    <div class="item-value">{{ step.photo_spots.join('、') }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 实用贴士 -->
+              <div v-if="step.practical_tips && step.practical_tips.length > 0" class="ai-step-section practical-section">
+                <div class="section-label">💡 实用贴士</div>
+                <ul class="practical-list">
+                  <li v-for="(pt, pti) in step.practical_tips" :key="pti">{{ pt }}</li>
+                </ul>
+              </div>
+
+              <!-- 快速贴士 chip -->
               <div v-if="step.tips" class="ai-step-tips">
                 <span v-for="(tip, ti) in step.tips" :key="ti" class="step-chip">{{ tip }}</span>
               </div>
+
               <!-- 交通路线 -->
               <div v-if="step.transit" class="ai-step-transit">
                 <div class="transit-head">
@@ -186,11 +247,15 @@
                     {{ modeIcon(step.transit.mode) }}
                   </span>
                   <span class="transit-label">🚗 交通路线</span>
-                  <span class="transit-text">{{ step.transit.from_prev }}</span>
+                  <span class="transit-text">{{ step.transit.from_prev || step.transit.fromPrev }}</span>
                 </div>
-                <div v-if="step.transit.route_hint" class="transit-hint">
+                <div v-if="step.transit.route_hint || step.transit.routeHint" class="transit-hint">
                   <span class="hint-arrow">→</span>
-                  <span class="hint-text">{{ step.transit.route_hint }}</span>
+                  <span class="hint-text">{{ step.transit.route_hint || step.transit.routeHint }}</span>
+                </div>
+                <div v-if="step.transit.cost || step.transit.duration" class="transit-meta">
+                  <span v-if="step.transit.duration" class="transit-meta-item">⏱️ {{ step.transit.duration }}</span>
+                  <span v-if="step.transit.cost" class="transit-meta-item">💰 {{ step.transit.cost }}</span>
                 </div>
               </div>
             </div>
@@ -347,68 +412,18 @@ const presetQuestions = [
 ]
 
 // ==============================
-// DeepSeek API 调用
-// API Key 请在 frontend/.env 文件中配置：VITE_DEEPSEEK_API_KEY=sk-your-key-here
+// AI 路线推荐：调用后端 Spring Boot 接口
+// POST http://localhost:8080/api/ai/route
+// 由后端代理访问 DeepSeek，避免在浏览器暴露 API Key
 // ==============================
-const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || ''
-const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions'
+
+const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080') + '/api/ai/route'
 
 const aiLoading = ref(false)
 const selectedQuestion = ref('')
 const customQuestion = ref('')
 const isCustomAsk = ref(false)
 const aiAnswer = ref(null)
-
-// 根据预设问题构造提示词，并结合当前地点完整数据
-const buildPrompt = (question) => {
-  // 把每个地点的完整信息（名称/位置/类别/描述/历史/亮点）打包为结构化文本
-  const locationDetails = locations.value.map((l, i) => {
-    return `【地点${i + 1}】
-- 名称：${l.name}
-- 所在区域：${l.location}
-- 类别：${l.category}
-- 简介：${l.description}
-- 历史背景：${l.history}
-- 核心亮点：${(l.highlights || []).join('、')}`
-  }).join('\n\n')
-
-  return `你是一名严谨的上海红十字文化导游，绝不能编造地点信息或虚构交通路线。
-
-【以下是当前系统中唯一可用的红十字地点完整信息，你必须且只能从这些地点中选择，绝对不能编造其他地点或修改名称】：
-
-${locationDetails}
-
-用户的问题是：「${question}」
-
-请基于上述真实信息，为用户生成一个结构化的游览路线建议，严格按照以下 JSON 格式返回（不要包含任何额外文字或 Markdown 标记）：
-
-{
-  "steps": [
-    {
-      "name": "地点名称（必须严格使用上方列表中的名称，不得修改或编造）",
-      "meta": "简短元信息，例如预计停留时间、门票提示等",
-      "desc": "2-3句话说明为什么把这里放在这个位置，以及参观重点（必须基于上方简介和历史，不能编造）",
-      "tips": ["小贴士1", "小贴士2"],
-      "transit": {
-        "from_prev": "从上一地点到本地点的交通方式描述（例如：地铁1号线2站 约10分钟 / 步行约8分钟 / 公交71路3站 约15分钟）",
-        "route_hint": "具体换乘或步行指引（基于两地点所在行政区做合理描述，不编造具体门牌号或不存在的线路）",
-        "mode": "交通方式标识，仅取以下之一：walk / subway / bus / taxi"
-      }
-    }
-  ],
-  "summary": ["路线亮点1", "路线亮点2", "路线亮点3"]
-}
-
-【必须遵守的规则（违反会导致用户投诉）】：
-1. steps 中的 name 字段必须与上方【地点】中提供的名称完全一致，不得修改、不得编造。
-2. 步骤数控制在 3-6 个之间，所有地点必须来自上述列表。
-3. transit 的交通方式描述必须基于上海真实的地铁/公交系统做合理推断，不允许编造如"机场专线"、"高速列车"等与红十字地点无关的内容。
-4. 第一个步骤的 transit.from_prev 请填写"从您的出发点前往本地点"。
-5. 如果用户问题中提到的出发点或区域信息不足以推断精确路线，请使用"地铁/公交/步行"这类通用交通方式描述，不要虚构。
-6. desc 和 tips 的内容必须基于上方简介和历史，不能编造虚假数据（例如不要把地点说成在机场、火车站等）。
-7. summary 用 3 条简短要点总结整条路线。
-8. 所有输出必须是合法 JSON，不要包含任何额外的解释文字。`
-}
 
 const selectAndAsk = async (q) => {
   await askAI(q.label, false)
@@ -427,72 +442,89 @@ const askAI = async (question, isCustom) => {
   selectedQuestion.value = question
   isCustomAsk.value = !!isCustom
 
-  // 若未配置 API Key，则返回本地 mock 数据，让 UI 也能演示
-  if (!DEEPSEEK_API_KEY) {
-    aiLoading.value = true
-    aiAnswer.value = null
+  // 先清掉旧结果，显示 loading
+  aiLoading.value = true
+  aiAnswer.value = null
 
-    setTimeout(() => {
+  // 准备请求体：问题 + 当前地点完整信息（由后端构造提示词和调用 DeepSeek）
+  const body = {
+    question: question,
+    locations: locations.value.map(l => ({
+      name: l.name,
+      category: l.category,
+      location: l.location,
+      description: l.description + '（历史背景：' + l.history + '；亮点：' + (l.highlights || []).join('、') + '）'
+    }))
+  }
+
+  try {
+    const res = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      // 后端返回错误（如限流、服务器异常）
       aiAnswer.value = {
         question: question,
         steps: generateMockRoute(question),
         summary: [
+          '后端暂不可用，以下为本地参考路线',
+          '请稍后重试以获得 AI 智能推荐',
           '路线经过精心编排，符合您的时间与兴趣',
-          '每站都有红十字文化的特色亮点',
-          '建议按顺序游览以获得最佳体验',
         ],
-        raw: '',
+        raw: data.error || '请求失败：HTTP ' + res.status,
       }
-      aiLoading.value = false
-      isCustomAsk.value = false
-    }, 1500)
-    return
-  }
-
-  // 真实调用 DeepSeek
-  try {
-    aiLoading.value = true
-    aiAnswer.value = null
-
-    const prompt = buildPrompt(question)
-    const res = await fetch(DEEPSEEK_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [
-          { role: 'system', content: '你是一名专业的上海红十字文化导游，回答要严谨、温暖、结构化。' },
-          { role: 'user', content: prompt },
-        ],
-        temperature: 0.7,
-        response_format: { type: 'json_object' },
-      }),
-    })
-
-    const data = await res.json()
-    const content = data.choices?.[0]?.message?.content || '{}'
-    let parsed
-    try {
-      parsed = JSON.parse(content)
-    } catch (e) {
-      parsed = { steps: [], summary: [] }
+      return
     }
+
+    // 后端返回的字段可能是 camelCase（fromPrev / routeHint），也可能是 snake_case（from_prev / route_hint）
+    // 统一转换让模板能兼容所有格式
+    const normalizedSteps = (data.steps || []).map(s => ({
+      name: s.name,
+      meta: s.meta,
+      desc: s.desc,
+      history: s.history,
+      best_time: s.best_time || s.bestTime,
+      ticket: s.ticket,
+      highlights: s.highlights || [],
+      photo_spots: s.photo_spots || s.photoSpots || [],
+      nearby_food: s.nearby_food || s.nearbyFood,
+      practical_tips: s.practical_tips || s.practicalTips || [],
+      tips: s.tips || [],
+      transit: s.transit ? {
+        from_prev: s.transit.from_prev || s.transit.fromPrev,
+        route_hint: s.transit.route_hint || s.transit.routeHint,
+        mode: s.transit.mode,
+        cost: s.transit.cost,
+        duration: s.transit.duration,
+      } : null
+    }))
 
     aiAnswer.value = {
       question: question,
-      steps: parsed.steps || [],
-      summary: parsed.summary || [],
-      raw: content,
+      steps: normalizedSteps,
+      summary: data.summary || [],
+      mocked: !!data.mocked,
+      errorMessage: data.errorMessage,
+      raw: '',
     }
   } catch (err) {
+    // 网络错误（后端未启动等）：降级为本地 mock 路线，给出明确提示
     aiAnswer.value = {
       question: question,
-      steps: [],
-      summary: [],
-      raw: '调用 DeepSeek API 失败：' + (err?.message || '未知错误') + '\n\n请检查 API Key 是否正确、网络是否可访问。',
+      steps: generateMockRoute(question),
+      summary: [
+        '无法连接到 AI 服务，以下为本地参考路线',
+        '请确认后端服务已启动（http://localhost:8080）',
+        '实际出行请以地图导航为准',
+      ],
+      raw: '无法连接后端服务：' + (err?.message || '网络错误') + '\n\n提示：请启动 Spring Boot 后端服务，或在 .env 中配置 VITE_BACKEND_URL。',
     }
   } finally {
     aiLoading.value = false
@@ -533,8 +565,10 @@ const generateMockRoute = (question) => {
   const transitByDistrict = (prevLoc, currLoc) => {
     if (!prevLoc) return {
       from_prev: '从您的出发点前往本地点',
-      route_hint: '建议使用地图导航查询具体路线',
+      route_hint: '建议使用手机地图导航，输入地点名称即可规划最优路线',
       mode: 'subway',
+      cost: '请以实际导航为准',
+      duration: '请以实际导航为准',
     }
 
     // 从 location 字段中提取行政区（格式："上海市 · 徐汇区"）
@@ -571,6 +605,8 @@ const generateMockRoute = (question) => {
         from_prev: '地铁 1-2 站 + 步行约 5 分钟，约 15 分钟',
         route_hint: `从${prevDist}乘坐地铁前往${currDist}，出站后步行几分钟到达`,
         mode: 'subway',
+        cost: '约4元',
+        duration: '约15分钟',
       }
     }
 
@@ -580,6 +616,8 @@ const generateMockRoute = (question) => {
         from_prev: '地铁 3-5 站，约 25 分钟',
         route_hint: `从${prevDist}经地铁过江线路前往${currDist}，具体线路请以地图导航为准`,
         mode: 'subway',
+        cost: '约6元',
+        duration: '约25分钟',
       }
     }
     if (prevDist === '闵行区' || currDist === '闵行区') {
@@ -587,6 +625,8 @@ const generateMockRoute = (question) => {
         from_prev: '地铁 4-6 站，约 30 分钟',
         route_hint: `从${prevDist}乘坐地铁前往${currDist}，具体线路请以地图导航为准`,
         mode: 'subway',
+        cost: '约7元',
+        duration: '约30分钟',
       }
     }
 
@@ -595,6 +635,8 @@ const generateMockRoute = (question) => {
       from_prev: '公交或地铁换乘，约 20-30 分钟',
       route_hint: `从${prevDist}前往${currDist}，建议使用地图导航查询最优换乘方案`,
       mode: 'bus',
+      cost: '约3元',
+      duration: '约25分钟',
     }
   }
 
@@ -603,9 +645,18 @@ const generateMockRoute = (question) => {
     const transit = transitByDistrict(prev, loc)
     return {
       name: loc.name,
-      meta: `预计参观 ${30 + idx * 10} 分钟（${loc.category}）`,
-      desc: loc.description,
-      tips: (loc.highlights || []).slice(0, 2),
+      meta: `预计参观 ${40 + idx * 10} 分钟（${loc.category}）`,
+      desc: loc.description + ' 本场馆是上海红十字文化的重要展示窗口，承载着深厚的人道主义精神，是了解上海乃至中国红十字运动历史的绝佳起点。',
+      history: '该场馆成立于近现代时期，见证了中国红十字运动在上海的发展历程，承载着几代红十字人的理想与实践。',
+      best_time: '建议工作日上午 9:00-11:00，此时人流较少，可安静参观；周末 10:00-14:00 为参观高峰期，建议提前到达。',
+      ticket: '免费开放，无需购票。建议提前通过官方公众号预约名额；部分场馆每周一闭馆维护。',
+      highlights: ['馆内珍藏历史文献与实物展品', '专业讲解员免费定时讲解（每日 10:00 / 14:00）', '互动多媒体展示区，深入了解红十字精神', '临期主题特展，定期更换内容'],
+      photo_spots: ['场馆正门的红十字主题雕塑', '一楼大厅的光辉历程展区', '二楼临展互动区（光线最佳，适合人像）'],
+      nearby_food: loc.location.includes('徐汇区')
+        ? '出门右转 200 米岳阳路有多家本帮菜馆，人均约 60-80 元；永康路有网红咖啡店，适合短暂休憩。'
+        : '附近商场 B1 层有实惠快餐，约 30-45 元；路边有连锁便利店，可购买简餐。',
+      practical_tips: ['场馆周边停车困难，建议搭乘地铁或公交前往', '馆内设有无障碍通道及轮椅免费借用服务', '可携带饮用水，但请勿携带食品进入展厅', '参观时长建议预留 1-2 小时'],
+      tips: ['请遵守场馆规定，勿使用闪光灯拍照', '部分展品需预约才能近距离观看'],
       transit,
     }
   })
@@ -1683,7 +1734,139 @@ const clearAnswer = () => {
   font-size: 14px;
   color: #5a6478;
   line-height: 1.8;
-  margin: 0 0 12px 0;
+  margin: 0 0 14px 0;
+}
+
+/* 通用区块样式 */
+.ai-step-section {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  animation: sectionIn 0.4s ease-out backwards;
+}
+@keyframes sectionIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section-label {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+.section-text {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.7;
+  margin: 0;
+}
+.highlights-list, .practical-list {
+  margin: 0;
+  padding-left: 20px;
+}
+.highlights-list li, .practical-list li {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.7;
+  margin-bottom: 4px;
+}
+
+/* 历史故事 - 米色背景 */
+.history-section {
+  background: linear-gradient(135deg, #fffdf5, #fff8e1);
+  border-left: 3px solid #d4a017;
+}
+/* 参观亮点 - 淡蓝背景 */
+.highlights-section {
+  background: linear-gradient(135deg, #f0f7ff, #e3f2fd);
+  border-left: 3px solid #1976d2;
+}
+/* 实用贴士 - 淡绿背景 */
+.practical-section {
+  background: linear-gradient(135deg, #f1fff5, #e8f5e9);
+  border-left: 3px solid #388e3c;
+}
+.history-section .section-label { color: #b8860b; }
+.highlights-section .section-label { color: #1565c0; }
+.practical-section .section-label { color: #2e7d32; }
+
+/* 最佳时间 & 门票 同行 */
+.time-ticket-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.time-ticket-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 1px solid #eee;
+}
+.item-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.item-content {
+  flex: 1;
+  min-width: 0;
+}
+.item-label {
+  font-size: 11px;
+  color: #999;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+.item-value {
+  font-size: 12.5px;
+  color: #333;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* 附近餐饮 & 打卡点 同行 */
+.food-photo-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.food-photo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid;
+}
+.food-item {
+  background: #fffbf5;
+  border-color: #ffe0b2;
+}
+.photo-item {
+  background: #fdf7ff;
+  border-color: #e1bee7;
+}
+
+/* 交通费用/时间元信息 */
+.transit-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.transit-meta-item {
+  font-size: 12px;
+  color: #777;
+  background: rgba(255,152,0,0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
 }
 
 .ai-step-tips {
