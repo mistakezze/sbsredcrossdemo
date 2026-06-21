@@ -322,6 +322,8 @@ const saveNote = () => {
   -webkit-text-fill-color: transparent;
   animation: titleShine 5s ease-in-out infinite;
   z-index: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 @keyframes titleShine {
@@ -335,6 +337,8 @@ const saveNote = () => {
   margin-bottom: 20px;
   position: relative;
   z-index: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .hero-checkin-time {
@@ -442,6 +446,8 @@ const saveNote = () => {
   font-weight: 700;
   position: relative;
   display: inline-block;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .section-title::after {
@@ -460,6 +466,8 @@ const saveNote = () => {
   color: #5a6478;
   line-height: 1.9;
   margin: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .highlights {
@@ -512,6 +520,8 @@ const saveNote = () => {
   color: #5a6478;
   line-height: 1.7;
   padding-top: 3px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* ==============================
@@ -586,6 +596,8 @@ const saveNote = () => {
   color: #5d4e00;
   line-height: 1.8;
   margin: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .note-empty {
@@ -706,16 +718,24 @@ const saveNote = () => {
   color: #1a2332;
   font-weight: 600;
   line-height: 1.5;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 @media (max-width: 768px) {
   .hero-section { padding: 32px 20px; }
-  .hero-title { font-size: 26px; }
+  .hero-title { font-size: 26px; line-height: 1.3; }
+  .hero-place { font-size: 14px; margin-bottom: 16px; }
+  .hero-checkin-time { gap: 10px; }
   .info-section { padding: 22px 18px; }
   .note-section { padding: 22px 18px; }
-  .info-grid { grid-template-columns: 1fr; }
-  .note-actions { flex-direction: column; }
-  .note-btn { width: 100%; text-align: center; }
+  .info-grid { grid-template-columns: 1fr; gap: 12px; }
+  .note-actions { flex-direction: column; gap: 10px; }
+  .note-btn { width: 100%; text-align: center; padding: 12px; }
+  .section-text { font-size: 14px; line-height: 1.8; }
+  .highlight-text { font-size: 14px; line-height: 1.7; }
+  .note-text { font-size: 14px; line-height: 1.75; }
+  .checkin-date { font-size: 13px; }
 }
 
 @media (max-width: 480px) {
@@ -729,15 +749,23 @@ const saveNote = () => {
   .info-section { padding: 18px 16px; }
   .note-section { padding: 18px 16px; }
   .section-title { font-size: 16px; }
-  .section-text { font-size: 14px; }
-  .note-input { font-size: 14px; }
+  .section-text { font-size: 14px; line-height: 1.75; }
+  .highlight-text { font-size: 13.5px; }
+  .highlight-marker { width: 28px; height: 28px; font-size: 11px; }
+  .info-value { font-size: 14px; }
+  .info-item { padding: 14px 16px; }
+  .note-input { font-size: 14px; min-height: 80px; }
+  .note-text { font-size: 13.5px; line-height: 1.75; }
 }
 
 @media (max-width: 375px) {
   .hero-section { padding: 20px 14px; }
   .hero-title { font-size: 20px; }
-  .info-item { padding: 14px 16px; }
+  .info-item { padding: 14px 14px; }
   .info-value { font-size: 14px; }
+  .info-label { font-size: 10px; letter-spacing: 1px; }
+  .section-text { font-size: 13.5px; }
+  .note-text { font-size: 13px; }
 }
 
 </style>

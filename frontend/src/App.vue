@@ -79,6 +79,10 @@ const { checkinCount } = useCheckinStore()
   gap: 16px;
   cursor: pointer;
   user-select: none;
+  /* 防止 logo 挤压导航 */
+  flex-shrink: 0;
+  min-width: 0;
+  max-width: 55%;
 }
 
 .logo-icon {
@@ -91,6 +95,7 @@ const { checkinCount } = useCheckinStore()
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
 }
 
 .logo-icon .cross-h,
@@ -109,38 +114,49 @@ const { checkinCount } = useCheckinStore()
   height: 24px;
 }
 
+.logo-text {
+  min-width: 0;
+}
+
 .logo-text h1 {
-  font-size: 22px;
+  font-size: 20px;
   margin: 0;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  word-break: break-word;
+  line-height: 1.3;
 }
 
 .logo-text p {
   font-size: 12px;
   margin: 2px 0 0 0;
   opacity: 0.85;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
+  /* 小屏隐藏英文字样，节省空间 */
 }
 
 .nav {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
+  gap: 6px;
+  padding: 10px 18px;
   color: rgba(255, 255, 255, 0.88);
   text-decoration: none;
   border-radius: 10px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   transition: all 0.25s ease;
   position: relative;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .nav-item:hover {
@@ -158,11 +174,13 @@ const { checkinCount } = useCheckinStore()
 .badge {
   background: #ffeb3b;
   color: #d32f2f;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 20px;
   min-width: 20px;
+  line-height: 1.4;
+  flex-shrink: 0;
 }
 
 .main-content {
@@ -189,6 +207,7 @@ const { checkinCount } = useCheckinStore()
 .footer-content p {
   margin: 4px 0;
   font-size: 14px;
+  word-break: break-word;
 }
 
 .footer-sub {
@@ -197,32 +216,51 @@ const { checkinCount } = useCheckinStore()
   letter-spacing: 4px;
 }
 
+@media (max-width: 960px) {
+  .logo-text p { display: none; }
+  .nav-item { padding: 10px 12px; font-size: 13px; }
+  .nav-item .nav-text { /* 如果有文字标签，可选择性隐藏 */ }
+}
+
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;
-    padding: 16px;
-    gap: 16px;
+    padding: 14px 16px;
+    gap: 12px;
+    width: 100%;
   }
 
-  .logo-text h1 {
-    font-size: 18px;
+  .logo {
+    width: 100%;
+    justify-content: center;
+    max-width: 100%;
   }
+
+  .logo-icon { width: 44px; height: 44px; }
+  .logo-icon .cross-h { width: 20px; height: 5px; }
+  .logo-icon .cross-v { width: 5px; height: 20px; }
+
+  .logo-text h1 { font-size: 17px; text-align: center; }
 
   .nav {
     width: 100%;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px;
   }
 
   .nav-item {
     padding: 10px 14px;
     font-size: 13px;
-    gap: 6px;
+    gap: 5px;
+    flex-shrink: 0;
   }
 
   .badge {
     font-size: 10px;
-    padding: 1px 6px;
+    padding: 1px 7px;
     min-width: 16px;
     max-width: 36px;
     overflow: hidden;
@@ -230,9 +268,7 @@ const { checkinCount } = useCheckinStore()
     white-space: nowrap;
   }
 
-  .main-content {
-    padding: 20px 16px;
-  }
+  .main-content { padding: 16px 14px; }
 }
 
 @media (max-width: 400px) {
@@ -240,8 +276,12 @@ const { checkinCount } = useCheckinStore()
     padding: 8px 10px;
     font-size: 12px;
   }
-  .nav-item .badge {
-    display: none;
-  }
+  /* 极窄屏：只保留图标 */
+  .nav-item .badge { display: none; }
+  .logo-text h1 { font-size: 15px; }
+  .logo-icon { width: 40px; height: 40px; }
+  .logo-icon .cross-h { width: 18px; height: 4px; }
+  .logo-icon .cross-v { width: 4px; height: 18px; }
 }
+
 </style>

@@ -204,6 +204,9 @@ const confirmDelete = () => {
   -webkit-text-fill-color: transparent;
   animation: titleShine 5s ease-in-out infinite;
   z-index: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.25;
 }
 
 @keyframes titleShine {
@@ -219,6 +222,8 @@ const confirmDelete = () => {
   max-width: 500px;
   position: relative;
   z-index: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .header-stats-card {
@@ -616,6 +621,8 @@ const confirmDelete = () => {
   font-weight: 700;
   line-height: 1.4;
   transition: color 0.3s ease;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .timeline-item:hover .card-location {
@@ -646,6 +653,8 @@ const confirmDelete = () => {
   gap: 8px;
   font-size: 13px;
   color: #7a8599;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .card-note {
@@ -692,6 +701,8 @@ const confirmDelete = () => {
   margin: 0;
   position: relative;
   z-index: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .card-footer {
@@ -836,25 +847,34 @@ const confirmDelete = () => {
     padding: 36px 24px;
     flex-direction: column;
     align-items: flex-start;
+    gap: 24px;
   }
-  .page-title { font-size: 28px; }
+  .page-title { font-size: 28px; line-height: 1.3; }
+  .page-desc { font-size: 14px; max-width: 100%; }
   .checkin-list { padding: 24px 20px; }
   .timeline-card { padding: 16px; }
-  .card-top { flex-direction: column; align-items: flex-start; }
+  .card-top { flex-direction: column; align-items: flex-start; gap: 10px; }
   .card-info { flex-direction: column; gap: 8px; }
-  .card-footer { flex-direction: column; gap: 12px; align-items: stretch; }
-  .delete-btn { width: 100%; }
+  .card-footer { flex-direction: column; gap: 12px; align-items: stretch; padding-top: 10px; }
+  .delete-btn { width: 100%; padding: 10px; }
   .timeline-dot { width: 34px; height: 34px; font-size: 13px; }
-  .timeline-left { width: 34px; }
+  .timeline-left { width: 34px; flex-shrink: 0; }
+  .card-location { font-size: 16px; }
+  .note-content { font-size: 13px; line-height: 1.7; }
+  .card-category { font-size: 11px; padding: 3px 10px; }
+  .view-detail { width: 100%; text-align: center; padding: 10px; background: rgba(211, 47, 47, 0.08); border-radius: 8px; }
 }
 
 @media (max-width: 480px) {
   .page-title { font-size: 24px; }
   .page-stats-card { padding: 16px 20px; }
-  .stats-number { font-size: 36px; }
-  .timeline-item { gap: 14px; }
-  .timeline-card { padding: 14px; }
+  .stats-number { font-size: 32px; }
+  .timeline-item { gap: 12px; }
+  .timeline-card { padding: 14px 12px; }
   .card-location { font-size: 15px; }
+  .info-row { font-size: 12px; }
+  .note-content { font-size: 12.5px; line-height: 1.7; }
+  .card-note { padding: 12px 14px; margin-bottom: 12px; }
   .confirm-box { padding: 28px 24px; }
   .confirm-actions { flex-direction: column; }
   .confirm-btn { width: 100%; text-align: center; }
@@ -865,7 +885,10 @@ const confirmDelete = () => {
   .checkin-list { padding: 20px 14px; }
   .timeline-left { width: 30px; flex-shrink: 0; }
   .timeline-dot { width: 30px; height: 30px; font-size: 12px; }
-  .timeline-card { padding: 12px 14px; }
+  .timeline-card { padding: 12px 12px; }
   .card-footer { padding-top: 10px; }
+  .card-location { font-size: 14.5px; }
+  .page-title { font-size: 22px; }
+  .page-desc { font-size: 13.5px; }
 }
 </style>

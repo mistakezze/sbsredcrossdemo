@@ -1008,6 +1008,9 @@ const clearAnswer = () => {
 .loc-info {
   flex: 1;
   min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .loc-name {
@@ -1016,6 +1019,9 @@ const clearAnswer = () => {
   margin: 0 0 8px 0;
   font-weight: 700;
   transition: color 0.3s ease;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.35;
 }
 
 .loc-card:hover .loc-name {
@@ -1031,6 +1037,9 @@ const clearAnswer = () => {
   color: #7a8599;
   margin-bottom: 12px;
   font-weight: 500;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.55;
 }
 
 .loc-desc {
@@ -1038,6 +1047,8 @@ const clearAnswer = () => {
   color: #5a6478;
   line-height: 1.8;
   margin: 0 0 16px 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .loc-tags {
@@ -1229,6 +1240,9 @@ const clearAnswer = () => {
   color: #1a2332;
   margin-bottom: 4px;
   transition: color 0.3s ease;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
 }
 
 .step-item:hover .step-name {
@@ -1242,6 +1256,8 @@ const clearAnswer = () => {
 .step-place {
   font-size: 12px;
   color: #7a8599;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .step-status {
@@ -1716,6 +1732,9 @@ const clearAnswer = () => {
   margin: 0 0 6px 0;
   font-weight: 700;
   transition: color 0.3s ease;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
 }
 
 .ai-step-item:hover .ai-step-name {
@@ -1728,6 +1747,8 @@ const clearAnswer = () => {
   font-weight: 600;
   margin-bottom: 10px;
   letter-spacing: 0.5px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .ai-step-desc {
@@ -1735,6 +1756,8 @@ const clearAnswer = () => {
   color: #5a6478;
   line-height: 1.8;
   margin: 0 0 14px 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* 通用区块样式 */
@@ -2366,107 +2389,202 @@ const clearAnswer = () => {
   .preset-questions { grid-template-columns: 1fr; }
 }
 
+/* 平板与手机 —— 核心适配 */
 @media (max-width: 768px) {
-  .page-title { font-size: 32px; }
-  .loc-card {
-    padding: 22px 20px;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .loc-number { width: 44px; height: 44px; font-size: 20px; }
-  .loc-icon { width: 60px; height: 60px; }
-  .cross-outer { width: 42px; height: 42px; }
-  .cross-h { width: 36px; height: 10px; }
-  .cross-v { width: 10px; height: 36px; }
-  .loc-name { font-size: 18px; }
-  .route-info { padding: 26px 20px; }
-  .modal-body { padding: 26px 24px; }
-  .modal-footer { padding: 20px 24px 28px; }
-  .modal-title { font-size: 22px; }
-  .ai-card { padding: 24px 20px; }
-  .ai-card-header { flex-direction: column; gap: 12px; align-items: flex-start; }
-  .tab-btn { padding: 10px 18px; font-size: 14px; }
-}
+  /* 页面标题 */
+  .page-title { font-size: 30px; letter-spacing: -0.5px; }
+  .page-subtitle { font-size: 14px; line-height: 1.65; }
 
-@media (max-width: 768px) {
-  .page-title { font-size: 32px; }
-  .page-subtitle { font-size: 14px; }
+  /* 地点卡片 —— 移动端关键修复
+     布局：[序号] [文字信息] 占满一行，状态单独在第二行
+     这样文字信息有最大宽度，不会被图标和状态挤压 */
   .loc-card {
-    padding: 20px 16px;
-    gap: 14px;
+    padding: 20px 18px;
+    gap: 12px;
+    row-gap: 12px;
     flex-wrap: wrap;
+    align-items: center;
+    border-radius: 18px;
   }
-  .loc-number { width: 40px; height: 40px; font-size: 18px; }
-  .loc-icon { width: 56px; height: 56px; }
-  .cross-outer { width: 40px; height: 40px; }
-  .cross-h { width: 34px; height: 9px; }
-  .cross-v { width: 9px; height: 34px; }
+
+  .loc-card::before {
+    width: 4px;
+  }
+
+  /* 序号缩小 */
+  .loc-number {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  /* 红十字图标 —— 平板保留，缩小 */
+  .loc-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .cross-outer { width: 34px; height: 34px; }
+  .cross-h { width: 28px; height: 8px; transform: translate(-50%, -50%); }
+  .cross-v { width: 8px; height: 28px; transform: translate(-50%, -50%); }
+
+  /* 文字信息区：占满剩余空间 */
+  .loc-info {
+    flex: 1;
+    min-width: 0;
+    min-width: 160px; /* 保证文字区至少有 160px 宽 */
+  }
+
   .loc-name { font-size: 17px; }
-  .loc-desc { font-size: 13px; margin-bottom: 12px; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+  .loc-meta { font-size: 12.5px; margin-bottom: 8px; }
+  .loc-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 10px;
+    -webkit-line-clamp: 3;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
   .loc-tags { gap: 6px; }
   .loc-tag { font-size: 11px; padding: 4px 10px; }
-  .loc-status { font-size: 12px; padding: 8px 14px; }
+
+  /* 状态标签：在手机上放到第二行，占满宽度 */
+  .loc-status {
+    width: 100%;
+    text-align: center;
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-top: 4px;
+  }
+
+  /* 路线说明区域 */
   .route-info { padding: 24px 16px; }
-  .step-item { padding: 14px 16px; gap: 12px; }
+
+  /* 步骤卡片 */
+  .step-item { padding: 14px 14px; gap: 12px; }
   .step-number { width: 32px; height: 32px; font-size: 14px; }
   .step-name { font-size: 14px; }
   .step-place { font-size: 12px; }
+
+  /* 弹窗 */
   .modal-body { padding: 24px 18px; }
   .modal-footer { padding: 18px 18px 24px; }
   .modal-title { font-size: 22px; }
+
+  /* AI 卡片 */
   .ai-card { padding: 20px 16px; }
   .ai-card-header { flex-direction: column; gap: 12px; align-items: flex-start; }
   .ai-title { font-size: 18px; }
-  .ai-subtitle { font-size: 13px; }
+  .ai-subtitle { font-size: 13px; line-height: 1.6; word-break: break-word; overflow-wrap: break-word; }
+
+  /* Tab 切换 */
   .tab-btn { padding: 10px 16px; font-size: 13px; }
   .tab-text { display: none; }
   .tabs-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .tabs { min-width: max-content; }
+
   /* AI 步骤卡片移动端 */
   .ai-step-item { padding: 18px 16px; gap: 14px; }
-  .ai-step-index { width: 38px; height: 38px; font-size: 18px; }
+  .ai-step-index { width: 38px; height: 38px; font-size: 18px; border-radius: 10px; }
   .ai-step-name { font-size: 15px; }
-  .ai-step-desc { font-size: 13px; }
+  .ai-step-desc { font-size: 13px; line-height: 1.75; }
+
+  /* 预设问题 */
   .preset-questions { grid-template-columns: 1fr; gap: 10px; }
   .preset-item { padding: 14px 16px; }
   .preset-label { font-size: 13px; }
   .preset-emoji { font-size: 22px; }
-  /* 交通区块移动端 */
+
+  /* 交通区块 */
   .transit-head { gap: 8px; }
   .transit-text { font-size: 12px; }
-  .transit-hint { flex-direction: column; gap: 4px; }
+  .transit-hint { flex-direction: column; gap: 4px; padding-left: 0; }
   .hint-arrow { display: none; }
-  /* 实用贴士/亮点列表缩小 */
-  .highlights-list li, .practical-list li { font-size: 12px; }
-  .item-value { font-size: 12px; }
+
+  /* 列表文字缩小 */
+  .highlights-list li, .practical-list li { font-size: 12.5px; line-height: 1.65; }
+  .item-value { font-size: 12.5px; word-break: break-word; overflow-wrap: break-word; }
 }
 
+/* 小手机 —— 更紧凑的布局 */
 @media (max-width: 480px) {
+  .page-title { font-size: 26px; }
+
+  /* 地点卡片：隐藏图标，给文字最大空间 */
+  .loc-card {
+    padding: 16px 14px;
+    gap: 10px;
+  }
+
+  .loc-icon {
+    display: none;
+  }
+
+  .loc-number {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+
+  .loc-info {
+    min-width: 0;
+  }
+
+  .loc-name { font-size: 16px; line-height: 1.4; }
+  .loc-meta { font-size: 12px; }
+  .loc-desc { font-size: 12.5px; line-height: 1.7; }
+
+  .loc-status {
+    font-size: 12.5px;
+    padding: 9px 12px;
+  }
+
+  /* Tab：两个按钮平分宽度 */
   .tabs { width: 100%; }
   .tab-btn { flex: 1; justify-content: center; padding: 12px 14px; }
   .tab-text { display: inline; }
   .tab-icon { display: none; }
-  .page-title { font-size: 26px; }
+
   /* 时间/门票、美食/拍照点 改为单列 */
-  .time-ticket-row { grid-template-columns: 1fr; }
-  .food-photo-row { grid-template-columns: 1fr; }
+  .time-ticket-row { grid-template-columns: 1fr; gap: 12px; }
+  .food-photo-row { grid-template-columns: 1fr; gap: 12px; }
+
   /* 自定义提问区 */
   .custom-ask-input { flex-direction: column; }
   .btn-ask-submit { width: 100%; min-width: unset; padding: 14px; }
   .ask-textarea { min-height: 80px; }
+
   /* 步骤列表改为单列 */
   .info-steps { grid-template-columns: 1fr; }
+
   /* 统计卡片 */
   .header-stats-card { min-width: unset; padding: 20px 28px; }
   .stats-number { font-size: 36px; }
+
+  /* AI 步骤 */
+  .ai-step-item { padding: 16px 14px; gap: 12px; }
+  .ai-step-index { width: 36px; height: 36px; font-size: 17px; }
+  .ai-step-meta { font-size: 11.5px; }
+  .ai-step-name { font-size: 14.5px; }
+  .ai-step-desc { font-size: 12.5px; }
 }
 
+/* 最小手机 —— 极限紧凑 */
 @media (max-width: 375px) {
-  .loc-card { padding: 16px 14px; }
-  .loc-icon { display: none; }
-  .loc-name { font-size: 16px; }
-  .loc-meta { font-size: 12px; }
   .page-title { font-size: 22px; }
-  .ai-step-item { padding: 16px 14px; }
+  .loc-card { padding: 14px 12px; gap: 10px; }
+  .loc-number { width: 32px; height: 32px; font-size: 14px; }
+  .loc-name { font-size: 15.5px; }
+  .loc-meta { font-size: 11.5px; }
+  .loc-desc { font-size: 12px; }
+  .ai-step-item { padding: 14px 12px; }
   .ai-step-meta { font-size: 11px; }
+  .step-item { padding: 12px; gap: 10px; }
+  .step-number { width: 30px; height: 30px; font-size: 13px; }
 }

@@ -323,6 +323,8 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   display: flex;
   flex-direction: column;
   gap: 8px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .title-main {
@@ -369,6 +371,8 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   line-height: 1.9;
   margin: 0 0 36px 0;
   animation: fadeInUp 1s ease-out 0.3s backwards;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 @keyframes fadeInUp {
@@ -584,6 +588,8 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   color: #1a2332;
   margin: 0 0 14px 0;
   font-weight: 800;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .title-text {
@@ -601,6 +607,9 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   font-size: 16px;
   color: #7a8599;
   margin: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.6;
 }
 
 /* ==============================
@@ -756,6 +765,8 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   margin: 0 0 4px 0;
   font-weight: 700;
   transition: color 0.3s ease;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .figure-card:hover .figure-name {
@@ -774,6 +785,8 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   color: var(--accent-color);
   margin: 0 0 12px 0;
   font-weight: 600;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .figure-desc {
@@ -781,6 +794,8 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   color: #5a6478;
   line-height: 1.75;
   margin: 0 0 14px 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .figure-achievement {
@@ -793,6 +808,9 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   margin-bottom: 12px;
   position: relative;
   overflow: hidden;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.6;
 }
 
 .figure-achievement::before {
@@ -821,6 +839,8 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   line-height: 1.7;
   opacity: 0.85;
   transition: opacity 0.3s ease;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .figure-card:hover .figure-quote {
@@ -1042,6 +1062,8 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   font-weight: 700;
   line-height: 1.4;
   transition: color 0.3s ease;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .location-card:hover .location-name {
@@ -1052,6 +1074,8 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   font-size: 13px;
   color: #7a8599;
   margin-bottom: 14px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .location-desc {
@@ -1059,6 +1083,8 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
   color: #5a6478;
   line-height: 1.8;
   margin: 0 0 18px 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .location-highlights {
@@ -1101,36 +1127,60 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
 
 @media (max-width: 640px) {
   .hero { padding: 40px 24px 60px; border-radius: 16px; }
-  .hero-title { font-size: 30px; }
+  .hero-content { max-width: 100%; }
+  .hero-title { font-size: 30px; line-height: 1.25; }
   .hero-subtitle { font-size: 24px; }
-  .hero-stats { padding: 18px 20px; gap: 14px; }
+  .hero-badge { font-size: 12px; padding: 8px 18px; letter-spacing: 1.5px; margin-bottom: 20px; }
+  .hero-stats { padding: 18px 20px; gap: 14px; margin-bottom: 24px; }
   .stat-number { font-size: 28px; }
   .stat-label { font-size: 12px; }
   .stat-divider { height: 32px; }
-  .hero-description { font-size: 15px; }
+  .hero-description { font-size: 15px; line-height: 1.8; margin-bottom: 28px; }
   .hero-actions { flex-direction: column; gap: 12px; }
-  .btn { width: 100%; justify-content: center; }
-  .section { padding: 40px 20px; }
-  .section-title { font-size: 28px; }
+  .btn { width: 100%; justify-content: center; padding: 14px 24px; font-size: 14px; }
+  .section { padding: 40px 20px; margin-bottom: 24px; }
+  .section-header { margin-bottom: 32px; }
+  .section-title { font-size: 28px; line-height: 1.3; }
+  .section-subtitle { font-size: 14px; }
+  .section-tag::before, .section-tag::after { display: none; }
   .figure-card {
     flex-direction: column;
-    padding: 28px 24px;
+    padding: 24px 20px;
     align-items: center;
     text-align: center;
+    gap: 18px;
   }
-  .figure-portrait { width: 100px; height: 100px; }
+  .figure-meta { justify-content: center; }
+  .figure-portrait { width: 90px; height: 90px; }
+  .figure-name { font-size: 20px; }
+  .figure-desc { font-size: 13.5px; }
   .locations-grid { grid-template-columns: 1fr; }
   .hero-glow-bg { display: none; }
   .particle:nth-child(n+7) { display: none; }
+  /* location card mobile text */
+  .location-body { padding: 20px 18px; }
+  .location-name { font-size: 17px; }
+  .location-desc { font-size: 13px; line-height: 1.7; }
 }
 
 @media (max-width: 375px) {
   .hero { padding: 32px 16px 48px; }
   .hero-title { font-size: 26px; }
   .hero-subtitle { font-size: 20px; }
-  .hero-badge { font-size: 12px; padding: 8px 18px; }
+  .hero-badge { font-size: 11px; padding: 7px 16px; }
+  .hero-description { font-size: 14px; }
   .hero-stats { padding: 16px; gap: 10px; }
   .stat-number { font-size: 24px; }
   .stat-divider { height: 28px; }
+  .section { padding: 32px 14px; }
+  .section-title { font-size: 24px; }
+  .section-subtitle { font-size: 13px; }
+  .figure-card { padding: 20px 16px; gap: 14px; }
+  .figure-portrait { width: 76px; height: 76px; }
+  .figure-name { font-size: 18px; }
+  .figure-desc { font-size: 13px; line-height: 1.7; }
+  .location-body { padding: 18px 16px; }
+  .location-name { font-size: 16px; }
+  .location-desc { font-size: 12.5px; }
 }
 </style>

@@ -16,6 +16,14 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+}
+
+@media (max-width: 480px) {
+  html { font-size: 14px; }
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -28,12 +36,28 @@ body {
   color: #1a2332;
   background: #f7f9fc;
   min-height: 100vh;
+  /* 移动端文字不挤压的关键：正常断词，中文按字 break */
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 全局让 flex 子项默认允许文字换行 */
+* {
+  box-sizing: border-box;
+}
+
+/* 移动端禁止横向滚动 */
+body {
+  overflow-x: hidden;
 }
 
 #app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -146,5 +170,20 @@ select {
 @media (min-width: 769px) {
   .show-mobile {
     display: none !important;
+  }
+}
+
+/* 移动端容器安全边距 */
+@media (max-width: 480px) {
+  body {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* 移动端卡片通用修复：确保文字能正常换行 */
+@media (max-width: 768px) {
+  p, h1, h2, h3, h4, h5, h6, span, li {
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 }
