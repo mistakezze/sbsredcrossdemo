@@ -11,92 +11,181 @@
       <button class="nf-btn" @click="goBack">返回</button>
     </div>
 
-    <div v-else class="detail-content">
-      <section class="hero-section" :style="{ '--accent-color': location?.color || '#d32f2f' }">
-        <div class="hero-content">
-          <span class="hero-category">{{ checkin.category }}</span>
-          <h1 class="hero-title">{{ checkin.locationName }}</h1>
-          <div class="hero-place">📍 {{ checkin.location }}</div>
-          <div class="hero-checkin-time">
-            <span class="checkin-badge">✓ 已打卡</span>
-            <span class="checkin-date">{{ checkin.checkinTime }}</span>
+    <template v-if="checkin && !isMobile">
+      <div class="detail-content">
+        <section class="hero-section" :style="{ '--accent-color': location?.color || '#d32f2f' }">
+          <div class="hero-content">
+            <span class="hero-category">{{ checkin.category }}</span>
+            <h1 class="hero-title">{{ checkin.locationName }}</h1>
+            <div class="hero-place">📍 {{ checkin.location }}</div>
+            <div class="hero-checkin-time">
+              <span class="checkin-badge">✓ 已打卡</span>
+              <span class="checkin-date">{{ checkin.checkinTime }}</span>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section v-if="location" class="info-section">
-        <h2 class="section-title">📖 地点介绍</h2>
-        <p class="section-text">{{ location.description }}</p>
-      </section>
+        <section v-if="location" class="info-section">
+          <h2 class="section-title">📖 地点介绍</h2>
+          <p class="section-text">{{ location.description }}</p>
+        </section>
 
-      <section v-if="location" class="info-section">
-        <h2 class="section-title">📜 历史背景</h2>
-        <p class="section-text">{{ location.history }}</p>
-      </section>
+        <section v-if="location" class="info-section">
+          <h2 class="section-title">📜 历史背景</h2>
+          <p class="section-text">{{ location.history }}</p>
+        </section>
 
-      <section v-if="location" class="info-section">
-        <h2 class="section-title">✨ 推荐看点</h2>
-        <ul class="highlights">
-          <li v-for="(h, i) in location.highlights" :key="i">
-            <span class="highlight-marker">{{ i + 1 }}</span>
-            <span class="highlight-text">{{ h }}</span>
-          </li>
-        </ul>
-      </section>
+        <section v-if="location" class="info-section">
+          <h2 class="section-title">✨ 推荐看点</h2>
+          <ul class="highlights">
+            <li v-for="(h, i) in location.highlights" :key="i">
+              <span class="highlight-marker">{{ i + 1 }}</span>
+              <span class="highlight-text">{{ h }}</span>
+            </li>
+          </ul>
+        </section>
 
-      <section class="note-section">
-        <div class="note-header">
-          <h2 class="section-title">✍️ 我的备注</h2>
-          <button
-            v-if="!isEditing"
-            class="edit-btn"
-            @click="startEdit"
-          >
-            编辑
-          </button>
-        </div>
-
-        <div v-if="!isEditing" class="note-display">
-          <p v-if="checkin.note" class="note-text">{{ checkin.note }}</p>
-          <p v-else class="note-empty">暂无备注，点击「编辑」添加您的感受。</p>
-        </div>
-
-        <div v-else class="note-editor">
-          <textarea
-            v-model="editNote"
-            class="note-input"
-            rows="4"
-            placeholder="记录您的感受或参观体验..."
-          ></textarea>
-          <div class="note-actions">
-            <button class="note-btn cancel" @click="cancelEdit">取消</button>
-            <button class="note-btn save" @click="saveNote">保存</button>
+        <section class="note-section">
+          <div class="note-header">
+            <h2 class="section-title">✍️ 我的备注</h2>
+            <button
+              v-if="!isEditing"
+              class="edit-btn"
+              @click="startEdit"
+            >
+              编辑
+            </button>
           </div>
-        </div>
-      </section>
 
-      <section class="info-section">
-        <h2 class="section-title">📋 打卡信息</h2>
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="info-label">地点名称</span>
-            <span class="info-value">{{ checkin.locationName }}</span>
+          <div v-if="!isEditing" class="note-display">
+            <p v-if="checkin.note" class="note-text">{{ checkin.note }}</p>
+            <p v-else class="note-empty">暂无备注，点击「编辑」添加您的感受。</p>
           </div>
-          <div class="info-item">
-            <span class="info-label">所在位置</span>
-            <span class="info-value">{{ checkin.location }}</span>
+
+          <div v-else class="note-editor">
+            <textarea
+              v-model="editNote"
+              class="note-input"
+              rows="4"
+              placeholder="记录您的感受或参观体验..."
+            ></textarea>
+            <div class="note-actions">
+              <button class="note-btn cancel" @click="cancelEdit">取消</button>
+              <button class="note-btn save" @click="saveNote">保存</button>
+            </div>
           </div>
-          <div class="info-item">
-            <span class="info-label">打卡时间</span>
-            <span class="info-value">{{ checkin.checkinTime }}</span>
+        </section>
+
+        <section class="info-section">
+          <h2 class="section-title">📋 打卡信息</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">地点名称</span>
+              <span class="info-value">{{ checkin.locationName }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">所在位置</span>
+              <span class="info-value">{{ checkin.location }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">打卡时间</span>
+              <span class="info-value">{{ checkin.checkinTime }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">记录 ID</span>
+              <span class="info-value">#{{ checkin.id }}</span>
+            </div>
           </div>
-          <div class="info-item">
-            <span class="info-label">记录 ID</span>
-            <span class="info-value">#{{ checkin.id }}</span>
+        </section>
+      </div>
+    </template>
+
+    <template v-if="checkin && isMobile">
+      <div class="mobile-content">
+        <section class="m-hero-section" :style="{ '--accent-color': location?.color || '#d32f2f' }">
+          <span class="m-hero-category">{{ checkin.category }}</span>
+          <h1 class="m-hero-title">{{ checkin.locationName }}</h1>
+          <div class="m-hero-place">📍 {{ checkin.location }}</div>
+          <div class="m-hero-checkin-time">
+            <span class="m-checkin-badge">✓ 已打卡</span>
+            <span class="m-checkin-date">{{ checkin.checkinTime }}</span>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+
+        <section v-if="location" class="m-info-section">
+          <h2 class="m-section-title">📖 地点介绍</h2>
+          <p class="m-section-text">{{ location.description }}</p>
+        </section>
+
+        <section v-if="location" class="m-info-section">
+          <h2 class="m-section-title">📜 历史背景</h2>
+          <p class="m-section-text">{{ location.history }}</p>
+        </section>
+
+        <section v-if="location" class="m-info-section">
+          <h2 class="m-section-title">✨ 推荐看点</h2>
+          <ul class="m-highlights">
+            <li v-for="(h, i) in location.highlights" :key="i">
+              <span class="m-highlight-marker">{{ i + 1 }}</span>
+              <span class="m-highlight-text">{{ h }}</span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="m-note-section">
+          <div class="m-note-header">
+            <h2 class="m-section-title">✍️ 我的备注</h2>
+            <button
+              v-if="!isEditing"
+              class="m-edit-btn"
+              @click="startEdit"
+            >
+              编辑
+            </button>
+          </div>
+
+          <div v-if="!isEditing" class="m-note-display">
+            <p v-if="checkin.note" class="m-note-text">{{ checkin.note }}</p>
+            <p v-else class="m-note-empty">暂无备注，点击「编辑」添加您的感受。</p>
+          </div>
+
+          <div v-else class="m-note-editor">
+            <textarea
+              v-model="editNote"
+              class="m-note-input"
+              rows="4"
+              placeholder="记录您的感受或参观体验..."
+            ></textarea>
+            <div class="m-note-actions">
+              <button class="m-note-btn cancel" @click="cancelEdit">取消</button>
+              <button class="m-note-btn save" @click="saveNote">保存</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="m-info-section">
+          <h2 class="m-section-title">📋 打卡信息</h2>
+          <div class="m-info-grid">
+            <div class="m-info-item">
+              <span class="m-info-label">地点名称</span>
+              <span class="m-info-value">{{ checkin.locationName }}</span>
+            </div>
+            <div class="m-info-item">
+              <span class="m-info-label">所在位置</span>
+              <span class="m-info-value">{{ checkin.location }}</span>
+            </div>
+            <div class="m-info-item">
+              <span class="m-info-label">打卡时间</span>
+              <span class="m-info-value">{{ checkin.checkinTime }}</span>
+            </div>
+            <div class="m-info-item">
+              <span class="m-info-label">记录 ID</span>
+              <span class="m-info-value">#{{ checkin.id }}</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -105,9 +194,12 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCheckinStore } from '../stores/checkinStore'
 import { useLocationStore } from '../stores/locationStore'
+import { useViewport } from '../composables/useViewport'
 
 const route = useRoute()
 const router = useRouter()
+
+const { isMobile } = useViewport()
 
 const { checkins, getCheckinById, updateNote } = useCheckinStore()
 const { locations } = useLocationStore()
@@ -199,19 +291,21 @@ const saveNote = () => {
 @keyframes iconShake {
   0%, 100% { transform: rotate(0deg); }
   25% { transform: rotate(-5deg); }
-  75% { transform: rotate(5deg); }
+  72% { transform: rotate(5deg); }
 }
 
 .not-found h2 {
   font-size: 22px;
   color: #1a2332;
   margin: 0 0 12px 0;
+  word-break: break-word;
 }
 
 .not-found p {
   font-size: 14px;
   color: #5a6478;
   margin: 0 0 28px 0;
+  word-break: break-word;
 }
 
 .nf-btn {
@@ -251,9 +345,11 @@ const saveNote = () => {
   box-shadow: 0 8px 20px rgba(211, 47, 47, 0.4);
 }
 
-/* ==============================
-   Hero 区块 - 渐变光效动画
-   ============================== */
+/* =========================================
+   PC 端样式
+   ========================================= */
+
+/* Hero 区块 */
 .hero-section {
   background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
   border-radius: 24px;
@@ -391,9 +487,7 @@ const saveNote = () => {
   font-weight: 500;
 }
 
-/* ==============================
-   Info 区块 - 入场与悬浮光效
-   ============================== */
+/* Info 区块 */
 .info-section {
   background: white;
   border-radius: 20px;
@@ -524,9 +618,7 @@ const saveNote = () => {
   overflow-wrap: break-word;
 }
 
-/* ==============================
-   Note 备注区块 - 金色流光
-   ============================== */
+/* Note 备注区块 */
 .note-section {
   background: linear-gradient(135deg, #fff8e1, #ffe9d9);
   border-radius: 20px;
@@ -676,9 +768,7 @@ const saveNote = () => {
   box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
 }
 
-/* ==============================
-   打卡信息网格 - 卡片悬浮
-   ============================== */
+/* 打卡信息网格 */
 .info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -722,50 +812,393 @@ const saveNote = () => {
   overflow-wrap: break-word;
 }
 
-@media (max-width: 768px) {
-  .hero-section { padding: 32px 20px; }
-  .hero-title { font-size: 26px; line-height: 1.3; }
-  .hero-place { font-size: 14px; margin-bottom: 16px; }
-  .hero-checkin-time { gap: 10px; }
-  .info-section { padding: 22px 18px; }
-  .note-section { padding: 22px 18px; }
-  .info-grid { grid-template-columns: 1fr; gap: 12px; }
-  .note-actions { flex-direction: column; gap: 10px; }
-  .note-btn { width: 100%; text-align: center; padding: 12px; }
-  .section-text { font-size: 14px; line-height: 1.8; }
-  .highlight-text { font-size: 14px; line-height: 1.7; }
-  .note-text { font-size: 14px; line-height: 1.75; }
-  .checkin-date { font-size: 13px; }
+/* =========================================
+   移动端样式
+   ========================================= */
+
+.mobile-content {
+  animation: pageFadeIn 0.6s ease-out;
+}
+
+.m-hero-section {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+  border-radius: 16px;
+  padding: 20px 16px;
+  margin-bottom: 16px;
+  border-left: 4px solid var(--accent-color);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(26, 35, 50, 0.05);
+}
+
+.m-hero-category {
+  display: inline-block;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, var(--accent-color), #ff7043);
+  color: white;
+  border-radius: 8px;
+  font-size: clamp(10px, 2.5vw, 12px);
+  font-weight: 600;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+  word-break: break-word;
+}
+
+.m-hero-title {
+  font-size: clamp(18px, 5vw, 24px);
+  color: #1a2332;
+  margin: 0 0 10px 0;
+  font-weight: 800;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.m-hero-place {
+  font-size: clamp(12px, 3vw, 14px);
+  color: #5a6478;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.m-hero-checkin-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.m-checkin-badge {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: clamp(10px, 2.5vw, 12px);
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.25);
+}
+
+.m-checkin-date {
+  font-size: clamp(11px, 2.8vw, 13px);
+  color: #7a8599;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+/* 移动端 info 区块 */
+.m-info-section {
+  background: white;
+  border-radius: 14px;
+  padding: 16px 14px;
+  box-shadow: 0 2px 10px rgba(26, 35, 50, 0.05);
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.m-section-title {
+  font-size: clamp(12px, 3.5vw, 15px);
+  color: #1a2332;
+  margin: 0 0 10px 0;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.m-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 28px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-color, #d32f2f), #ff7043);
+  border-radius: 2px;
+}
+
+.m-section-text {
+  font-size: clamp(12px, 3vw, 14px);
+  color: #5a6478;
+  line-height: 1.75;
+  margin: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.m-highlights {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.m-highlights li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f2f5;
+  position: relative;
+}
+
+.m-highlights li:last-child {
+  border-bottom: none;
+}
+
+.m-highlight-marker {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--accent-color, #d32f2f), #ff7043);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(10px, 2.5vw, 11px);
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(211, 47, 47, 0.2);
+}
+
+.m-highlight-text {
+  font-size: clamp(12px, 3vw, 14px);
+  color: #5a6478;
+  line-height: 1.65;
+  padding-top: 2px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 移动端 Note 区块 */
+.m-note-section {
+  background: linear-gradient(135deg, #fff8e1, #ffe9d9);
+  border-radius: 14px;
+  padding: 16px 14px;
+  margin-bottom: 12px;
+  border-left: 4px solid #ff9800;
+  position: relative;
+  overflow: hidden;
+}
+
+.m-note-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.m-edit-btn {
+  background: white;
+  border: 1.5px solid #ff9800;
+  color: #ff9800;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: clamp(11px, 2.8vw, 13px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(255, 152, 0, 0.15);
+}
+
+.m-edit-btn:active {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
+  transform: scale(0.97);
+  box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
+}
+
+.m-note-display {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  padding: 14px 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.m-note-text {
+  font-size: clamp(12px, 3vw, 14px);
+  color: #5d4e00;
+  line-height: 1.75;
+  margin: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.m-note-empty {
+  font-size: clamp(12px, 3vw, 13px);
+  color: #8a6d00;
+  font-style: italic;
+  margin: 0;
+}
+
+.m-note-editor {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  padding: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.m-note-input {
+  width: 100%;
+  border: 1.5px solid #ffcc80;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: clamp(13px, 3.3vw, 15px);
+  color: #1a2332;
+  font-family: inherit;
+  resize: vertical;
+  background: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+  line-height: 1.65;
+  margin-bottom: 10px;
+  min-height: 80px;
+}
+
+.m-note-input:focus {
+  outline: none;
+  border-color: #ff9800;
+  box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.15);
+}
+
+.m-note-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.m-note-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: clamp(13px, 3.3vw, 15px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.m-note-btn.cancel {
+  background: white;
+  color: #7a8599;
+  border: 1.5px solid #e5e9ef;
+}
+
+.m-note-btn.cancel:active {
+  background: #f5f5f5;
+  transform: scale(0.97);
+}
+
+.m-note-btn.save {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
+  box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
+}
+
+.m-note-btn.save:active {
+  transform: scale(0.97);
+  box-shadow: 0 5px 14px rgba(255, 152, 0, 0.4);
+}
+
+/* 移动端打卡信息网格 */
+.m-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.m-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #fafbfc, #f5f7fa);
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.m-info-item:active {
+  border-color: var(--accent-color, #d32f2f);
+  background: linear-gradient(135deg, #fff8f8, #ffffff);
+  transform: scale(0.99);
+}
+
+.m-info-label {
+  font-size: clamp(10px, 2.5vw, 11px);
+  color: #7a8599;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.m-info-value {
+  font-size: clamp(13px, 3.3vw, 15px);
+  color: #1a2332;
+  font-weight: 600;
+  line-height: 1.5;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* =========================================
+   未找到记录的小屏适配
+   ========================================= */
+
+@media (max-width: 600px) {
+  .checkin-detail {
+    padding: 14px 12px;
+    max-width: 100%;
+  }
+
+  .back-btn {
+    padding: 8px 14px;
+    font-size: clamp(12px, 3vw, 13px);
+    margin-bottom: 16px;
+    border-radius: 8px;
+  }
+
+  .not-found {
+    padding: 40px 20px;
+    border-radius: 16px;
+  }
+
+  .nf-icon {
+    font-size: 48px;
+  }
+
+  .not-found h2 {
+    font-size: clamp(16px, 4.5vw, 20px);
+  }
+
+  .not-found p {
+    font-size: clamp(12px, 3vw, 14px);
+    margin-bottom: 20px;
+  }
+
+  .nf-btn {
+    padding: 12px 28px;
+    font-size: clamp(13px, 3.3vw, 15px);
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
-  .hero-section { padding: 24px 16px; border-radius: 16px; }
-  .hero-title { font-size: 22px; }
-  .hero-category { font-size: 11px; padding: 6px 14px; }
-  .hero-place { font-size: 14px; }
-  .checkin-badge { font-size: 11px; padding: 6px 14px; }
-  .checkin-date { font-size: 13px; }
-  .back-btn { padding: 8px 16px; font-size: 13px; margin-bottom: 18px; }
-  .info-section { padding: 18px 16px; }
-  .note-section { padding: 18px 16px; }
-  .section-title { font-size: 16px; }
-  .section-text { font-size: 14px; line-height: 1.75; }
-  .highlight-text { font-size: 13.5px; }
-  .highlight-marker { width: 28px; height: 28px; font-size: 11px; }
-  .info-value { font-size: 14px; }
-  .info-item { padding: 14px 16px; }
-  .note-input { font-size: 14px; min-height: 80px; }
-  .note-text { font-size: 13.5px; line-height: 1.75; }
+  .m-info-grid {
+    grid-template-columns: 1fr;
+  }
 }
-
-@media (max-width: 375px) {
-  .hero-section { padding: 20px 14px; }
-  .hero-title { font-size: 20px; }
-  .info-item { padding: 14px 14px; }
-  .info-value { font-size: 14px; }
-  .info-label { font-size: 10px; letter-spacing: 1px; }
-  .section-text { font-size: 13.5px; }
-  .note-text { font-size: 13px; }
-}
-
 </style>

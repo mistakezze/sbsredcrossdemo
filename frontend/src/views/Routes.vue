@@ -1,281 +1,471 @@
 <template>
   <div class="routes-page">
-    <!-- 页面头部 -->
-    <div class="page-header">
-      <div class="page-badge">路线推荐</div>
-      <h1 class="page-title">上海红十字地点游览路线</h1>
-      <p class="page-subtitle">从博物馆到救灾中心，从医疗机构到国际代表处，循着先驱者的足迹，探索上海这座红十字之城。</p>
-    </div>
-
     <!-- ==============================
-         Tab 切换：固定推荐 / AI推荐
+         PC 端模板
          ============================== -->
-    <div class="tabs-wrap">
-      <div class="tabs">
-        <button
-          class="tab-btn"
-          :class="{ active: currentTab === 'fixed' }"
-          @click="switchTab('fixed')"
-        >
-          <span class="tab-icon">📋</span>
-          <span class="tab-text">固定路线推荐</span>
-        </button>
-        <button
-          class="tab-btn"
-          :class="{ active: currentTab === 'ai' }"
-          @click="switchTab('ai')"
-        >
-          <span class="tab-icon">✨</span>
-          <span class="tab-text">AI 智能推荐</span>
-        </button>
+    <template v-if="!isMobile">
+      <!-- 页面头部 -->
+      <div class="pc-page-header">
+        <div class="pc-page-badge">路线推荐</div>
+        <h1 class="pc-page-title">上海红十字地点游览路线</h1>
+        <p class="pc-page-subtitle">从博物馆到救灾中心，从医疗机构到国际代表处，循着先驱者的足迹，探索上海这座红十字之城。</p>
       </div>
-    </div>
 
-    <!-- ==============================
-         Tab 1：固定路线推荐（保留原逻辑）
-         ============================== -->
-    <div v-if="currentTab === 'fixed'" class="tab-content tab-fixed">
-      <div class="locations-list">
-        <div
-          v-for="(loc, index) in sortedLocations"
-          :key="loc.id"
-          class="loc-card"
-          :class="{ 'loc-checked': hasCheckedIn(loc.id) }"
-          @click="openModal(loc)"
-        >
-          <div class="loc-number">{{ index + 1 }}</div>
-          <div class="loc-icon">
-            <div class="cross-outer">
-              <div class="cross-h"></div>
-              <div class="cross-v"></div>
-            </div>
-          </div>
-          <div class="loc-info">
-            <h3 class="loc-name">{{ loc.name }}</h3>
-            <div class="loc-meta">{{ loc.location }} · {{ loc.category }}</div>
-            <p class="loc-desc">{{ loc.description }}</p>
-            <div class="loc-tags">
-              <span v-for="tag in loc.highlights" :key="tag" class="loc-tag">{{ tag }}</span>
-            </div>
-          </div>
-          <div class="loc-status">
-            <span v-if="hasCheckedIn(loc.id)" class="status-done">✓ 已打卡</span>
-            <span v-else class="status-todo">点击打卡 →</span>
-          </div>
+      <!-- Tab 切换 -->
+      <div class="pc-tabs-wrap">
+        <div class="pc-tabs">
+          <button
+            class="pc-tab-btn"
+            :class="{ active: currentTab === 'fixed' }"
+            @click="switchTab('fixed')"
+          >
+            <span class="pc-tab-icon">📋</span>
+            <span class="pc-tab-text">固定路线推荐</span>
+          </button>
+          <button
+            class="pc-tab-btn"
+            :class="{ active: currentTab === 'ai' }"
+            @click="switchTab('ai')"
+          >
+            <span class="pc-tab-icon">✨</span>
+            <span class="pc-tab-text">AI 智能推荐</span>
+          </button>
         </div>
       </div>
 
-      <!-- 路线说明 -->
-      <div class="route-info">
-        <div class="info-title">📋 推荐游览顺序</div>
-        <div class="info-steps">
+      <!-- Tab 1：固定路线推荐 -->
+      <div v-if="currentTab === 'fixed'" class="pc-tab-content">
+        <div class="pc-locations-list">
           <div
             v-for="(loc, index) in sortedLocations"
             :key="loc.id"
-            class="step-item"
-            :class="{ 'step-checked': hasCheckedIn(loc.id) }"
+            class="pc-loc-card"
+            :class="{ 'pc-loc-checked': hasCheckedIn(loc.id) }"
             @click="openModal(loc)"
           >
-            <div class="step-number" :style="{ background: hasCheckedIn(loc.id) ? '#4caf50' : '#d32f2f' }">{{ index + 1 }}</div>
-            <div class="step-content">
-              <div class="step-name">{{ loc.name }}</div>
-              <div class="step-place">{{ loc.location }} · {{ loc.category }}</div>
+            <div class="pc-loc-number">{{ index + 1 }}</div>
+            <div class="pc-loc-icon">
+              <div class="pc-cross-outer">
+                <div class="pc-cross-h"></div>
+                <div class="pc-cross-v"></div>
+              </div>
             </div>
-            <div class="step-status">{{ hasCheckedIn(loc.id) ? '✓ 已打卡' : '点击打卡' }}</div>
+            <div class="pc-loc-info">
+              <h3 class="pc-loc-name">{{ loc.name }}</h3>
+              <div class="pc-loc-meta">{{ loc.location }} · {{ loc.category }}</div>
+              <p class="pc-loc-desc">{{ loc.description }}</p>
+              <div class="pc-loc-tags">
+                <span v-for="tag in loc.highlights" :key="tag" class="pc-loc-tag">{{ tag }}</span>
+              </div>
+            </div>
+            <div class="pc-loc-status">
+              <span v-if="hasCheckedIn(loc.id)" class="pc-status-done">✓ 已打卡</span>
+              <span v-else class="pc-status-todo">点击打卡 →</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 路线说明 -->
+        <div class="pc-route-info">
+          <div class="pc-info-title">📋 推荐游览顺序</div>
+          <div class="pc-info-steps">
+            <div
+              v-for="(loc, index) in sortedLocations"
+              :key="loc.id"
+              class="pc-step-item"
+              :class="{ 'pc-step-checked': hasCheckedIn(loc.id) }"
+              @click="openModal(loc)"
+            >
+              <div class="pc-step-number" :style="{ background: hasCheckedIn(loc.id) ? '#4caf50' : '#d32f2f' }">{{ index + 1 }}</div>
+              <div class="pc-step-content">
+                <div class="pc-step-name">{{ loc.name }}</div>
+                <div class="pc-step-place">{{ loc.location }} · {{ loc.category }}</div>
+              </div>
+              <div class="pc-step-status">{{ hasCheckedIn(loc.id) ? '✓ 已打卡' : '点击打卡' }}</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- Tab 2：AI 智能推荐 -->
+      <div v-if="currentTab === 'ai'" class="pc-tab-content">
+        <!-- 预设问题区域 -->
+        <div class="pc-ai-card pc-ai-question-card">
+          <div class="pc-ai-card-header">
+            <div class="pc-ai-icon">🤖</div>
+            <div class="pc-ai-header-text">
+              <h3 class="pc-ai-title">选择你感兴趣的方向</h3>
+              <p class="pc-ai-subtitle">从下方预设问题中选一个，AI 将为你智能生成个性化游览路线</p>
+            </div>
+          </div>
+
+          <div class="pc-preset-questions">
+            <div
+              v-for="(q, idx) in presetQuestions"
+              :key="idx"
+              class="pc-preset-item"
+              :class="{ selected: selectedQuestion === q.label, loading: aiLoading && selectedQuestion === q.label }"
+              @click="selectAndAsk(q)"
+            >
+              <span class="pc-preset-emoji">{{ q.emoji }}</span>
+              <span class="pc-preset-label">{{ q.label }}</span>
+              <span v-if="aiLoading && selectedQuestion === q.label" class="pc-preset-spinner"></span>
+            </div>
+          </div>
+
+          <!-- 自定义提问区 -->
+          <div class="pc-custom-ask">
+            <div class="pc-custom-ask-label">
+              <span class="pc-ask-emoji">💬</span>
+              <span>或直接描述您的需求，AI 将为您量身规划</span>
+            </div>
+            <div class="pc-custom-ask-input">
+              <textarea
+                v-model="customQuestion"
+                class="pc-ask-textarea"
+                rows="2"
+                placeholder="例如：我上午 9 点从虹桥火车站出发，想在下午 3 点前游览 3 个最有故事感的红十字地点，帮忙安排路线和交通"
+                @keydown.enter.ctrl="submitCustom"
+              ></textarea>
+              <button
+                class="pc-btn-ask-submit"
+                :disabled="aiLoading || !customQuestion.trim()"
+                @click="submitCustom"
+              >
+                <span v-if="aiLoading && isCustomAsk" class="pc-submit-spinner"></span>
+                <span v-else class="pc-submit-arrow">➤</span>
+                <span class="pc-submit-text">{{ aiLoading && isCustomAsk ? '生成中...' : '生成路线' }}</span>
+              </button>
+            </div>
+            <div class="pc-custom-ask-tip">
+              小提示：Ctrl + Enter 快捷提交 · 可告诉 AI 您的起点、时间、兴趣偏好等
+            </div>
+          </div>
+        </div>
+
+        <!-- AI 回答结果区域 -->
+        <div v-if="aiAnswer" class="pc-ai-card pc-ai-result-card">
+          <div class="pc-ai-result-header">
+            <span class="pc-result-badge">✨ AI 推荐路线</span>
+            <button class="pc-btn-refresh" @click="clearAnswer">清空重新生成</button>
+          </div>
+
+          <div class="pc-ai-result-question">
+            <span class="pc-q-label">您的问题：</span>
+            <span class="pc-q-text">{{ aiAnswer.question }}</span>
+          </div>
+
+          <div class="pc-ai-disclaimer">
+            <span class="pc-disclaimer-icon">⚠️</span>
+            <span class="pc-disclaimer-text">路线中的交通方式由 AI 基于地点所在行政区推断生成，仅作游览参考。实际出行请以地图导航（高德/百度地图）提供的实时线路为准。</span>
+          </div>
+
+          <div v-if="aiAnswer.steps && aiAnswer.steps.length > 0" class="pc-ai-steps">
+            <div
+              v-for="(step, idx) in aiAnswer.steps"
+              :key="idx"
+              class="pc-ai-step-item"
+            >
+              <div class="pc-ai-step-index">{{ idx + 1 }}</div>
+              <div class="pc-ai-step-content">
+                <h4 class="pc-ai-step-name">{{ step.name }}</h4>
+                <div class="pc-ai-step-meta">{{ step.meta }}</div>
+                <p class="pc-ai-step-desc">{{ step.desc }}</p>
+
+                <div v-if="step.history" class="pc-ai-step-section pc-history-section">
+                  <div class="pc-section-label">📜 历史故事</div>
+                  <p class="pc-section-text">{{ step.history }}</p>
+                </div>
+
+                <div v-if="step.highlights && step.highlights.length > 0" class="pc-ai-step-section pc-highlights-section">
+                  <div class="pc-section-label">⭐ 参观亮点</div>
+                  <ul class="pc-highlights-list">
+                    <li v-for="(h, hi) in step.highlights" :key="hi">{{ h }}</li>
+                  </ul>
+                </div>
+
+                <div class="pc-time-ticket-row">
+                  <div v-if="step.best_time || step.bestTime" class="pc-time-ticket-item">
+                    <span class="pc-item-icon">🕐</span>
+                    <div class="pc-item-content">
+                      <div class="pc-item-label">最佳时间</div>
+                      <div class="pc-item-value">{{ step.best_time || step.bestTime }}</div>
+                    </div>
+                  </div>
+                  <div v-if="step.ticket" class="pc-time-ticket-item">
+                    <span class="pc-item-icon">🎟️</span>
+                    <div class="pc-item-content">
+                      <div class="pc-item-label">门票预约</div>
+                      <div class="pc-item-value">{{ step.ticket }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pc-food-photo-row">
+                  <div v-if="step.nearby_food || step.nearbyFood" class="pc-food-photo-item pc-food-item">
+                    <span class="pc-item-icon">🍜</span>
+                    <div class="pc-item-content">
+                      <div class="pc-item-label">附近餐饮</div>
+                      <div class="pc-item-value">{{ step.nearby_food || step.nearbyFood }}</div>
+                    </div>
+                  </div>
+                  <div v-if="step.photo_spots && step.photo_spots.length > 0" class="pc-food-photo-item pc-photo-item">
+                    <span class="pc-item-icon">📷</span>
+                    <div class="pc-item-content">
+                      <div class="pc-item-label">拍照打卡点</div>
+                      <div class="pc-item-value">{{ step.photo_spots.join('、') }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="step.practical_tips && step.practical_tips.length > 0" class="pc-ai-step-section pc-practical-section">
+                  <div class="pc-section-label">💡 实用贴士</div>
+                  <ul class="pc-practical-list">
+                    <li v-for="(pt, pti) in step.practical_tips" :key="pti">{{ pt }}</li>
+                  </ul>
+                </div>
+
+                <div v-if="step.tips" class="pc-ai-step-tips">
+                  <span v-for="(tip, ti) in step.tips" :key="ti" class="pc-step-chip">{{ tip }}</span>
+                </div>
+
+                <div v-if="step.transit" class="pc-ai-step-transit">
+                  <div class="pc-transit-head">
+                    <span class="pc-transit-icon" :class="`pc-mode-${step.transit.mode}`">
+                      {{ modeIcon(step.transit.mode) }}
+                    </span>
+                    <span class="pc-transit-label">🚗 交通路线</span>
+                    <span class="pc-transit-text">{{ step.transit.from_prev || step.transit.fromPrev }}</span>
+                  </div>
+                  <div v-if="step.transit.route_hint || step.transit.routeHint" class="pc-transit-hint">
+                    <span class="pc-hint-arrow">→</span>
+                    <span class="pc-hint-text">{{ step.transit.route_hint || step.transit.routeHint }}</span>
+                  </div>
+                  <div v-if="step.transit.cost || step.transit.duration" class="pc-transit-meta">
+                    <span v-if="step.transit.duration" class="pc-transit-meta-item">⏱️ {{ step.transit.duration }}</span>
+                    <span v-if="step.transit.cost" class="pc-transit-meta-item">💰 {{ step.transit.cost }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="pc-ai-raw-content">
+            <p class="pc-ai-raw-text">{{ aiAnswer.raw }}</p>
+          </div>
+
+          <div v-if="aiAnswer.summary" class="pc-ai-summary">
+            <div class="pc-summary-title">📝 路线要点</div>
+            <ul class="pc-summary-list">
+              <li v-for="(s, i) in aiAnswer.summary" :key="i">{{ s }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </template>
 
     <!-- ==============================
-         Tab 2：AI 智能推荐
+         移动端模板
          ============================== -->
-    <div v-else-if="currentTab === 'ai'" class="tab-content tab-ai">
+    <template v-else>
+      <!-- 页面头部（紧凑） -->
+      <div class="mobile-page-header">
+        <div class="mobile-page-badge">路线推荐</div>
+        <h1 class="mobile-page-title">上海红十字地点游览路线</h1>
+        <p class="mobile-page-subtitle">从博物馆到救灾中心，循着先驱者的足迹探索红十字之城。</p>
+      </div>
 
-      <!-- 预设问题区域 -->
-      <div class="ai-card ai-question-card">
-        <div class="ai-card-header">
-          <div class="ai-icon">🤖</div>
-          <div class="ai-header-text">
-            <h3 class="ai-title">选择你感兴趣的方向</h3>
-            <p class="ai-subtitle">从下方预设问题中选一个，AI 将为你智能生成个性化游览路线</p>
-          </div>
-        </div>
-
-        <div class="preset-questions">
-          <div
-            v-for="(q, idx) in presetQuestions"
-            :key="idx"
-            class="preset-item"
-            :class="{ selected: selectedQuestion === q.label, loading: aiLoading && selectedQuestion === q.label }"
-            @click="selectAndAsk(q)"
+      <!-- Tab 切换（全宽度按钮样式） -->
+      <div class="mobile-tabs-wrap">
+        <div class="mobile-tabs">
+          <button
+            class="mobile-tab-btn"
+            :class="{ active: currentTab === 'fixed' }"
+            @click="switchTab('fixed')"
           >
-            <span class="preset-emoji">{{ q.emoji }}</span>
-            <span class="preset-label">{{ q.label }}</span>
-            <span v-if="aiLoading && selectedQuestion === q.label" class="preset-spinner"></span>
+            <span class="mobile-tab-text">固定路线</span>
+          </button>
+          <button
+            class="mobile-tab-btn"
+            :class="{ active: currentTab === 'ai' }"
+            @click="switchTab('ai')"
+          >
+            <span class="mobile-tab-text">AI 推荐</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 1：固定路线推荐（移动端单列紧凑卡片） -->
+      <div v-if="currentTab === 'fixed'" class="mobile-tab-content">
+        <div class="mobile-locations-list">
+          <div
+            v-for="(loc, index) in sortedLocations"
+            :key="loc.id"
+            class="mobile-loc-card"
+            :class="{ 'mobile-loc-checked': hasCheckedIn(loc.id) }"
+            @click="openModal(loc)"
+          >
+            <div class="mobile-loc-number">{{ index + 1 }}</div>
+            <div class="mobile-loc-info">
+              <h3 class="mobile-loc-name">{{ loc.name }}</h3>
+              <div class="mobile-loc-meta">{{ loc.location }}</div>
+              <p class="mobile-loc-desc">{{ loc.description }}</p>
+              <div v-if="loc.highlights && loc.highlights.length > 0" class="mobile-loc-tags">
+                <span v-for="tag in loc.highlights.slice(0, 2)" :key="tag" class="mobile-loc-tag">{{ tag }}</span>
+              </div>
+            </div>
+            <div class="mobile-loc-status">
+              <span v-if="hasCheckedIn(loc.id)" class="mobile-status-done">✓</span>
+              <span v-else class="mobile-status-todo">›</span>
+            </div>
           </div>
         </div>
 
-        <!-- 自定义提问区 -->
-        <div class="custom-ask">
-          <div class="custom-ask-label">
-            <span class="ask-emoji">💬</span>
-            <span>或直接描述您的需求，AI 将为您量身规划</span>
+        <!-- 路线说明（简化为列表样式） -->
+        <div class="mobile-route-info">
+          <div class="mobile-info-title">📋 游览顺序</div>
+          <div class="mobile-info-steps">
+            <div
+              v-for="(loc, index) in sortedLocations"
+              :key="loc.id"
+              class="mobile-step-item"
+              :class="{ 'mobile-step-checked': hasCheckedIn(loc.id) }"
+              @click="openModal(loc)"
+            >
+              <div class="mobile-step-number" :style="{ background: hasCheckedIn(loc.id) ? '#4caf50' : '#d32f2f' }">{{ index + 1 }}</div>
+              <div class="mobile-step-content">
+                <div class="mobile-step-name">{{ loc.name }}</div>
+                <div class="mobile-step-place">{{ loc.location }}</div>
+              </div>
+              <div class="mobile-step-status">{{ hasCheckedIn(loc.id) ? '✓' : '›' }}</div>
+            </div>
           </div>
-          <div class="custom-ask-input">
+        </div>
+      </div>
+
+      <!-- Tab 2：AI 智能推荐（移动端紧凑） -->
+      <div v-if="currentTab === 'ai'" class="mobile-tab-content">
+        <!-- 预设问题区域（单列卡片） -->
+        <div class="mobile-ai-card mobile-ai-question-card">
+          <div class="mobile-ai-card-header">
+            <span class="mobile-ai-icon">🤖</span>
+            <span class="mobile-ai-title">选择方向</span>
+          </div>
+
+          <div class="mobile-preset-questions">
+            <div
+              v-for="(q, idx) in presetQuestions"
+              :key="idx"
+              class="mobile-preset-item"
+              :class="{ selected: selectedQuestion === q.label, loading: aiLoading && selectedQuestion === q.label }"
+              @click="selectAndAsk(q)"
+            >
+              <span class="mobile-preset-emoji">{{ q.emoji }}</span>
+              <span class="mobile-preset-label">{{ q.label }}</span>
+              <span v-if="aiLoading && selectedQuestion === q.label" class="mobile-preset-spinner"></span>
+            </div>
+          </div>
+
+          <div class="mobile-custom-ask">
+            <div class="mobile-custom-ask-label">
+              <span>💬 或直接描述需求</span>
+            </div>
             <textarea
               v-model="customQuestion"
-              class="ask-textarea"
+              class="mobile-ask-textarea"
               rows="2"
-              placeholder="例如：我上午 9 点从虹桥火车站出发，想在下午 3 点前游览 3 个最有故事感的红十字地点，帮忙安排路线和交通"
+              placeholder="例如：上午9点从虹桥出发，下午3点前游览3个最有故事感的地点"
               @keydown.enter.ctrl="submitCustom"
             ></textarea>
             <button
-              class="btn-ask-submit"
+              class="mobile-btn-ask-submit"
               :disabled="aiLoading || !customQuestion.trim()"
               @click="submitCustom"
             >
-              <span v-if="aiLoading && isCustomAsk" class="submit-spinner"></span>
-              <span v-else class="submit-arrow">➤</span>
-              <span class="submit-text">{{ aiLoading && isCustomAsk ? '生成中...' : '生成路线' }}</span>
+              <span v-if="aiLoading && isCustomAsk" class="mobile-submit-spinner"></span>
+              <span class="mobile-submit-text">{{ aiLoading && isCustomAsk ? '生成中...' : '生成路线' }}</span>
             </button>
           </div>
-          <div class="custom-ask-tip">
-            小提示：Ctrl + Enter 快捷提交 · 可告诉 AI 您的起点、时间、兴趣偏好等
+        </div>
+
+        <!-- AI 结果（紧凑） -->
+        <div v-if="aiAnswer" class="mobile-ai-card mobile-ai-result-card">
+          <div class="mobile-ai-result-header">
+            <span class="mobile-result-badge">✨ AI 推荐</span>
+            <button class="mobile-btn-refresh" @click="clearAnswer">清空</button>
           </div>
-        </div>
-      </div>
 
-      <!-- AI 回答结果区域 -->
-      <div v-if="aiAnswer" class="ai-card ai-result-card">
-        <div class="ai-result-header">
-          <span class="result-badge">✨ AI 推荐路线</span>
-          <button class="btn-refresh" @click="clearAnswer">清空重新生成</button>
-        </div>
+          <div class="mobile-ai-result-question">
+            <span class="mobile-q-text">{{ aiAnswer.question }}</span>
+          </div>
 
-        <div class="ai-result-question">
-          <span class="q-label">您的问题：</span>
-          <span class="q-text">{{ aiAnswer.question }}</span>
-        </div>
-
-        <!-- 信息来源/免责提示 -->
-        <div class="ai-disclaimer">
-          <span class="disclaimer-icon">⚠️</span>
-          <span class="disclaimer-text">路线中的交通方式由 AI 基于地点所在行政区推断生成，仅作游览参考。实际出行请以地图导航（高德/百度地图）提供的实时线路为准。</span>
-        </div>
-
-        <!-- 路线步骤卡片（详细版） -->
-        <div v-if="aiAnswer.steps && aiAnswer.steps.length > 0" class="ai-steps">
-          <div
-            v-for="(step, idx) in aiAnswer.steps"
-            :key="idx"
-            class="ai-step-item"
-          >
-            <div class="ai-step-index">{{ idx + 1 }}</div>
-            <div class="ai-step-content">
-              <h4 class="ai-step-name">{{ step.name }}</h4>
-              <div class="ai-step-meta">{{ step.meta }}</div>
-              <p class="ai-step-desc">{{ step.desc }}</p>
-
-              <!-- 历史背景 -->
-              <div v-if="step.history" class="ai-step-section history-section">
-                <div class="section-label">📜 历史故事</div>
-                <p class="section-text">{{ step.history }}</p>
-              </div>
-
-              <!-- 参观亮点 -->
-              <div v-if="step.highlights && step.highlights.length > 0" class="ai-step-section highlights-section">
-                <div class="section-label">⭐ 参观亮点</div>
-                <ul class="highlights-list">
-                  <li v-for="(h, hi) in step.highlights" :key="hi">{{ h }}</li>
-                </ul>
-              </div>
-
-              <!-- 最佳时间 & 门票 -->
-              <div class="time-ticket-row">
-                <div v-if="step.best_time || step.bestTime" class="time-ticket-item">
-                  <span class="item-icon">🕐</span>
-                  <div class="item-content">
-                    <div class="item-label">最佳时间</div>
-                    <div class="item-value">{{ step.best_time || step.bestTime }}</div>
-                  </div>
+          <div v-if="aiAnswer.steps && aiAnswer.steps.length > 0" class="mobile-ai-steps">
+            <div
+              v-for="(step, idx) in aiAnswer.steps"
+              :key="idx"
+              class="mobile-ai-step-item"
+            >
+              <div class="mobile-ai-step-top">
+                <div class="mobile-ai-step-index">{{ idx + 1 }}</div>
+                <div class="mobile-ai-step-title">
+                  <h4 class="mobile-ai-step-name">{{ step.name }}</h4>
+                  <div class="mobile-ai-step-meta">{{ step.meta }}</div>
                 </div>
-                <div v-if="step.ticket" class="time-ticket-item">
-                  <span class="item-icon">🎟️</span>
-                  <div class="item-content">
-                    <div class="item-label">门票预约</div>
-                    <div class="item-value">{{ step.ticket }}</div>
-                  </div>
+              </div>
+              <p class="mobile-ai-step-desc">{{ step.desc }}</p>
+
+              <div v-if="step.best_time || step.bestTime || step.ticket" class="mobile-time-ticket-row">
+                <div v-if="step.best_time || step.bestTime" class="mobile-time-ticket-item">
+                  <span>🕐</span>
+                  <div class="mobile-item-value">{{ step.best_time || step.bestTime }}</div>
+                </div>
+                <div v-if="step.ticket" class="mobile-time-ticket-item">
+                  <span>🎟️</span>
+                  <div class="mobile-item-value">{{ step.ticket }}</div>
                 </div>
               </div>
 
-              <!-- 附近餐饮 & 打卡点 -->
-              <div class="food-photo-row">
-                <div v-if="step.nearby_food || step.nearbyFood" class="food-photo-item food-item">
-                  <span class="item-icon">🍜</span>
-                  <div class="item-content">
-                    <div class="item-label">附近餐饮</div>
-                    <div class="item-value">{{ step.nearby_food || step.nearbyFood }}</div>
-                  </div>
+              <div v-if="step.nearby_food || step.nearbyFood || (step.photo_spots && step.photo_spots.length > 0)" class="mobile-food-photo-row">
+                <div v-if="step.nearby_food || step.nearbyFood" class="mobile-food-photo-item mobile-food-item">
+                  <span>🍜</span>
+                  <div class="mobile-item-value">{{ step.nearby_food || step.nearbyFood }}</div>
                 </div>
-                <div v-if="step.photo_spots && step.photo_spots.length > 0" class="food-photo-item photo-item">
-                  <span class="item-icon">📷</span>
-                  <div class="item-content">
-                    <div class="item-label">拍照打卡点</div>
-                    <div class="item-value">{{ step.photo_spots.join('、') }}</div>
-                  </div>
+                <div v-if="step.photo_spots && step.photo_spots.length > 0" class="mobile-food-photo-item mobile-photo-item">
+                  <span>📷</span>
+                  <div class="mobile-item-value">{{ step.photo_spots.join('、') }}</div>
                 </div>
               </div>
 
-              <!-- 实用贴士 -->
-              <div v-if="step.practical_tips && step.practical_tips.length > 0" class="ai-step-section practical-section">
-                <div class="section-label">💡 实用贴士</div>
-                <ul class="practical-list">
-                  <li v-for="(pt, pti) in step.practical_tips" :key="pti">{{ pt }}</li>
-                </ul>
-              </div>
-
-              <!-- 快速贴士 chip -->
-              <div v-if="step.tips" class="ai-step-tips">
-                <span v-for="(tip, ti) in step.tips" :key="ti" class="step-chip">{{ tip }}</span>
-              </div>
-
-              <!-- 交通路线 -->
-              <div v-if="step.transit" class="ai-step-transit">
-                <div class="transit-head">
-                  <span class="transit-icon" :class="`mode-${step.transit.mode}`">
-                    {{ modeIcon(step.transit.mode) }}
-                  </span>
-                  <span class="transit-label">🚗 交通路线</span>
-                  <span class="transit-text">{{ step.transit.from_prev || step.transit.fromPrev }}</span>
+              <div v-if="step.transit" class="mobile-ai-step-transit">
+                <div class="mobile-transit-head">
+                  <span class="mobile-transit-icon">{{ modeIcon(step.transit.mode) }}</span>
+                  <span class="mobile-transit-label">交通</span>
+                  <span class="mobile-transit-text">{{ step.transit.from_prev || step.transit.fromPrev }}</span>
                 </div>
-                <div v-if="step.transit.route_hint || step.transit.routeHint" class="transit-hint">
-                  <span class="hint-arrow">→</span>
-                  <span class="hint-text">{{ step.transit.route_hint || step.transit.routeHint }}</span>
+                <div v-if="step.transit.route_hint || step.transit.routeHint" class="mobile-transit-hint">
+                  <span>{{ step.transit.route_hint || step.transit.routeHint }}</span>
                 </div>
-                <div v-if="step.transit.cost || step.transit.duration" class="transit-meta">
-                  <span v-if="step.transit.duration" class="transit-meta-item">⏱️ {{ step.transit.duration }}</span>
-                  <span v-if="step.transit.cost" class="transit-meta-item">💰 {{ step.transit.cost }}</span>
+                <div v-if="step.transit.cost || step.transit.duration" class="mobile-transit-meta">
+                  <span v-if="step.transit.duration">⏱️ {{ step.transit.duration }}</span>
+                  <span v-if="step.transit.cost"> 💰 {{ step.transit.cost }}</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- 纯文本/Markdown 显示区（若 steps 为空） -->
-        <div v-else class="ai-raw-content">
-          <p class="ai-raw-text">{{ aiAnswer.raw }}</p>
-        </div>
+          <div v-else class="mobile-ai-raw-content">
+            <p class="mobile-ai-raw-text">{{ aiAnswer.raw }}</p>
+          </div>
 
-        <!-- 摘要/小贴士 -->
-        <div v-if="aiAnswer.summary" class="ai-summary">
-          <div class="summary-title">📝 路线要点</div>
-          <ul class="summary-list">
-            <li v-for="(s, i) in aiAnswer.summary" :key="i">{{ s }}</li>
-          </ul>
+          <div v-if="aiAnswer.summary && aiAnswer.summary.length > 0" class="mobile-ai-summary">
+            <div class="mobile-summary-title">📝 要点</div>
+            <ul class="mobile-summary-list">
+              <li v-for="(s, i) in aiAnswer.summary" :key="i">{{ s }}</li>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
+    </template>
 
     <!-- ==============================
          地点详情弹窗（通用）
@@ -344,6 +534,9 @@
 import { ref, computed } from 'vue'
 import { useLocationStore } from '../stores/locationStore'
 import { useCheckinStore } from '../stores/checkinStore'
+import { useViewport } from '../composables/useViewport'
+
+const { isMobile } = useViewport()
 
 const { locations } = useLocationStore()
 const { hasCheckedIn, addCheckin, getCheckinNote, getCheckinTime } = useCheckinStore()
@@ -436,17 +629,15 @@ const submitCustom = async () => {
   await askAI(text, true)
 }
 
-// 统一的 AI 提问入口：question 是用户的问题文本，isCustom 表明是否来自自定义输入
+// 统一的 AI 提问入口
 const askAI = async (question, isCustom) => {
   if (aiLoading.value) return
   selectedQuestion.value = question
   isCustomAsk.value = !!isCustom
 
-  // 先清掉旧结果，显示 loading
   aiLoading.value = true
   aiAnswer.value = null
 
-  // 准备请求体：问题 + 当前地点完整信息（由后端构造提示词和调用 DeepSeek）
   const body = {
     question: question,
     locations: locations.value.map(l => ({
@@ -469,7 +660,6 @@ const askAI = async (question, isCustom) => {
     const data = await res.json()
 
     if (!res.ok) {
-      // 后端返回错误（如限流、服务器异常）
       aiAnswer.value = {
         question: question,
         steps: generateMockRoute(question),
@@ -483,8 +673,6 @@ const askAI = async (question, isCustom) => {
       return
     }
 
-    // 后端返回的字段可能是 camelCase（fromPrev / routeHint），也可能是 snake_case（from_prev / route_hint）
-    // 统一转换让模板能兼容所有格式
     const normalizedSteps = (data.steps || []).map(s => ({
       name: s.name,
       meta: s.meta,
@@ -515,7 +703,6 @@ const askAI = async (question, isCustom) => {
       raw: '',
     }
   } catch (err) {
-    // 网络错误（后端未启动等）：降级为本地 mock 路线，给出明确提示
     aiAnswer.value = {
       question: question,
       steps: generateMockRoute(question),
@@ -543,14 +730,13 @@ const modeIcon = (mode) => {
   return map[mode] || '🚗'
 }
 
-// 本地 mock 路线生成（未配置 API Key 时用于演示）
+// 本地 mock 路线生成
 const generateMockRoute = (question) => {
   const locs = locations.value
   const takeHalf = question.includes('半天') || question.includes('3-4小时') || question.includes('精华')
   const takeAll = question.includes('一天') || question.includes('完整') || question.includes('全部')
   const takeCount = takeHalf ? 4 : (takeAll ? locs.length : Math.min(5, locs.length))
 
-  // 根据问题关键字简单重新排序，但不随机打乱
   const sortedLocs = [...locs]
   const isKids = question.includes('儿童') || question.includes('青少年')
   const isMuseum = question.includes('博物馆') || question.includes('历史') || question.includes('深度')
@@ -561,7 +747,6 @@ const generateMockRoute = (question) => {
 
   const picked = sortedLocs.slice(0, takeCount)
 
-  // 基于地点所在行政区，生成合理的交通描述（不编造具体站名，只给出合理的通用描述）
   const transitByDistrict = (prevLoc, currLoc) => {
     if (!prevLoc) return {
       from_prev: '从您的出发点前往本地点',
@@ -571,7 +756,6 @@ const generateMockRoute = (question) => {
       duration: '请以实际导航为准',
     }
 
-    // 从 location 字段中提取行政区（格式："上海市 · 徐汇区"）
     const getDist = (l) => {
       const parts = (l.location || '').split('·').map(s => s.trim())
       return parts[parts.length - 1] || '上海'
@@ -580,7 +764,6 @@ const generateMockRoute = (question) => {
     const prevDist = getDist(prevLoc)
     const currDist = getDist(currLoc)
 
-    // 同一行政区 → 步行或公交
     if (prevDist === currDist) {
       return {
         from_prev: '步行约 10-15 分钟，或公交 2 站',
@@ -589,7 +772,6 @@ const generateMockRoute = (question) => {
       }
     }
 
-    // 相邻行政区 → 地铁 + 短步行
     const adjacentPairs = [
       ['黄浦区', '静安区'], ['静安区', '长宁区'], ['静安区', '徐汇区'],
       ['徐汇区', '长宁区'], ['徐汇区', '黄浦区'], ['徐汇区', '杨浦区'],
@@ -610,7 +792,6 @@ const generateMockRoute = (question) => {
       }
     }
 
-    // 跨区（如浦东新区、闵行区与其他区）→ 地铁多站
     if (prevDist === '浦东新区' || currDist === '浦东新区') {
       return {
         from_prev: '地铁 3-5 站，约 25 分钟',
@@ -630,7 +811,6 @@ const generateMockRoute = (question) => {
       }
     }
 
-    // 默认：跨区公交/地铁换乘
     return {
       from_prev: '公交或地铁换乘，约 20-30 分钟',
       route_hint: `从${prevDist}前往${currDist}，建议使用地图导航查询最优换乘方案`,
@@ -678,13 +858,15 @@ const clearAnswer = () => {
 }
 
 /* ==============================
-   页面头部
+   PC 端样式
    ============================== */
-.page-header {
+
+/* 页面头部 */
+.pc-page-header {
   text-align: center;
 }
 
-.page-badge {
+.pc-page-badge {
   display: inline-block;
   padding: 10px 24px;
   background: white;
@@ -704,7 +886,7 @@ const clearAnswer = () => {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.page-title {
+.pc-page-title {
   font-size: clamp(18px, 4vw, 38px);
   color: #1a2332;
   margin: 0 0 16px 0;
@@ -722,7 +904,7 @@ const clearAnswer = () => {
   50% { background-position: 100% 50%; }
 }
 
-.page-subtitle {
+.pc-page-subtitle {
   font-size: 16px;
   color: #7a8599;
   margin: 0 auto;
@@ -736,15 +918,13 @@ const clearAnswer = () => {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ==============================
-   Tab 切换
-   ============================== */
-.tabs-wrap {
+/* Tab 切换 */
+.pc-tabs-wrap {
   display: flex;
   justify-content: center;
 }
 
-.tabs {
+.pc-tabs {
   display: inline-flex;
   background: white;
   padding: 6px;
@@ -753,7 +933,7 @@ const clearAnswer = () => {
   gap: 6px;
 }
 
-.tab-btn {
+.pc-tab-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -768,12 +948,12 @@ const clearAnswer = () => {
   transition: all 0.3s ease;
 }
 
-.tab-btn:hover {
+.pc-tab-btn:hover {
   color: #d32f2f;
   background: rgba(211, 47, 47, 0.05);
 }
 
-.tab-btn.active {
+.pc-tab-btn.active {
   background: linear-gradient(135deg, #d32f2f, #b71c1c);
   color: white;
   box-shadow: 0 6px 16px rgba(211, 47, 47, 0.35);
@@ -785,11 +965,11 @@ const clearAnswer = () => {
   to { transform: scale(1); }
 }
 
-.tab-icon {
+.pc-tab-icon {
   font-size: 17px;
 }
 
-.tab-content {
+.pc-tab-content {
   animation: tabContentFadeIn 0.45s ease-out;
 }
 
@@ -798,16 +978,14 @@ const clearAnswer = () => {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ==============================
-   固定路线 - 列表
-   ============================== */
-.locations-list {
+/* 固定路线 - 列表 */
+.pc-locations-list {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.loc-card {
+.pc-loc-card {
   background: #ffffff;
   border-radius: 22px;
   padding: 28px;
@@ -822,7 +1000,7 @@ const clearAnswer = () => {
   animation: cardSlideIn 0.7s ease-out backwards;
 }
 
-.loc-card::before {
+.pc-loc-card::before {
   content: '';
   position: absolute;
   left: 0;
@@ -834,7 +1012,7 @@ const clearAnswer = () => {
   transition: width 0.3s ease;
 }
 
-.loc-card::after {
+.pc-loc-card::after {
   content: '';
   position: absolute;
   top: 0;
@@ -846,51 +1024,50 @@ const clearAnswer = () => {
   pointer-events: none;
 }
 
-.loc-card:nth-child(1) { animation-delay: 0.05s; }
-.loc-card:nth-child(2) { animation-delay: 0.15s; }
-.loc-card:nth-child(3) { animation-delay: 0.25s; }
-.loc-card:nth-child(4) { animation-delay: 0.35s; }
-.loc-card:nth-child(5) { animation-delay: 0.45s; }
-.loc-card:nth-child(6) { animation-delay: 0.55s; }
-.loc-card:nth-child(7) { animation-delay: 0.65s; }
-.loc-card:nth-child(8) { animation-delay: 0.75s; }
+.pc-loc-card:nth-child(1) { animation-delay: 0.05s; }
+.pc-loc-card:nth-child(2) { animation-delay: 0.15s; }
+.pc-loc-card:nth-child(3) { animation-delay: 0.25s; }
+.pc-loc-card:nth-child(4) { animation-delay: 0.35s; }
+.pc-loc-card:nth-child(5) { animation-delay: 0.45s; }
+.pc-loc-card:nth-child(6) { animation-delay: 0.55s; }
+.pc-loc-card:nth-child(7) { animation-delay: 0.65s; }
+.pc-loc-card:nth-child(8) { animation-delay: 0.75s; }
 
 @keyframes cardSlideIn {
   from { opacity: 0; transform: translateX(-30px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
-.loc-card:hover {
+.pc-loc-card:hover {
   transform: translateX(8px);
   border-color: #ff7043;
   box-shadow: 0 12px 40px rgba(255, 112, 67, 0.18);
 }
 
-.loc-card:hover::before {
+.pc-loc-card:hover::before {
   width: 8px;
 }
 
-.loc-card:hover::after {
+.pc-loc-card:hover::after {
   width: 180px;
   height: 180px;
 }
 
-.loc-card.loc-checked {
+.pc-loc-card.pc-loc-checked {
   border-color: #c8e6c9;
   background: linear-gradient(135deg, #f1f8e9 0%, #ffffff 100%);
 }
 
-.loc-card.loc-checked::before {
+.pc-loc-card.pc-loc-checked::before {
   background: linear-gradient(180deg, #4caf50, #81c784);
 }
 
-.loc-card.loc-checked:hover {
+.pc-loc-card.pc-loc-checked:hover {
   border-color: #4caf50;
   box-shadow: 0 12px 40px rgba(76, 175, 80, 0.22);
 }
 
-/* 序号 */
-.loc-number {
+.pc-loc-number {
   flex-shrink: 0;
   width: 52px;
   height: 52px;
@@ -907,17 +1084,17 @@ const clearAnswer = () => {
   position: relative;
 }
 
-.loc-card:hover .loc-number {
+.pc-loc-card:hover .pc-loc-number {
   transform: rotate(-8deg) scale(1.1);
   box-shadow: 0 10px 24px rgba(211, 47, 47, 0.45);
 }
 
-.loc-card.loc-checked .loc-number {
+.pc-loc-card.pc-loc-checked .pc-loc-number {
   background: linear-gradient(135deg, #4caf50, #2e7d32);
   box-shadow: 0 6px 18px rgba(76, 175, 80, 0.3);
 }
 
-.loc-number::after {
+.pc-loc-number::after {
   content: '';
   position: absolute;
   top: -4px;
@@ -929,7 +1106,7 @@ const clearAnswer = () => {
   animation: dotPulse 2s ease-in-out infinite;
 }
 
-.loc-card.loc-checked .loc-number::after {
+.pc-loc-card.pc-loc-checked .pc-loc-number::after {
   background: #81c784;
 }
 
@@ -938,8 +1115,7 @@ const clearAnswer = () => {
   50% { transform: scale(1.35); opacity: 0.6; }
 }
 
-/* 红十字图标 */
-.loc-icon {
+.pc-loc-icon {
   flex-shrink: 0;
   width: 72px;
   height: 72px;
@@ -953,19 +1129,19 @@ const clearAnswer = () => {
   overflow: hidden;
 }
 
-.loc-card:hover .loc-icon {
+.pc-loc-card:hover .pc-loc-icon {
   transform: rotate(5deg) scale(1.08);
   background: linear-gradient(135deg, #ffe0e0, #ffcccc);
 }
 
-.cross-outer {
+.pc-cross-outer {
   width: 50px;
   height: 50px;
   position: relative;
   animation: crossBreath 3s ease-in-out infinite;
 }
 
-.cross-h, .cross-v {
+.pc-cross-h, .pc-cross-v {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -975,20 +1151,20 @@ const clearAnswer = () => {
   transition: all 0.3s ease;
 }
 
-.cross-h {
+.pc-cross-h {
   width: 42px;
   height: 12px;
   transform: translate(-50%, -50%);
 }
 
-.cross-v {
+.pc-cross-v {
   width: 12px;
   height: 42px;
   transform: translate(-50%, -50%);
 }
 
-.loc-card:hover .cross-h,
-.loc-card:hover .cross-v {
+.pc-loc-card:hover .pc-cross-h,
+.pc-loc-card:hover .pc-cross-v {
   background: linear-gradient(135deg, #ff7043, #d32f2f);
   box-shadow: 0 4px 14px rgba(255, 112, 67, 0.5);
 }
@@ -998,14 +1174,13 @@ const clearAnswer = () => {
   50% { transform: scale(1.08); }
 }
 
-.loc-card.loc-checked .cross-h,
-.loc-card.loc-checked .cross-v {
+.pc-loc-card.pc-loc-checked .pc-cross-h,
+.pc-loc-card.pc-loc-checked .pc-cross-v {
   background: linear-gradient(135deg, #4caf50, #2e7d32);
   box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
 
-/* 卡片信息内容 */
-.loc-info {
+.pc-loc-info {
   flex: 1;
   min-width: 0;
   max-width: 100%;
@@ -1013,7 +1188,7 @@ const clearAnswer = () => {
   flex-direction: column;
 }
 
-.loc-name {
+.pc-loc-name {
   font-size: 22px;
   color: #1a2332;
   margin: 0 0 8px 0;
@@ -1024,15 +1199,15 @@ const clearAnswer = () => {
   line-height: 1.35;
 }
 
-.loc-card:hover .loc-name {
+.pc-loc-card:hover .pc-loc-name {
   color: #d32f2f;
 }
 
-.loc-card.loc-checked:hover .loc-name {
+.pc-loc-card.pc-loc-checked:hover .pc-loc-name {
   color: #4caf50;
 }
 
-.loc-meta {
+.pc-loc-meta {
   font-size: 13px;
   color: #7a8599;
   margin-bottom: 12px;
@@ -1042,7 +1217,7 @@ const clearAnswer = () => {
   line-height: 1.55;
 }
 
-.loc-desc {
+.pc-loc-desc {
   font-size: 14px;
   color: #5a6478;
   line-height: 1.8;
@@ -1051,13 +1226,13 @@ const clearAnswer = () => {
   overflow-wrap: break-word;
 }
 
-.loc-tags {
+.pc-loc-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.loc-tag {
+.pc-loc-tag {
   font-size: 12px;
   color: #d32f2f;
   background: rgba(211, 47, 47, 0.1);
@@ -1067,22 +1242,21 @@ const clearAnswer = () => {
   transition: all 0.3s ease;
 }
 
-.loc-card:hover .loc-tag {
+.pc-loc-card:hover .pc-loc-tag {
   background: rgba(211, 47, 47, 0.18);
   transform: translateY(-1px);
 }
 
-.loc-card.loc-checked .loc-tag {
+.pc-loc-card.pc-loc-checked .pc-loc-tag {
   color: #4caf50;
   background: rgba(76, 175, 80, 0.12);
 }
 
-.loc-card.loc-checked:hover .loc-tag {
+.pc-loc-card.pc-loc-checked:hover .pc-loc-tag {
   background: rgba(76, 175, 80, 0.22);
 }
 
-/* 状态标签 */
-.loc-status {
+.pc-loc-status {
   flex-shrink: 0;
   font-size: 14px;
   font-weight: 700;
@@ -1094,20 +1268,20 @@ const clearAnswer = () => {
   overflow: hidden;
 }
 
-.status-todo {
+.pc-status-todo {
   color: #ff7043;
   background: linear-gradient(135deg, rgba(255, 112, 67, 0.1), rgba(255, 112, 67, 0.05));
   border: 2px solid rgba(255, 112, 67, 0.3);
 }
 
-.loc-card:hover .status-todo {
+.pc-loc-card:hover .pc-status-todo {
   background: linear-gradient(135deg, #ff7043, #d32f2f);
   color: white;
   transform: translateX(4px);
   box-shadow: 0 6px 16px rgba(255, 112, 67, 0.35);
 }
 
-.status-done {
+.pc-status-done {
   color: white;
   background: linear-gradient(135deg, #4caf50, #2e7d32);
   box-shadow: 0 4px 14px rgba(76, 175, 80, 0.35);
@@ -1119,10 +1293,8 @@ const clearAnswer = () => {
   50% { box-shadow: 0 6px 22px rgba(76, 175, 80, 0.6); }
 }
 
-/* ==============================
-   路线说明区块
-   ============================== */
-.route-info {
+/* 路线说明区块 */
+.pc-route-info {
   background: white;
   border-radius: 24px;
   padding: 36px;
@@ -1131,7 +1303,7 @@ const clearAnswer = () => {
   overflow: hidden;
 }
 
-.route-info::before {
+.pc-route-info::before {
   content: '';
   position: absolute;
   top: 0;
@@ -1143,7 +1315,7 @@ const clearAnswer = () => {
   opacity: 0.5;
 }
 
-.info-title {
+.pc-info-title {
   font-size: 22px;
   font-weight: 800;
   color: #1a2332;
@@ -1152,13 +1324,13 @@ const clearAnswer = () => {
   letter-spacing: 1px;
 }
 
-.info-steps {
+.pc-info-steps {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
 }
 
-.step-item {
+.pc-step-item {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -1172,7 +1344,7 @@ const clearAnswer = () => {
   overflow: hidden;
 }
 
-.step-item::before {
+.pc-step-item::before {
   content: '';
   position: absolute;
   left: 0;
@@ -1183,28 +1355,28 @@ const clearAnswer = () => {
   transition: width 0.3s ease;
 }
 
-.step-item:hover {
+.pc-step-item:hover {
   background: white;
   border-color: #d32f2f;
   transform: translateX(6px);
   box-shadow: 0 6px 20px rgba(211, 47, 47, 0.12);
 }
 
-.step-item:hover::before {
+.pc-step-item:hover::before {
   width: 100%;
 }
 
-.step-item.step-checked {
+.pc-step-item.pc-step-checked {
   background: linear-gradient(135deg, rgba(76, 175, 80, 0.08), rgba(76, 175, 80, 0.03));
 }
 
-.step-item.step-checked:hover {
+.pc-step-item.pc-step-checked:hover {
   border-color: #4caf50;
   background: white;
   box-shadow: 0 6px 20px rgba(76, 175, 80, 0.15);
 }
 
-.step-number {
+.pc-step-number {
   flex-shrink: 0;
   width: 34px;
   height: 34px;
@@ -1220,21 +1392,21 @@ const clearAnswer = () => {
   z-index: 1;
 }
 
-.step-item:hover .step-number {
+.pc-step-item:hover .pc-step-number {
   transform: rotate(360deg) scale(1.1);
 }
 
-.step-item.step-checked .step-number {
+.pc-step-item.pc-step-checked .pc-step-number {
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
 }
 
-.step-content {
+.pc-step-content {
   flex: 1;
   min-width: 0;
   z-index: 1;
 }
 
-.step-name {
+.pc-step-name {
   font-size: 15px;
   font-weight: 700;
   color: #1a2332;
@@ -1245,22 +1417,22 @@ const clearAnswer = () => {
   line-height: 1.4;
 }
 
-.step-item:hover .step-name {
+.pc-step-item:hover .pc-step-name {
   color: #d32f2f;
 }
 
-.step-item.step-checked:hover .step-name {
+.pc-step-item.pc-step-checked:hover .pc-step-name {
   color: #4caf50;
 }
 
-.step-place {
+.pc-step-place {
   font-size: 12px;
   color: #7a8599;
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
-.step-status {
+.pc-step-status {
   flex-shrink: 0;
   font-size: 13px;
   color: #d32f2f;
@@ -1269,18 +1441,16 @@ const clearAnswer = () => {
   z-index: 1;
 }
 
-.step-item.step-checked .step-status {
+.pc-step-item.pc-step-checked .pc-step-status {
   color: #4caf50;
 }
 
-.step-item:hover .step-status {
+.pc-step-item:hover .pc-step-status {
   transform: translateX(4px);
 }
 
-/* ==============================
-   AI 推荐页面
-   ============================== */
-.ai-card {
+/* AI 推荐页面 */
+.pc-ai-card {
   background: white;
   border-radius: 24px;
   padding: 36px;
@@ -1290,8 +1460,7 @@ const clearAnswer = () => {
   overflow: hidden;
 }
 
-/* 问题卡片头部 */
-.ai-card-header {
+.pc-ai-card-header {
   display: flex;
   align-items: flex-start;
   gap: 18px;
@@ -1300,7 +1469,7 @@ const clearAnswer = () => {
   border-bottom: 2px solid #f0f2f5;
 }
 
-.ai-icon {
+.pc-ai-icon {
   flex-shrink: 0;
   width: 64px;
   height: 64px;
@@ -1319,33 +1488,32 @@ const clearAnswer = () => {
   50% { transform: translateY(-6px) rotate(2deg); }
 }
 
-.ai-header-text {
+.pc-ai-header-text {
   flex: 1;
 }
 
-.ai-title {
+.pc-ai-title {
   font-size: 22px;
   color: #1a2332;
   margin: 0 0 8px 0;
   font-weight: 800;
 }
 
-.ai-subtitle {
+.pc-ai-subtitle {
   font-size: 14px;
   color: #7a8599;
   margin: 0;
   line-height: 1.7;
 }
 
-/* 预设问题按钮 */
-.preset-questions {
+.pc-preset-questions {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
   margin-bottom: 24px;
 }
 
-.preset-item {
+.pc-preset-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1359,7 +1527,7 @@ const clearAnswer = () => {
   overflow: hidden;
 }
 
-.preset-item::before {
+.pc-preset-item::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -1368,39 +1536,39 @@ const clearAnswer = () => {
   transition: opacity 0.3s ease;
 }
 
-.preset-item:hover {
+.pc-preset-item:hover {
   transform: translateY(-3px);
   border-color: #d32f2f;
   background: white;
   box-shadow: 0 10px 28px rgba(211, 47, 47, 0.18);
 }
 
-.preset-item:hover::before {
+.pc-preset-item:hover::before {
   opacity: 1;
 }
 
-.preset-item.selected {
+.pc-preset-item.selected {
   border-color: #d32f2f;
   background: linear-gradient(135deg, #fff5f5, #ffecec);
   box-shadow: 0 8px 24px rgba(211, 47, 47, 0.2);
 }
 
-.preset-item.loading {
+.pc-preset-item.loading {
   opacity: 0.7;
   pointer-events: none;
 }
 
-.preset-emoji {
+.pc-preset-emoji {
   font-size: 26px;
   flex-shrink: 0;
   transition: transform 0.3s ease;
 }
 
-.preset-item:hover .preset-emoji {
+.pc-preset-item:hover .pc-preset-emoji {
   transform: scale(1.25) rotate(-5deg);
 }
 
-.preset-label {
+.pc-preset-label {
   font-size: 14px;
   color: #1a2332;
   font-weight: 600;
@@ -1408,11 +1576,11 @@ const clearAnswer = () => {
   flex: 1;
 }
 
-.preset-item:hover .preset-label {
+.pc-preset-item:hover .pc-preset-label {
   color: #d32f2f;
 }
 
-.preset-spinner {
+.pc-preset-spinner {
   width: 18px;
   height: 18px;
   border: 3px solid rgba(211, 47, 47, 0.2);
@@ -1427,8 +1595,7 @@ const clearAnswer = () => {
   to { transform: rotate(360deg); }
 }
 
-/* 提示 */
-.custom-ask {
+.pc-custom-ask {
   margin-top: 8px;
   padding: 20px;
   background: linear-gradient(135deg, #fff9f5, #fff3e0);
@@ -1442,7 +1609,7 @@ const clearAnswer = () => {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.custom-ask-label {
+.pc-custom-ask-label {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1452,17 +1619,17 @@ const clearAnswer = () => {
   color: #5d4037;
 }
 
-.ask-emoji {
+.pc-ask-emoji {
   font-size: 18px;
 }
 
-.custom-ask-input {
+.pc-custom-ask-input {
   display: flex;
   gap: 10px;
   align-items: stretch;
 }
 
-.ask-textarea {
+.pc-ask-textarea {
   flex: 1;
   min-height: 56px;
   padding: 12px 14px;
@@ -1478,17 +1645,17 @@ const clearAnswer = () => {
   outline: none;
 }
 
-.ask-textarea::placeholder {
+.pc-ask-textarea::placeholder {
   color: #bca89a;
 }
 
-.ask-textarea:focus {
+.pc-ask-textarea:focus {
   border-color: #d32f2f;
   box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.08);
   background: #fffaf5;
 }
 
-.btn-ask-submit {
+.pc-btn-ask-submit {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1507,29 +1674,29 @@ const clearAnswer = () => {
   flex-shrink: 0;
 }
 
-.btn-ask-submit:hover:not(:disabled) {
+.pc-btn-ask-submit:hover:not(:disabled) {
   background: linear-gradient(135deg, #c62828, #a61b1b);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(211, 47, 47, 0.35);
 }
 
-.btn-ask-submit:active:not(:disabled) {
+.pc-btn-ask-submit:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.btn-ask-submit:disabled {
+.pc-btn-ask-submit:disabled {
   background: #e0e0e0;
   color: #9e9e9e;
   cursor: not-allowed;
   box-shadow: none;
 }
 
-.submit-arrow {
+.pc-submit-arrow {
   font-size: 14px;
   line-height: 1;
 }
 
-.submit-spinner {
+.pc-submit-spinner {
   width: 14px;
   height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.35);
@@ -1538,11 +1705,11 @@ const clearAnswer = () => {
   animation: spinSpin 0.8s linear infinite;
 }
 
-.submit-text {
+.pc-submit-text {
   font-size: 14px;
 }
 
-.custom-ask-tip {
+.pc-custom-ask-tip {
   margin-top: 10px;
   padding-left: 2px;
   font-size: 12px;
@@ -1550,41 +1717,20 @@ const clearAnswer = () => {
   line-height: 1.6;
 }
 
-.ai-hint {
-  background: linear-gradient(135deg, #fff8e1, #ffecb3);
-  padding: 16px 20px;
-  border-radius: 12px;
-  border-left: 4px solid #ff9800;
-  font-size: 13px;
-  color: #8a6d00;
-  line-height: 1.7;
-}
-
-.ai-hint code {
-  display: inline-block;
-  padding: 2px 8px;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 6px;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  color: #d32f2f;
-  font-weight: 600;
-}
-
 /* AI 结果卡片 */
-.ai-result-card {
+.pc-ai-result-card {
   background: linear-gradient(135deg, #ffffff 0%, #fffaf5 100%);
   border: 2px solid rgba(211, 47, 47, 0.15);
 }
 
-.ai-result-header {
+.pc-ai-result-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.result-badge {
+.pc-result-badge {
   display: inline-block;
   padding: 10px 22px;
   background: linear-gradient(135deg, #d32f2f, #b71c1c);
@@ -1602,7 +1748,7 @@ const clearAnswer = () => {
   to { transform: scale(1); opacity: 1; }
 }
 
-.btn-refresh {
+.pc-btn-refresh {
   padding: 10px 20px;
   background: transparent;
   color: #7a8599;
@@ -1614,13 +1760,13 @@ const clearAnswer = () => {
   transition: all 0.3s ease;
 }
 
-.btn-refresh:hover {
+.pc-btn-refresh:hover {
   color: #d32f2f;
   border-color: #d32f2f;
   background: rgba(211, 47, 47, 0.05);
 }
 
-.ai-result-question {
+.pc-ai-result-question {
   background: #f8fafc;
   padding: 16px 20px;
   border-radius: 12px;
@@ -1631,20 +1777,19 @@ const clearAnswer = () => {
   align-items: center;
 }
 
-.q-label {
+.pc-q-label {
   font-size: 13px;
   color: #7a8599;
   font-weight: 600;
 }
 
-.q-text {
+.pc-q-text {
   font-size: 14px;
   color: #1a2332;
   font-weight: 700;
 }
 
-/* AI 结果免责提示 */
-.ai-disclaimer {
+.pc-ai-disclaimer {
   background: linear-gradient(135deg, #fffbe6, #fff3cd);
   border-left: 3px solid #f5a623;
   border-radius: 10px;
@@ -1658,25 +1803,25 @@ const clearAnswer = () => {
   color: #7a5a00;
 }
 
-.disclaimer-icon {
+.pc-disclaimer-icon {
   font-size: 16px;
   flex-shrink: 0;
   line-height: 1.7;
 }
 
-.disclaimer-text {
+.pc-disclaimer-text {
   flex: 1;
 }
 
 /* AI 步骤列表 */
-.ai-steps {
+.pc-ai-steps {
   display: flex;
   flex-direction: column;
   gap: 18px;
   margin-bottom: 24px;
 }
 
-.ai-step-item {
+.pc-ai-step-item {
   display: flex;
   gap: 16px;
   padding: 22px 24px;
@@ -1688,25 +1833,25 @@ const clearAnswer = () => {
   position: relative;
 }
 
-.ai-step-item:nth-child(1) { animation-delay: 0.05s; }
-.ai-step-item:nth-child(2) { animation-delay: 0.15s; }
-.ai-step-item:nth-child(3) { animation-delay: 0.25s; }
-.ai-step-item:nth-child(4) { animation-delay: 0.35s; }
-.ai-step-item:nth-child(5) { animation-delay: 0.45s; }
-.ai-step-item:nth-child(6) { animation-delay: 0.55s; }
+.pc-ai-step-item:nth-child(1) { animation-delay: 0.05s; }
+.pc-ai-step-item:nth-child(2) { animation-delay: 0.15s; }
+.pc-ai-step-item:nth-child(3) { animation-delay: 0.25s; }
+.pc-ai-step-item:nth-child(4) { animation-delay: 0.35s; }
+.pc-ai-step-item:nth-child(5) { animation-delay: 0.45s; }
+.pc-ai-step-item:nth-child(6) { animation-delay: 0.55s; }
 
 @keyframes stepSlideIn {
   from { opacity: 0; transform: translateX(-20px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
-.ai-step-item:hover {
+.pc-ai-step-item:hover {
   border-color: #d32f2f;
   transform: translateX(4px);
   box-shadow: 0 10px 28px rgba(211, 47, 47, 0.15);
 }
 
-.ai-step-index {
+.pc-ai-step-index {
   flex-shrink: 0;
   width: 44px;
   height: 44px;
@@ -1721,12 +1866,12 @@ const clearAnswer = () => {
   box-shadow: 0 6px 14px rgba(211, 47, 47, 0.3);
 }
 
-.ai-step-content {
+.pc-ai-step-content {
   flex: 1;
   min-width: 0;
 }
 
-.ai-step-name {
+.pc-ai-step-name {
   font-size: clamp(12px, 2vw, 17px);
   color: #1a2332;
   margin: 0 0 6px 0;
@@ -1737,11 +1882,11 @@ const clearAnswer = () => {
   line-height: 1.4;
 }
 
-.ai-step-item:hover .ai-step-name {
+.pc-ai-step-item:hover .pc-ai-step-name {
   color: #d32f2f;
 }
 
-.ai-step-meta {
+.pc-ai-step-meta {
   font-size: 12px;
   color: #d32f2f;
   font-weight: 600;
@@ -1751,7 +1896,7 @@ const clearAnswer = () => {
   overflow-wrap: break-word;
 }
 
-.ai-step-desc {
+.pc-ai-step-desc {
   font-size: 14px;
   color: #5a6478;
   line-height: 1.8;
@@ -1761,66 +1906,72 @@ const clearAnswer = () => {
 }
 
 /* 通用区块样式 */
-.ai-step-section {
+.pc-ai-step-section {
   margin-bottom: 12px;
   padding: 12px 14px;
   border-radius: 10px;
   animation: sectionIn 0.4s ease-out backwards;
 }
+
 @keyframes sectionIn {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.section-label {
+
+.pc-section-label {
   font-size: 12px;
   font-weight: 700;
   margin-bottom: 6px;
   letter-spacing: 0.5px;
 }
-.section-text {
+
+.pc-section-text {
   font-size: 13px;
   color: #555;
   line-height: 1.7;
   margin: 0;
 }
-.highlights-list, .practical-list {
+
+.pc-highlights-list, .pc-practical-list {
   margin: 0;
   padding-left: 20px;
 }
-.highlights-list li, .practical-list li {
+
+.pc-highlights-list li, .pc-practical-list li {
   font-size: 13px;
   color: #444;
   line-height: 1.7;
   margin-bottom: 4px;
 }
 
-/* 历史故事 - 米色背景 */
-.history-section {
+.pc-history-section {
   background: linear-gradient(135deg, #fffdf5, #fff8e1);
   border-left: 3px solid #d4a017;
 }
-/* 参观亮点 - 淡蓝背景 */
-.highlights-section {
+
+.pc-highlights-section {
   background: linear-gradient(135deg, #f0f7ff, #e3f2fd);
   border-left: 3px solid #1976d2;
 }
-/* 实用贴士 - 淡绿背景 */
-.practical-section {
+
+.pc-practical-section {
   background: linear-gradient(135deg, #f1fff5, #e8f5e9);
   border-left: 3px solid #388e3c;
 }
-.history-section .section-label { color: #b8860b; }
-.highlights-section .section-label { color: #1565c0; }
-.practical-section .section-label { color: #2e7d32; }
+
+.pc-history-section .pc-section-label { color: #b8860b; }
+.pc-highlights-section .pc-section-label { color: #1565c0; }
+.pc-practical-section .pc-section-label { color: #2e7d32; }
 
 /* 最佳时间 & 门票 同行 */
-.time-ticket-row {
+.pc-time-ticket-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-bottom: 12px;
 }
-.time-ticket-item {
+
+.pc-time-ticket-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -1829,16 +1980,19 @@ const clearAnswer = () => {
   border-radius: 10px;
   border: 1px solid #eee;
 }
-.item-icon {
+
+.pc-item-icon {
   font-size: 18px;
   flex-shrink: 0;
   margin-top: 2px;
 }
-.item-content {
+
+.pc-item-content {
   flex: 1;
   min-width: 0;
 }
-.item-label {
+
+.pc-item-label {
   font-size: 11px;
   color: #999;
   font-weight: 600;
@@ -1846,7 +2000,8 @@ const clearAnswer = () => {
   letter-spacing: 0.5px;
   margin-bottom: 3px;
 }
-.item-value {
+
+.pc-item-value {
   font-size: 12.5px;
   color: #333;
   line-height: 1.5;
@@ -1854,13 +2009,14 @@ const clearAnswer = () => {
 }
 
 /* 附近餐饮 & 打卡点 同行 */
-.food-photo-row {
+.pc-food-photo-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-bottom: 12px;
 }
-.food-photo-item {
+
+.pc-food-photo-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -1868,37 +2024,25 @@ const clearAnswer = () => {
   border-radius: 10px;
   border: 1px solid;
 }
-.food-item {
+
+.pc-food-item {
   background: #fffbf5;
   border-color: #ffe0b2;
 }
-.photo-item {
+
+.pc-photo-item {
   background: #fdf7ff;
   border-color: #e1bee7;
 }
 
-/* 交通费用/时间元信息 */
-.transit-meta {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
-  flex-wrap: wrap;
-}
-.transit-meta-item {
-  font-size: 12px;
-  color: #777;
-  background: rgba(255,152,0,0.1);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-.ai-step-tips {
+/* 快速贴士 chip */
+.pc-ai-step-tips {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.step-chip {
+.pc-step-chip {
   font-size: 12px;
   padding: 5px 12px;
   background: rgba(211, 47, 47, 0.08);
@@ -1908,7 +2052,7 @@ const clearAnswer = () => {
 }
 
 /* 交通路线展示 */
-.ai-step-transit {
+.pc-ai-step-transit {
   margin-top: 14px;
   padding: 14px 16px;
   background: linear-gradient(135deg, #fff8f5, #fff3eb);
@@ -1917,19 +2061,19 @@ const clearAnswer = () => {
   animation: transitIn 0.4s ease-out backwards;
 }
 
-.ai-step-item:nth-child(1) .ai-step-transit { animation-delay: 0.15s; }
-.ai-step-item:nth-child(2) .ai-step-transit { animation-delay: 0.25s; }
-.ai-step-item:nth-child(3) .ai-step-transit { animation-delay: 0.35s; }
-.ai-step-item:nth-child(4) .ai-step-transit { animation-delay: 0.45s; }
-.ai-step-item:nth-child(5) .ai-step-transit { animation-delay: 0.55s; }
-.ai-step-item:nth-child(6) .ai-step-transit { animation-delay: 0.65s; }
+.pc-ai-step-item:nth-child(1) .pc-ai-step-transit { animation-delay: 0.15s; }
+.pc-ai-step-item:nth-child(2) .pc-ai-step-transit { animation-delay: 0.25s; }
+.pc-ai-step-item:nth-child(3) .pc-ai-step-transit { animation-delay: 0.35s; }
+.pc-ai-step-item:nth-child(4) .pc-ai-step-transit { animation-delay: 0.45s; }
+.pc-ai-step-item:nth-child(5) .pc-ai-step-transit { animation-delay: 0.55s; }
+.pc-ai-step-item:nth-child(6) .pc-ai-step-transit { animation-delay: 0.65s; }
 
 @keyframes transitIn {
   from { opacity: 0; transform: translateX(-8px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
-.transit-head {
+.pc-transit-head {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1937,7 +2081,7 @@ const clearAnswer = () => {
   margin-bottom: 6px;
 }
 
-.transit-icon {
+.pc-transit-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1950,25 +2094,20 @@ const clearAnswer = () => {
   flex-shrink: 0;
 }
 
-.transit-icon.mode-walk { background: #e8f5e9; }
-.transit-icon.mode-subway { background: #e3f2fd; }
-.transit-icon.mode-bus { background: #fff3e0; }
-.transit-icon.mode-taxi { background: #fff8c4; }
-
-.transit-label {
+.pc-transit-label {
   font-size: 12px;
   color: #e65100;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 
-.transit-text {
+.pc-transit-text {
   font-size: 13px;
   color: #5d4037;
   font-weight: 600;
 }
 
-.transit-hint {
+.pc-transit-hint {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -1976,7 +2115,7 @@ const clearAnswer = () => {
   padding-left: 38px;
 }
 
-.hint-arrow {
+.pc-hint-arrow {
   color: #ff9800;
   font-size: 14px;
   font-weight: 700;
@@ -1984,21 +2123,37 @@ const clearAnswer = () => {
   line-height: 1.6;
 }
 
-.hint-text {
+.pc-hint-text {
   font-size: 12px;
   color: #795548;
   line-height: 1.6;
 }
 
+/* 交通费用/时间元信息 */
+.pc-transit-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.pc-transit-meta-item {
+  font-size: 12px;
+  color: #777;
+  background: rgba(255,152,0,0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
 /* 原始文本内容区 */
-.ai-raw-content {
+.pc-ai-raw-content {
   background: #f8fafc;
   padding: 24px;
   border-radius: 14px;
   margin-bottom: 24px;
 }
 
-.ai-raw-text {
+.pc-ai-raw-text {
   font-size: 14px;
   color: #5a6478;
   line-height: 1.9;
@@ -2007,14 +2162,14 @@ const clearAnswer = () => {
 }
 
 /* 摘要 */
-.ai-summary {
+.pc-ai-summary {
   background: linear-gradient(135deg, #fff8e1, #ffe9d9);
   padding: 22px 26px;
   border-radius: 16px;
   border-left: 5px solid #ff9800;
 }
 
-.summary-title {
+.pc-summary-title {
   font-size: 15px;
   color: #8a6d00;
   font-weight: 800;
@@ -2022,12 +2177,12 @@ const clearAnswer = () => {
   letter-spacing: 0.5px;
 }
 
-.summary-list {
+.pc-summary-list {
   margin: 0;
   padding-left: 20px;
 }
 
-.summary-list li {
+.pc-summary-list li {
   font-size: 14px;
   color: #5d4e00;
   line-height: 1.8;
@@ -2035,7 +2190,785 @@ const clearAnswer = () => {
 }
 
 /* ==============================
-   弹窗
+   移动端样式
+   ============================== */
+
+/* 页面头部 */
+.mobile-page-header {
+  text-align: center;
+  padding: 0 4px;
+}
+
+.mobile-page-header .mobile-page-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  background: white;
+  border: 1.5px solid #d32f2f;
+  color: #d32f2f;
+  border-radius: 30px;
+  font-size: clamp(10px, 2.5vw, 12px);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.12);
+}
+
+.mobile-page-title {
+  font-size: clamp(18px, 5.5vw, 24px);
+  color: #1a2332;
+  margin: 0 0 10px 0;
+  font-weight: 800;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.mobile-page-subtitle {
+  font-size: clamp(11px, 3vw, 13px);
+  color: #7a8599;
+  margin: 0 auto;
+  line-height: 1.6;
+  max-width: 100%;
+  word-break: break-word;
+}
+
+/* Tab 切换 - 全宽度按钮样式 */
+.mobile-tabs-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.mobile-tabs {
+  display: flex;
+  width: 100%;
+  background: white;
+  padding: 4px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(26, 35, 50, 0.08);
+  gap: 4px;
+}
+
+.mobile-tab-btn {
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #7a8599;
+  font-size: clamp(12px, 3.5vw, 14px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.mobile-tab-btn:active {
+  background: rgba(211, 47, 47, 0.08);
+  color: #d32f2f;
+  transform: scale(0.98);
+}
+
+.mobile-tab-btn.active {
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  color: white;
+  box-shadow: 0 3px 10px rgba(211, 47, 47, 0.3);
+}
+
+/* 固定路线 - 单列紧凑卡片 */
+.mobile-locations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-loc-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1.5px solid #fce4ec;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(26, 35, 50, 0.04);
+}
+
+.mobile-loc-card:active {
+  background: #fff5f5;
+  border-color: #ffcdd2;
+  transform: scale(0.99);
+}
+
+.mobile-loc-card.mobile-loc-checked {
+  border-color: #c8e6c9;
+  background: linear-gradient(135deg, #f1f8e9 0%, #ffffff 100%);
+}
+
+.mobile-loc-number {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  color: white;
+  font-size: clamp(12px, 3.5vw, 14px);
+  font-weight: 800;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.25);
+}
+
+.mobile-loc-card.mobile-loc-checked .mobile-loc-number {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.mobile-loc-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-loc-name {
+  font-size: clamp(13px, 4vw, 16px);
+  color: #1a2332;
+  margin: 0 0 4px 0;
+  font-weight: 700;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+.mobile-loc-meta {
+  font-size: clamp(10px, 2.8vw, 12px);
+  color: #7a8599;
+  margin-bottom: 6px;
+  font-weight: 500;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.mobile-loc-desc {
+  font-size: clamp(11px, 3vw, 13px);
+  color: #5a6478;
+  line-height: 1.6;
+  margin: 0 0 8px 0;
+  word-break: break-word;
+}
+
+.mobile-loc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.mobile-loc-tag {
+  font-size: clamp(9px, 2.5vw, 11px);
+  color: #d32f2f;
+  background: rgba(211, 47, 47, 0.1);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.mobile-loc-status {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  background: rgba(255, 112, 67, 0.1);
+  color: #ff7043;
+  margin-top: 2px;
+}
+
+.mobile-loc-card.mobile-loc-checked .mobile-loc-status {
+  background: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+}
+
+/* 路线说明 - 移动端列表样式 */
+.mobile-route-info {
+  background: white;
+  border-radius: 14px;
+  padding: 16px 14px;
+  box-shadow: 0 2px 8px rgba(26, 35, 50, 0.06);
+  margin-top: 8px;
+}
+
+.mobile-info-title {
+  font-size: clamp(12px, 3.5vw, 14px);
+  font-weight: 800;
+  color: #1a2332;
+  text-align: center;
+  margin-bottom: 14px;
+  letter-spacing: 0.5px;
+}
+
+.mobile-info-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mobile-step-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #fafbfc;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1.5px solid transparent;
+}
+
+.mobile-step-item:active {
+  background: #fff5f5;
+  border-color: #ffcdd2;
+}
+
+.mobile-step-item.mobile-step-checked {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.08), rgba(76, 175, 80, 0.03));
+}
+
+.mobile-step-number {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: clamp(10px, 2.8vw, 12px);
+  box-shadow: 0 2px 6px rgba(211, 47, 47, 0.25);
+}
+
+.mobile-step-item.mobile-step-checked .mobile-step-number {
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+}
+
+.mobile-step-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-step-name {
+  font-size: clamp(11px, 3.2vw, 13px);
+  font-weight: 700;
+  color: #1a2332;
+  margin-bottom: 2px;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+.mobile-step-place {
+  font-size: clamp(9px, 2.5vw, 11px);
+  color: #7a8599;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.mobile-step-status {
+  flex-shrink: 0;
+  font-size: 14px;
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.mobile-step-item.mobile-step-checked .mobile-step-status {
+  color: #4caf50;
+}
+
+/* AI 推荐页面 - 移动端 */
+.mobile-ai-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px 14px;
+  box-shadow: 0 2px 8px rgba(26, 35, 50, 0.06);
+  margin-bottom: 14px;
+}
+
+.mobile-ai-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1.5px solid #f0f2f5;
+  justify-content: center;
+}
+
+.mobile-ai-icon {
+  font-size: clamp(18px, 5vw, 22px);
+}
+
+.mobile-ai-title {
+  font-size: clamp(12px, 3.5vw, 15px);
+  color: #1a2332;
+  font-weight: 800;
+}
+
+/* 预设问题 - 单列卡片 */
+.mobile-preset-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.mobile-preset-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #fafbfc, #f5f7fa);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-preset-item:active {
+  background: #fff5f5;
+  border-color: #ffcdd2;
+  transform: scale(0.99);
+}
+
+.mobile-preset-item.selected {
+  border-color: #d32f2f;
+  background: linear-gradient(135deg, #fff5f5, #ffecec);
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15);
+}
+
+.mobile-preset-item.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.mobile-preset-emoji {
+  font-size: clamp(16px, 5vw, 20px);
+  flex-shrink: 0;
+}
+
+.mobile-preset-label {
+  font-size: clamp(11px, 3.2vw, 13px);
+  color: #1a2332;
+  font-weight: 600;
+  line-height: 1.45;
+  flex: 1;
+  word-break: break-word;
+}
+
+.mobile-preset-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(211, 47, 47, 0.2);
+  border-top-color: #d32f2f;
+  border-radius: 50%;
+  animation: spinSpin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+/* 自定义提问 - 移动端 */
+.mobile-custom-ask {
+  margin-top: 4px;
+  padding: 12px;
+  background: linear-gradient(135deg, #fff9f5, #fff3e0);
+  border-radius: 12px;
+  border: 1.5px dashed #ffcc80;
+}
+
+.mobile-custom-ask-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: clamp(10px, 2.8vw, 12px);
+  font-weight: 600;
+  color: #5d4037;
+}
+
+.mobile-ask-textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1.5px solid #ffe0b2;
+  border-radius: 10px;
+  font-size: clamp(11px, 3.2vw, 13px);
+  font-family: inherit;
+  color: #3e2723;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+.mobile-ask-textarea::placeholder {
+  color: #bca89a;
+}
+
+.mobile-ask-textarea:focus {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.08);
+}
+
+.mobile-btn-ask-submit {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #d32f2f, #c62828);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: clamp(12px, 3.5vw, 14px);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(211, 47, 47, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.mobile-btn-ask-submit:active:not(:disabled) {
+  background: linear-gradient(135deg, #b71c1c, #a61b1b);
+  transform: scale(0.99);
+}
+
+.mobile-btn-ask-submit:disabled {
+  background: #e0e0e0;
+  color: #9e9e9e;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.mobile-submit-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spinSpin 0.8s linear infinite;
+}
+
+/* AI 结果 - 移动端 */
+.mobile-ai-result-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fffaf5 100%);
+  border: 1.5px solid rgba(211, 47, 47, 0.15);
+}
+
+.mobile-ai-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 10px;
+}
+
+.mobile-result-badge {
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  color: white;
+  border-radius: 8px;
+  font-size: clamp(10px, 2.8vw, 12px);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.25);
+}
+
+.mobile-btn-refresh {
+  padding: 6px 12px;
+  background: transparent;
+  color: #7a8599;
+  border: 1.5px solid #e5e9ef;
+  border-radius: 8px;
+  font-size: clamp(10px, 2.8vw, 12px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-btn-refresh:active {
+  color: #d32f2f;
+  border-color: #d32f2f;
+  background: rgba(211, 47, 47, 0.05);
+}
+
+.mobile-ai-result-question {
+  background: #f8fafc;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+.mobile-q-text {
+  font-size: clamp(11px, 3vw, 13px);
+  color: #1a2332;
+  font-weight: 700;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+/* AI 步骤列表 - 移动端 */
+.mobile-ai-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.mobile-ai-step-item {
+  padding: 14px;
+  background: white;
+  border-radius: 12px;
+  border: 1.5px solid #f5f5f5;
+  transition: all 0.2s ease;
+}
+
+.mobile-ai-step-top {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.mobile-ai-step-index {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #d32f2f, #ff7043);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(12px, 3.5vw, 14px);
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(211, 47, 47, 0.25);
+}
+
+.mobile-ai-step-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-ai-step-name {
+  font-size: clamp(12px, 3.5vw, 15px);
+  color: #1a2332;
+  margin: 0 0 3px 0;
+  font-weight: 700;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+.mobile-ai-step-meta {
+  font-size: clamp(10px, 2.8vw, 11px);
+  color: #d32f2f;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.mobile-ai-step-desc {
+  font-size: clamp(11px, 3vw, 13px);
+  color: #5a6478;
+  line-height: 1.65;
+  margin: 0 0 10px 0;
+  word-break: break-word;
+}
+
+/* 时间/门票 - 移动端 */
+.mobile-time-ticket-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mobile-time-ticket-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.mobile-time-ticket-item span:first-child {
+  font-size: clamp(12px, 3.5vw, 14px);
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+.mobile-item-value {
+  font-size: clamp(10px, 2.8vw, 12px);
+  color: #333;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* 附近餐饮/拍照点 - 移动端 */
+.mobile-food-photo-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mobile-food-photo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid;
+}
+
+.mobile-food-photo-item.mobile-food-item {
+  background: #fffbf5;
+  border-color: #ffe0b2;
+}
+
+.mobile-food-photo-item.mobile-photo-item {
+  background: #fdf7ff;
+  border-color: #e1bee7;
+}
+
+.mobile-food-photo-item span:first-child {
+  font-size: clamp(12px, 3.5vw, 14px);
+  flex-shrink: 0;
+}
+
+/* 交通路线 - 移动端 */
+.mobile-ai-step-transit {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #fff8f5, #fff3eb);
+  border-left: 2.5px solid #ff9800;
+  border-radius: 8px;
+}
+
+.mobile-transit-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.mobile-transit-icon {
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+.mobile-transit-label {
+  font-size: clamp(9px, 2.5vw, 11px);
+  color: #e65100;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.mobile-transit-text {
+  font-size: clamp(11px, 3vw, 13px);
+  color: #5d4037;
+  font-weight: 600;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
+.mobile-transit-hint {
+  margin-top: 4px;
+  padding-left: 0;
+}
+
+.mobile-transit-hint span {
+  font-size: clamp(10px, 2.8vw, 12px);
+  color: #795548;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.mobile-transit-meta {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.mobile-transit-meta span {
+  font-size: clamp(9px, 2.5vw, 11px);
+  color: #777;
+  background: rgba(255, 152, 0, 0.12);
+  padding: 3px 6px;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+/* AI 原始内容 - 移动端 */
+.mobile-ai-raw-content {
+  background: #f8fafc;
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+
+.mobile-ai-raw-text {
+  font-size: clamp(11px, 3vw, 13px);
+  color: #5a6478;
+  line-height: 1.8;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* AI 摘要 - 移动端 */
+.mobile-ai-summary {
+  background: linear-gradient(135deg, #fff8e1, #ffe9d9);
+  padding: 14px;
+  border-radius: 10px;
+  border-left: 3px solid #ff9800;
+}
+
+.mobile-summary-title {
+  font-size: clamp(11px, 3.2vw, 13px);
+  color: #8a6d00;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+
+.mobile-summary-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.mobile-summary-list li {
+  font-size: clamp(10px, 2.8vw, 12px);
+  color: #5d4e00;
+  line-height: 1.7;
+  margin-bottom: 3px;
+  word-break: break-word;
+}
+
+/* ==============================
+   弹窗 - 通用（PC + 移动端适配）
    ============================== */
 .modal-overlay {
   position: fixed;
@@ -2160,6 +3093,12 @@ const clearAnswer = () => {
   transform: rotate(90deg) scale(1.1);
 }
 
+.modal-close:active {
+  background: #b71c1c;
+  color: white;
+  transform: scale(0.95);
+}
+
 .modal-body {
   padding: 32px 36px;
 }
@@ -2169,6 +3108,8 @@ const clearAnswer = () => {
   color: #1a2332;
   margin: 0 0 12px 0;
   font-weight: 800;
+  word-break: break-word;
+  line-height: 1.3;
 }
 
 .modal-place {
@@ -2183,6 +3124,7 @@ const clearAnswer = () => {
   color: #5a6478;
   line-height: 1.9;
   margin: 0 0 24px 0;
+  word-break: break-word;
 }
 
 .modal-history {
@@ -2227,6 +3169,7 @@ const clearAnswer = () => {
   line-height: 1.8;
   position: relative;
   z-index: 1;
+  word-break: break-word;
 }
 
 .modal-highlights {
@@ -2255,11 +3198,16 @@ const clearAnswer = () => {
   border-radius: 20px;
   font-weight: 600;
   transition: all 0.3s ease;
+  word-break: break-word;
 }
 
 .highlight-item:hover {
   transform: translateY(-2px);
   background: color-mix(in srgb, var(--accent-color) 20%, transparent);
+}
+
+.highlight-item:active {
+  transform: translateY(0);
 }
 
 .modal-note-box {
@@ -2281,6 +3229,7 @@ const clearAnswer = () => {
   color: #1b5e20;
   line-height: 1.7;
   margin-bottom: 10px;
+  word-break: break-word;
 }
 
 .modal-note-box .note-time {
@@ -2366,6 +3315,7 @@ const clearAnswer = () => {
 
 .btn-checkin:active {
   transform: translateY(0);
+  background: linear-gradient(135deg, #b71c1c, #a61b1b);
 }
 
 .btn-checked {
@@ -2381,210 +3331,179 @@ const clearAnswer = () => {
   box-shadow: 0 6px 20px rgba(76, 175, 80, 0.35);
 }
 
-/* ==============================
-   响应式
-   ============================== */
-@media (max-width: 900px) {
-  .info-steps { grid-template-columns: 1fr; }
-  .preset-questions { grid-template-columns: 1fr; }
-}
-
-/* 平板与手机 —— 核心适配 */
+/* 弹窗 - 移动端适配 */
 @media (max-width: 768px) {
-  /* 页面标题 */
-  .page-title { font-size: 30px; letter-spacing: -0.5px; }
-  .page-subtitle { font-size: 14px; line-height: 1.65; }
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+    background: rgba(15, 26, 43, 0.85);
+  }
 
-  /* 地点卡片 —— 移动端关键修复
-     布局：[序号] [文字信息] 占满一行，状态单独在第二行
-     这样文字信息有最大宽度，不会被图标和状态挤压 */
-  .loc-card {
+  .modal-card {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.3);
+    animation: slideUpMobile 0.35s ease-out;
+  }
+
+  @keyframes slideUpMobile {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-image {
+    aspect-ratio: 16 / 10;
+  }
+
+  .modal-category {
+    top: 14px;
+    left: 14px;
+    padding: 6px 14px;
+    font-size: clamp(10px, 2.8vw, 12px);
+    border-radius: 8px;
+  }
+
+  .modal-close {
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    font-size: 24px;
+  }
+
+  .modal-body {
     padding: 20px 18px;
-    gap: 12px;
-    row-gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-    border-radius: 18px;
   }
 
-  .loc-card::before {
-    width: 4px;
-  }
-
-  /* 序号缩小 */
-  .loc-number {
-    width: 38px;
-    height: 38px;
-    font-size: 16px;
-    border-radius: 10px;
-    flex-shrink: 0;
-  }
-
-  /* 红十字图标 —— 平板保留，缩小 */
-  .loc-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    flex-shrink: 0;
-  }
-  .cross-outer { width: 34px; height: 34px; }
-  .cross-h { width: 28px; height: 8px; transform: translate(-50%, -50%); }
-  .cross-v { width: 8px; height: 28px; transform: translate(-50%, -50%); }
-
-  /* 文字信息区：占满剩余空间 */
-  .loc-info {
-    flex: 1;
-    min-width: 0;
-    min-width: 160px; /* 保证文字区至少有 160px 宽 */
-  }
-
-  .loc-name { font-size: 17px; }
-  .loc-meta { font-size: 12.5px; margin-bottom: 8px; }
-  .loc-desc {
-    font-size: 13px;
-    line-height: 1.7;
+  .modal-title {
+    font-size: clamp(18px, 5.5vw, 22px);
     margin-bottom: 10px;
-    -webkit-line-clamp: 3;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
 
-  .loc-tags { gap: 6px; }
-  .loc-tag { font-size: 11px; padding: 4px 10px; }
+  .modal-place {
+    font-size: clamp(12px, 3.5vw, 14px);
+    margin-bottom: 16px;
+  }
 
-  /* 状态标签：在手机上放到第二行，占满宽度 */
-  .loc-status {
-    width: 100%;
-    text-align: center;
-    font-size: 13px;
-    padding: 10px 14px;
+  .modal-desc {
+    font-size: clamp(12px, 3.5vw, 14px);
+    line-height: 1.75;
+    margin-bottom: 18px;
+  }
+
+  .modal-history {
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+    border-left-width: 3px;
+  }
+
+  .history-label {
+    font-size: clamp(11px, 3vw, 13px);
+    margin-bottom: 6px;
+  }
+
+  .history-text {
+    font-size: clamp(11px, 3.2vw, 13px);
+    line-height: 1.7;
+  }
+
+  .modal-highlights {
+    margin-bottom: 18px;
+  }
+
+  .highlights-label {
+    font-size: clamp(11px, 3vw, 13px);
+    margin-bottom: 10px;
+  }
+
+  .highlights-list {
+    gap: 8px;
+  }
+
+  .highlight-item {
+    font-size: clamp(11px, 3vw, 13px);
+    padding: 6px 12px;
+    border-radius: 16px;
+  }
+
+  .modal-note-box {
+    padding: 14px 16px;
+    border-radius: 12px;
+  }
+
+  .modal-note-box .note-label {
+    font-size: clamp(11px, 3vw, 13px);
+    margin-bottom: 8px;
+  }
+
+  .modal-note-box .note-content {
+    font-size: clamp(12px, 3.5vw, 14px);
+    line-height: 1.6;
+  }
+
+  .modal-note-box .note-time {
+    font-size: clamp(10px, 2.8vw, 12px);
+  }
+
+  .modal-note-input {
+    padding: 14px 16px;
+    border-radius: 12px;
+  }
+
+  .modal-note-input .note-label {
+    font-size: clamp(11px, 3vw, 13px);
+    margin-bottom: 10px;
+  }
+
+  .note-input {
+    padding: 12px 14px;
+    font-size: clamp(12px, 3.5vw, 14px);
     border-radius: 10px;
-    margin-top: 4px;
+    line-height: 1.65;
   }
 
-  /* 路线说明区域 */
-  .route-info { padding: 24px 16px; }
+  .modal-footer {
+    padding: 16px 18px 28px;
+  }
 
-  /* 步骤卡片 */
-  .step-item { padding: 14px 14px; gap: 12px; }
-  .step-number { width: 32px; height: 32px; font-size: 14px; }
-  .step-name { font-size: 14px; }
-  .step-place { font-size: 12px; }
+  .btn-checkin,
+  .btn-checked {
+    padding: 14px 24px;
+    font-size: clamp(13px, 3.8vw, 15px);
+    border-radius: 12px;
+  }
 
-  /* 弹窗 */
-  .modal-body { padding: 24px 18px; }
-  .modal-footer { padding: 18px 18px 24px; }
-  .modal-title { font-size: 22px; }
-
-  /* AI 卡片 */
-  .ai-card { padding: 20px 16px; }
-  .ai-card-header { flex-direction: column; gap: 12px; align-items: flex-start; }
-  .ai-title { font-size: 18px; }
-  .ai-subtitle { font-size: 13px; line-height: 1.6; word-break: break-word; overflow-wrap: break-word; }
-
-  /* Tab 切换 */
-  .tab-btn { padding: 10px 16px; font-size: 13px; }
-  .tab-text { display: none; }
-  .tabs-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .tabs { min-width: max-content; }
-
-  /* AI 步骤卡片移动端 */
-  .ai-step-item { padding: 18px 16px; gap: 14px; }
-  .ai-step-index { width: 38px; height: 38px; font-size: 18px; border-radius: 10px; }
-  .ai-step-name { font-size: 15px; }
-  .ai-step-desc { font-size: 13px; line-height: 1.75; }
-
-  /* 预设问题 */
-  .preset-questions { grid-template-columns: 1fr; gap: 10px; }
-  .preset-item { padding: 14px 16px; }
-  .preset-label { font-size: 13px; }
-  .preset-emoji { font-size: 22px; }
-
-  /* 交通区块 */
-  .transit-head { gap: 8px; }
-  .transit-text { font-size: 12px; }
-  .transit-hint { flex-direction: column; gap: 4px; padding-left: 0; }
-  .hint-arrow { display: none; }
-
-  /* 列表文字缩小 */
-  .highlights-list li, .practical-list li { font-size: 12.5px; line-height: 1.65; }
-  .item-value { font-size: 12.5px; word-break: break-word; overflow-wrap: break-word; }
+  .btn-checkin:hover {
+    transform: translateY(-1px);
+  }
 }
 
-/* 小手机 —— 更紧凑的布局 */
 @media (max-width: 480px) {
-  .page-title { font-size: 26px; }
+  .modal-card {
+    max-height: 95vh;
+  }
 
-  /* 地点卡片：隐藏图标，给文字最大空间 */
-  .loc-card {
+  .modal-image {
+    aspect-ratio: 16 / 9;
+  }
+
+  .modal-body {
     padding: 16px 14px;
-    gap: 10px;
   }
 
-  .loc-icon {
-    display: none;
+  .modal-footer {
+    padding: 14px 14px 22px;
   }
 
-  .loc-number {
-    width: 34px;
-    height: 34px;
-    font-size: 15px;
+  .modal-history {
+    padding: 12px 14px;
   }
 
-  .loc-info {
-    min-width: 0;
+  .modal-note-box,
+  .modal-note-input {
+    padding: 12px 14px;
   }
-
-  .loc-name { font-size: 16px; line-height: 1.4; }
-  .loc-meta { font-size: 12px; }
-  .loc-desc { font-size: 12.5px; line-height: 1.7; }
-
-  .loc-status {
-    font-size: 12.5px;
-    padding: 9px 12px;
-  }
-
-  /* Tab：两个按钮平分宽度 */
-  .tabs { width: 100%; }
-  .tab-btn { flex: 1; justify-content: center; padding: 12px 14px; }
-  .tab-text { display: inline; }
-  .tab-icon { display: none; }
-
-  /* 时间/门票、美食/拍照点 改为单列 */
-  .time-ticket-row { grid-template-columns: 1fr; gap: 12px; }
-  .food-photo-row { grid-template-columns: 1fr; gap: 12px; }
-
-  /* 自定义提问区 */
-  .custom-ask-input { flex-direction: column; }
-  .btn-ask-submit { width: 100%; min-width: unset; padding: 14px; }
-  .ask-textarea { min-height: 80px; }
-
-  /* 步骤列表改为单列 */
-  .info-steps { grid-template-columns: 1fr; }
-
-  /* 统计卡片 */
-  .header-stats-card { min-width: unset; padding: 20px 28px; }
-  .stats-number { font-size: 36px; }
-
-  /* AI 步骤 */
-  .ai-step-item { padding: 16px 14px; gap: 12px; }
-  .ai-step-index { width: 36px; height: 36px; font-size: 17px; }
-  .ai-step-meta { font-size: 11.5px; }
-  .ai-step-name { font-size: 14.5px; }
-  .ai-step-desc { font-size: 12.5px; }
 }
-
-/* 最小手机 —— 极限紧凑 */
-@media (max-width: 375px) {
-  .page-title { font-size: 22px; }
-  .loc-card { padding: 14px 12px; gap: 10px; }
-  .loc-number { width: 32px; height: 32px; font-size: 14px; }
-  .loc-name { font-size: 15.5px; }
-  .loc-meta { font-size: 11.5px; }
-  .loc-desc { font-size: 12px; }
-  .ai-step-item { padding: 14px 12px; }
-  .ai-step-meta { font-size: 11px; }
-  .step-item { padding: 12px; gap: 10px; }
-  .step-number { width: 30px; height: 30px; font-size: 13px; }
-}
+</style>
