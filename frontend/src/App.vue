@@ -1,0 +1,226 @@
+<template>
+  <div class="app-container">
+    <header class="header">
+      <div class="header-content">
+        <div class="logo" @click="router.push('/')">
+          <div class="logo-icon">
+            <span class="cross-h"></span>
+            <span class="cross-v"></span>
+          </div>
+          <div class="logo-text">
+            <h1>红十字会文化之旅</h1>
+            <p>Red Cross Cultural Journey</p>
+          </div>
+        </div>
+        <nav class="nav">
+          <router-link to="/" class="nav-item" :class="{ active: $route.path === '/' }">
+            🏠 首页
+          </router-link>
+          <router-link to="/routes" class="nav-item" :class="{ active: $route.path === '/routes' }">
+            🗺️ 路线推荐
+          </router-link>
+          <router-link to="/checkins" class="nav-item" :class="{ active: $route.path === '/checkins' }">
+            📋 个人打卡
+            <span v-if="checkinCount > 0" class="badge">{{ checkinCount }}</span>
+          </router-link>
+        </nav>
+      </div>
+    </header>
+    <main class="main-content">
+      <router-view></router-view>
+    </main>
+    <footer class="footer">
+      <div class="footer-content">
+        <p>© 2026 红十字会文化之旅 | 人道主义精神传承</p>
+        <p class="footer-sub">以人为本 · 博爱奉献 · 共建和平</p>
+      </div>
+    </footer>
+  </div>
+</template>
+
+<script setup>
+import { useRouter } from 'vue-router'
+import { useCheckinStore } from './stores/checkinStore'
+
+const router = useRouter()
+const { checkinCount } = useCheckinStore()
+</script>
+
+<style scoped>
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f7f9fc;
+}
+
+.header {
+  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(211, 47, 47, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.logo-icon {
+  width: 54px;
+  height: 54px;
+  background: white;
+  border-radius: 14px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.logo-icon .cross-h,
+.logo-icon .cross-v {
+  position: absolute;
+  background: #d32f2f;
+}
+
+.logo-icon .cross-h {
+  width: 24px;
+  height: 6px;
+}
+
+.logo-icon .cross-v {
+  width: 6px;
+  height: 24px;
+}
+
+.logo-text h1 {
+  font-size: 22px;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.logo-text p {
+  font-size: 12px;
+  margin: 2px 0 0 0;
+  opacity: 0.85;
+  letter-spacing: 1.5px;
+}
+
+.nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.nav-item.active {
+  background: white;
+  color: #d32f2f;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.badge {
+  background: #ffeb3b;
+  color: #d32f2f;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  min-width: 20px;
+}
+
+.main-content {
+  flex: 1;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.footer {
+  background: #1a2332;
+  color: #a0aec0;
+  padding: 28px 32px;
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-content p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.footer-sub {
+  font-size: 12px !important;
+  opacity: 0.7;
+  letter-spacing: 4px;
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .logo-text h1 {
+    font-size: 18px;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-item {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .main-content {
+    padding: 20px 16px;
+  }
+}
+</style>
