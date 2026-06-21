@@ -14,23 +14,31 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    @Value("#{'${app.cors.allowed-origins:http://localhost:5173}'.split(',')}")
-    private List<String> allowedOrigins;
+    @Value("${app.cors.allowed-origins:}")
+    private String allowedOriginsRaw;
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                String[] origins = allowedOrigins.stream()
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .toArray(String[]::new);
-                registry.addMapping("/api/**")
-                    .allowedOrigins(origins)
-                    .allowedMethods("GET", "POST", "OPTIONS")
-                    .allowedHeaders("*")
-                    .maxAge(3600);
+                String raw = allowedOriginsRaw == null ? "" : allowedOriginsRaw.trim();
+                if (raw.isEmpty()) {
+                    // 没有配置白名单时，允许所有来源（部署到云端时推荐此模式）
+                    registry.addMapping("/api/**")
+                        .allowedOriginPatterns("*")
+                        .allowedMethods("GET", "POST", "OPTIONS")
+                        .allowedHeaders("*")
+                        .maxAge(3600);
+                } else {
+                    String[] origins = raw.split(",");
+                    java.util.Arrays.setAll(origins, i -> origins[i].trim());
+                    registry.addMapping("/api/**")
+                        .allowedOrigins(origins)
+                        .allowedMethods("GET", "POST", "OPTIONS")
+                        .allowedHeaders("*")
+                        .maxAge(3600);
+                }
             }
         };
     }
