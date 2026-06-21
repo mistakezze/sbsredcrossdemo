@@ -315,7 +315,7 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
 }
 
 .hero-title {
-  font-size: 52px;
+  font-size: clamp(24px, 5vw, 52px);
   line-height: 1.2;
   margin: 0 0 24px 0;
   color: #1a2332;
@@ -760,7 +760,7 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
 }
 
 .figure-name {
-  font-size: 22px;
+  font-size: clamp(24px, 5vw, 22px);
   color: #1a2332;
   margin: 0 0 4px 0;
   font-weight: 700;
@@ -1056,7 +1056,7 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
 }
 
 .location-name {
-  font-size: 18px;
+  font-size: clamp(12px, 2vw, 18px);
   color: #1a2332;
   margin: 0 0 10px 0;
   font-weight: 700;
@@ -1079,7 +1079,7 @@ const { hasCheckedIn, checkinCount } = useCheckinStore()
 }
 
 .location-desc {
-  font-size: 13px;
+  font-size: clamp(12px, 2vw, 13px);
   color: #5a6478;
   line-height: 1.8;
   margin: 0 0 18px 0;

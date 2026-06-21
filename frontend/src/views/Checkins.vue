@@ -192,7 +192,7 @@ const confirmDelete = () => {
 }
 
 .page-title {
-  font-size: 40px;
+  font-size: clamp(22px, 5vw, 40px);
   color: #1a2332;
   margin: 0 0 16px 0;
   font-weight: 800;
@@ -695,7 +695,7 @@ const confirmDelete = () => {
 }
 
 .note-content {
-  font-size: 14px;
+  font-size: clamp(12px, 2vw, 14px);
   color: #5d4e00;
   line-height: 1.7;
   margin: 0;

@@ -440,7 +440,7 @@ const saveNote = () => {
 }
 
 .section-title {
-  font-size: 18px;
+  font-size: clamp(12px, 2vw, 18px);
   color: #1a2332;
   margin: 0 0 16px 0;
   font-weight: 700;
@@ -516,7 +516,7 @@ const saveNote = () => {
 }
 
 .highlight-text {
-  font-size: 15px;
+  font-size: clamp(12px, 2vw, 15px);
   color: #5a6478;
   line-height: 1.7;
   padding-top: 3px;
@@ -592,7 +592,7 @@ const saveNote = () => {
 }
 
 .note-text {
-  font-size: 15px;
+  font-size: clamp(12px, 2vw, 15px);
   color: #5d4e00;
   line-height: 1.8;
   margin: 0;

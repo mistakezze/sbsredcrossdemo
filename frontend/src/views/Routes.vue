@@ -705,7 +705,7 @@ const clearAnswer = () => {
 }
 
 .page-title {
-  font-size: 46px;
+  font-size: clamp(18px, 4vw, 38px);
   color: #1a2332;
   margin: 0 0 16px 0;
   font-weight: 800;
@@ -1727,7 +1727,7 @@ const clearAnswer = () => {
 }
 
 .ai-step-name {
-  font-size: 17px;
+  font-size: clamp(12px, 2vw, 17px);
   color: #1a2332;
   margin: 0 0 6px 0;
   font-weight: 700;
