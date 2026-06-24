@@ -99,9 +99,15 @@ const { isMobile } = useViewport()
   background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
   color: white;
   box-shadow: 0 4px 20px rgba(211, 47, 47, 0.25);
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.pc-page-content {
+  padding-top: 80px;
 }
 
 .pc-header-inner {
@@ -216,7 +222,7 @@ const { isMobile } = useViewport()
   max-width: 1280px;
   width: 100%;
   margin: 0 auto;
-  padding: 32px;
+  padding: 96px 32px 0;
 }
 
 .pc-footer {
