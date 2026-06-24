@@ -82,11 +82,9 @@
           <div class="carousel-viewport">
             <transition name="slide-fade" mode="out-in">
               <div
-                v-for="(figure, index) in figures"
-                v-show="index === figureIndex"
-                :key="figure.id"
+                :key="figureIndex"
                 class="pc-figure-card large"
-                :style="{ '--accent-color': figure.color }"
+                :style="{ '--accent-color': figures[figureIndex]?.color }"
               >
                 <div class="pc-figure-portrait large">
                   <div class="portrait-glow"></div>
@@ -98,14 +96,14 @@
                 </div>
                 <div class="pc-figure-content">
                   <div class="pc-figure-meta">
-                    <span class="figure-years">{{ figure.years }}</span>
+                    <span class="figure-years">{{ figures[figureIndex]?.years }}</span>
                   </div>
-                  <h3 class="pc-figure-name large">{{ figure.name }}</h3>
-                  <p class="figure-en large">{{ figure.enName }}</p>
-                  <p class="pc-figure-title-line large">{{ figure.title }}</p>
-                  <p class="pc-figure-desc large">{{ figure.description }}</p>
-                  <div class="pc-figure-achievement large">🏆 {{ figure.achievement }}</div>
-                  <blockquote v-if="figure.quote" class="figure-quote large">「{{ figure.quote }}」</blockquote>
+                  <h3 class="pc-figure-name large">{{ figures[figureIndex]?.name }}</h3>
+                  <p class="figure-en large">{{ figures[figureIndex]?.enName }}</p>
+                  <p class="pc-figure-title-line large">{{ figures[figureIndex]?.title }}</p>
+                  <p class="pc-figure-desc large">{{ figures[figureIndex]?.description }}</p>
+                  <div class="pc-figure-achievement large">🏆 {{ figures[figureIndex]?.achievement }}</div>
+                  <blockquote v-if="figures[figureIndex]?.quote" class="figure-quote large">「{{ figures[figureIndex]?.quote }}」</blockquote>
                 </div>
               </div>
             </transition>
@@ -153,15 +151,13 @@
           <div class="carousel-viewport">
             <transition name="slide-fade" mode="out-in">
               <router-link
-                v-for="(loc, index) in locations"
-                v-show="index === locationIndex"
-                :key="loc.id"
+                :key="locationIndex"
                 :to="`/routes`"
                 class="pc-location-card large"
-                :style="{ '--accent-color': loc.color }"
+                :style="{ '--accent-color': locations[locationIndex]?.color }"
               >
-                <div class="pc-location-image large" :class="{ 'has-image': loc.image }">
-                  <img v-if="loc.image" :src="loc.image" :alt="loc.name" />
+                <div class="pc-location-image large" :class="{ 'has-image': locations[locationIndex]?.image }">
+                  <img v-if="locations[locationIndex]?.image" :src="locations[locationIndex]?.image" :alt="locations[locationIndex]?.name" />
                   <div v-else class="image-placeholder">
                     <div class="placeholder-cross">
                       <span class="ph-h"></span>
@@ -170,19 +166,19 @@
                     <span class="placeholder-text">图片预留位置</span>
                   </div>
                   <div class="shine-overlay"></div>
-                  <div class="location-category large">{{ loc.category }}</div>
-                  <div v-if="hasCheckedIn(loc.id)" class="location-checked large">
+                  <div class="location-category large">{{ locations[locationIndex]?.category }}</div>
+                  <div v-if="locations[locationIndex] && hasCheckedIn(locations[locationIndex]?.id)" class="location-checked large">
                     <span class="check-icon">✓</span>
                     <span>已打卡</span>
                   </div>
                 </div>
                 <div class="pc-location-body large">
-                  <h3 class="pc-location-name large">{{ loc.name }}</h3>
-                  <div class="location-place large">📍 {{ loc.location }}</div>
-                  <p class="pc-location-desc large">{{ loc.description }}</p>
+                  <h3 class="pc-location-name large">{{ locations[locationIndex]?.name }}</h3>
+                  <div class="location-place large">📍 {{ locations[locationIndex]?.location }}</div>
+                  <p class="pc-location-desc large">{{ locations[locationIndex]?.description }}</p>
                   <div class="location-highlights large">
-                    <span v-for="(h, i) in loc.highlights.slice(0, 3)" :key="i" class="highlight-tag">{{ h }}</span>
-                    <span v-if="loc.highlights.length > 3" class="highlight-tag more">+{{ loc.highlights.length - 3 }}</span>
+                    <span v-for="(h, i) in (locations[locationIndex]?.highlights || []).slice(0, 3)" :key="i" class="highlight-tag">{{ h }}</span>
+                    <span v-if="(locations[locationIndex]?.highlights?.length || 0) > 3" class="highlight-tag more">+{{ locations[locationIndex].highlights.length - 3 }}</span>
                   </div>
                 </div>
               </router-link>
@@ -262,6 +258,7 @@
         </div>
 
         <div class="mobile-figure-scroll">
+          <div class="scroll-spacer"></div>
           <div class="mobile-figure-track">
             <div
               v-for="figure in figures"
@@ -287,6 +284,7 @@
               </div>
             </div>
           </div>
+          <div class="scroll-spacer"></div>
         </div>
       </section>
 
@@ -301,6 +299,7 @@
         </div>
 
         <div class="mobile-location-scroll">
+          <div class="scroll-spacer"></div>
           <div class="mobile-location-track">
             <router-link
               v-for="loc in locations"
@@ -328,6 +327,7 @@
               </div>
             </router-link>
           </div>
+          <div class="scroll-spacer"></div>
         </div>
       </section>
 
@@ -1347,8 +1347,10 @@ const locationIndex = ref(0)
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  margin: 0 -18px;
-  padding: 4px 18px 20px;
+  padding: 4px 0 20px;
+  /* 第一张卡片居中：scroll-padding 让对齐点偏到中间 */
+  scroll-padding-inline-start: calc((100vw - 18px * 2 - 14px) / 2 - 14px);
+  scroll-padding-inline-end: calc(18px);
 }
 
 .mobile-figure-scroll::-webkit-scrollbar,
@@ -1360,13 +1362,20 @@ const locationIndex = ref(0)
 .mobile-location-track {
   display: flex;
   gap: 14px;
+  width: max-content;
+  padding: 0 18px;
 }
 
 .mobile-figure-card-snap,
 .mobile-location-card-snap {
   flex-shrink: 0;
-  width: 85%;
+  width: calc(85vw - 18px * 2 + 14px);
   scroll-snap-align: start;
+}
+
+.scroll-spacer {
+  flex-shrink: 0;
+  width: calc((100vw - 18px * 2 - 14px) / 2 - 14px);
 }
 
 /* ===== 移动端人物横滑卡片 ===== */
