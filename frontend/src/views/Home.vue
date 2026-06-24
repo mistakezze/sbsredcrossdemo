@@ -69,27 +69,65 @@
           <p class="pc-section-subtitle">那些以博爱精神改变世界的人们</p>
         </div>
 
-        <div class="pc-figures-grid">
-          <div v-for="figure in figures" :key="figure.id" class="pc-figure-card" :style="{ '--accent-color': figure.color }">
-            <div class="pc-figure-portrait">
-              <div class="portrait-glow"></div>
-              <div class="portrait-icon">
-                <span class="portrait-h"></span>
-                <span class="portrait-v"></span>
+        <div class="pc-figures-carousel">
+          <button
+            class="carousel-arrow prev"
+            :class="{ disabled: figureIndex === 0 }"
+            @click="figureIndex > 0 && figureIndex--"
+            aria-label="上一个"
+          >
+            <span>‹</span>
+          </button>
+
+          <div class="carousel-viewport">
+            <transition name="slide-fade" mode="out-in">
+              <div
+                v-for="(figure, index) in figures"
+                v-show="index === figureIndex"
+                :key="figure.id"
+                class="pc-figure-card large"
+                :style="{ '--accent-color': figure.color }"
+              >
+                <div class="pc-figure-portrait large">
+                  <div class="portrait-glow"></div>
+                  <div class="portrait-icon">
+                    <span class="portrait-h"></span>
+                    <span class="portrait-v"></span>
+                  </div>
+                  <div class="portrait-ring"></div>
+                </div>
+                <div class="pc-figure-content">
+                  <div class="pc-figure-meta">
+                    <span class="figure-years">{{ figure.years }}</span>
+                  </div>
+                  <h3 class="pc-figure-name large">{{ figure.name }}</h3>
+                  <p class="figure-en large">{{ figure.enName }}</p>
+                  <p class="pc-figure-title-line large">{{ figure.title }}</p>
+                  <p class="pc-figure-desc large">{{ figure.description }}</p>
+                  <div class="pc-figure-achievement large">🏆 {{ figure.achievement }}</div>
+                  <blockquote v-if="figure.quote" class="figure-quote large">「{{ figure.quote }}」</blockquote>
+                </div>
               </div>
-              <div class="portrait-ring"></div>
-            </div>
-            <div class="pc-figure-content">
-              <div class="pc-figure-meta">
-                <span class="figure-years">{{ figure.years }}</span>
-              </div>
-              <h3 class="pc-figure-name">{{ figure.name }}</h3>
-              <p class="figure-en">{{ figure.enName }}</p>
-              <p class="pc-figure-title-line">{{ figure.title }}</p>
-              <p class="pc-figure-desc">{{ figure.description }}</p>
-              <div class="pc-figure-achievement">🏆 {{ figure.achievement }}</div>
-              <blockquote v-if="figure.quote" class="figure-quote">「{{ figure.quote }}」</blockquote>
-            </div>
+            </transition>
+          </div>
+
+          <button
+            class="carousel-arrow next"
+            :class="{ disabled: figureIndex === figures.length - 1 }"
+            @click="figureIndex < figures.length - 1 && figureIndex++"
+            aria-label="下一个"
+          >
+            <span>›</span>
+          </button>
+
+          <div class="carousel-dots">
+            <span
+              v-for="(_, i) in figures"
+              :key="i"
+              class="dot"
+              :class="{ active: i === figureIndex }"
+              @click="figureIndex = i"
+            ></span>
           </div>
         </div>
       </section>
@@ -102,40 +140,73 @@
           <p class="pc-section-subtitle">承载人道精神的标志性建筑与场所</p>
         </div>
 
-        <div class="pc-locations-grid">
-          <router-link
-            v-for="loc in locations"
-            :key="loc.id"
-            :to="`/routes`"
-            class="pc-location-card"
-            :style="{ '--accent-color': loc.color }"
+        <div class="pc-locations-carousel">
+          <button
+            class="carousel-arrow prev"
+            :class="{ disabled: locationIndex === 0 }"
+            @click="locationIndex > 0 && locationIndex--"
+            aria-label="上一个"
           >
-            <div class="pc-location-image" :class="{ 'has-image': loc.image }">
-              <img v-if="loc.image" :src="loc.image" :alt="loc.name" />
-              <div v-else class="image-placeholder">
-                <div class="placeholder-cross">
-                  <span class="ph-h"></span>
-                  <span class="ph-v"></span>
+            <span>‹</span>
+          </button>
+
+          <div class="carousel-viewport">
+            <transition name="slide-fade" mode="out-in">
+              <router-link
+                v-for="(loc, index) in locations"
+                v-show="index === locationIndex"
+                :key="loc.id"
+                :to="`/routes`"
+                class="pc-location-card large"
+                :style="{ '--accent-color': loc.color }"
+              >
+                <div class="pc-location-image large" :class="{ 'has-image': loc.image }">
+                  <img v-if="loc.image" :src="loc.image" :alt="loc.name" />
+                  <div v-else class="image-placeholder">
+                    <div class="placeholder-cross">
+                      <span class="ph-h"></span>
+                      <span class="ph-v"></span>
+                    </div>
+                    <span class="placeholder-text">图片预留位置</span>
+                  </div>
+                  <div class="shine-overlay"></div>
+                  <div class="location-category large">{{ loc.category }}</div>
+                  <div v-if="hasCheckedIn(loc.id)" class="location-checked large">
+                    <span class="check-icon">✓</span>
+                    <span>已打卡</span>
+                  </div>
                 </div>
-                <span class="placeholder-text">图片预留位置</span>
-              </div>
-              <div class="shine-overlay"></div>
-              <div class="location-category">{{ loc.category }}</div>
-              <div v-if="hasCheckedIn(loc.id)" class="location-checked">
-                <span class="check-icon">✓</span>
-                <span>已打卡</span>
-              </div>
-            </div>
-            <div class="pc-location-body">
-              <h3 class="pc-location-name">{{ loc.name }}</h3>
-              <div class="location-place">📍 {{ loc.location }}</div>
-              <p class="pc-location-desc">{{ loc.description }}</p>
-              <div class="location-highlights">
-                <span v-for="(h, i) in loc.highlights.slice(0, 2)" :key="i" class="highlight-tag">{{ h }}</span>
-                <span v-if="loc.highlights.length > 2" class="highlight-tag more">+{{ loc.highlights.length - 2 }}</span>
-              </div>
-            </div>
-          </router-link>
+                <div class="pc-location-body large">
+                  <h3 class="pc-location-name large">{{ loc.name }}</h3>
+                  <div class="location-place large">📍 {{ loc.location }}</div>
+                  <p class="pc-location-desc large">{{ loc.description }}</p>
+                  <div class="location-highlights large">
+                    <span v-for="(h, i) in loc.highlights.slice(0, 3)" :key="i" class="highlight-tag">{{ h }}</span>
+                    <span v-if="loc.highlights.length > 3" class="highlight-tag more">+{{ loc.highlights.length - 3 }}</span>
+                  </div>
+                </div>
+              </router-link>
+            </transition>
+          </div>
+
+          <button
+            class="carousel-arrow next"
+            :class="{ disabled: locationIndex === locations.length - 1 }"
+            @click="locationIndex < locations.length - 1 && locationIndex++"
+            aria-label="下一个"
+          >
+            <span>›</span>
+          </button>
+
+          <div class="carousel-dots">
+            <span
+              v-for="(_, i) in locations"
+              :key="i"
+              class="dot"
+              :class="{ active: i === locationIndex }"
+              @click="locationIndex = i"
+            ></span>
+          </div>
         </div>
       </section>
     </template>
@@ -180,7 +251,7 @@
         </div>
       </section>
 
-      <!-- 移动端 人物区（卡片列表样式） -->
+      <!-- 移动端 人物区（横滑卡片） -->
       <section class="mobile-section">
         <div class="mobile-section-header">
           <div class="mobile-section-title-wrap">
@@ -190,29 +261,36 @@
           <span class="mobile-section-count">{{ figures.length }} 位</span>
         </div>
 
-        <div class="mobile-figure-list">
-          <div v-for="figure in figures" :key="figure.id" class="mobile-figure-card" :style="{ '--accent-color': figure.color }">
-            <div class="mobile-figure-avatar">
-              <span class="mobile-avatar-h"></span>
-              <span class="mobile-avatar-v"></span>
-            </div>
-            <div class="mobile-figure-info">
-              <div class="mobile-figure-head">
-                <span class="mobile-figure-name">{{ figure.name }}</span>
-                <span class="mobile-figure-years">{{ figure.years }}</span>
+        <div class="mobile-figure-scroll">
+          <div class="mobile-figure-track">
+            <div
+              v-for="figure in figures"
+              :key="figure.id"
+              class="mobile-figure-card-snap"
+              :style="{ '--accent-color': figure.color }"
+            >
+              <div class="mobile-figure-avatar large">
+                <span class="mobile-avatar-h"></span>
+                <span class="mobile-avatar-v"></span>
               </div>
-              <p class="mobile-figure-title">{{ figure.title }}</p>
-              <p class="mobile-figure-desc">{{ figure.description }}</p>
-              <div class="mobile-figure-tags">
-                <span class="mobile-tag achievement">🏆 {{ figure.achievement }}</span>
+              <div class="mobile-figure-info">
+                <div class="mobile-figure-head">
+                  <span class="mobile-figure-name">{{ figure.name }}</span>
+                  <span class="mobile-figure-years">{{ figure.years }}</span>
+                </div>
+                <p class="mobile-figure-title">{{ figure.title }}</p>
+                <p class="mobile-figure-desc">{{ figure.description }}</p>
+                <div class="mobile-figure-tags">
+                  <span class="mobile-tag achievement">🏆 {{ figure.achievement }}</span>
+                </div>
+                <blockquote v-if="figure.quote" class="mobile-figure-quote">「{{ figure.quote }}」</blockquote>
               </div>
-              <blockquote v-if="figure.quote" class="mobile-figure-quote">「{{ figure.quote }}」</blockquote>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- 移动端 地点区（卡片网格样式） -->
+      <!-- 移动端 地点区（横滑卡片） -->
       <section class="mobile-section">
         <div class="mobile-section-header">
           <div class="mobile-section-title-wrap">
@@ -222,32 +300,34 @@
           <span class="mobile-section-count">{{ locations.length }} 处</span>
         </div>
 
-        <div class="mobile-location-list">
-          <router-link
-            v-for="loc in locations"
-            :key="loc.id"
-            :to="`/routes`"
-            class="mobile-location-card"
-            :style="{ '--accent-color': loc.color }"
-          >
-            <div class="mobile-location-image">
-              <img v-if="loc.image" :src="loc.image" :alt="loc.name" />
-              <template v-else>
-                <span class="mobile-loc-icon-h"></span>
-                <span class="mobile-loc-icon-v"></span>
-              </template>
-              <div class="mobile-location-cat">{{ loc.category }}</div>
-              <div v-if="hasCheckedIn(loc.id)" class="mobile-location-checked">✓</div>
-            </div>
-            <div class="mobile-location-info">
-              <h3 class="mobile-location-name">{{ loc.name }}</h3>
-              <div class="mobile-location-place">📍 {{ loc.location }}</div>
-              <p class="mobile-location-desc">{{ loc.description }}</p>
-              <div class="mobile-location-tags">
-                <span v-for="(h, i) in loc.highlights.slice(0, 3)" :key="i" class="mobile-tag">{{ h }}</span>
+        <div class="mobile-location-scroll">
+          <div class="mobile-location-track">
+            <router-link
+              v-for="loc in locations"
+              :key="loc.id"
+              :to="`/routes`"
+              class="mobile-location-card-snap"
+              :style="{ '--accent-color': loc.color }"
+            >
+              <div class="mobile-location-image">
+                <img v-if="loc.image" :src="loc.image" :alt="loc.name" />
+                <template v-else>
+                  <span class="mobile-loc-icon-h"></span>
+                  <span class="mobile-loc-icon-v"></span>
+                </template>
+                <div class="mobile-location-cat">{{ loc.category }}</div>
+                <div v-if="hasCheckedIn(loc.id)" class="mobile-location-checked">✓</div>
               </div>
-            </div>
-          </router-link>
+              <div class="mobile-location-info">
+                <h3 class="mobile-location-name">{{ loc.name }}</h3>
+                <div class="mobile-location-place">📍 {{ loc.location }}</div>
+                <p class="mobile-location-desc">{{ loc.description }}</p>
+                <div class="mobile-location-tags">
+                  <span v-for="(h, i) in loc.highlights.slice(0, 3)" :key="i" class="mobile-tag">{{ h }}</span>
+                </div>
+              </div>
+            </router-link>
+          </div>
         </div>
       </section>
 
@@ -265,6 +345,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useFigureStore } from '../stores/figureStore'
 import { useLocationStore } from '../stores/locationStore'
 import { useCheckinStore } from '../stores/checkinStore'
@@ -274,6 +355,9 @@ const { figures } = useFigureStore()
 const { locations } = useLocationStore()
 const { hasCheckedIn, checkinCount } = useCheckinStore()
 const { isMobile } = useViewport()
+
+const figureIndex = ref(0)
+const locationIndex = ref(0)
 </script>
 
 <style scoped>
@@ -590,36 +674,137 @@ const { isMobile } = useViewport()
   line-height: 1.6;
 }
 
-/* PC 人物卡片 */
-.pc-figures-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 28px;
+/* ===== PC 轮播通用样式 ===== */
+.pc-figures-carousel,
+.pc-locations-carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 60px;
 }
 
-.pc-figure-card {
-  background: white;
-  border-radius: 22px;
-  padding: 32px;
+.carousel-viewport {
+  flex: 1;
   display: flex;
-  gap: 24px;
-  box-shadow: 0 4px 24px rgba(26, 35, 50, 0.06);
-  transition: all 0.4s ease;
-  border-left: 5px solid var(--accent-color);
+  justify-content: center;
+  min-height: 300px;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #e5e9ef;
+  color: #1a2332;
+  font-size: 28px;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(26, 35, 50, 0.1);
+  transition: all 0.3s ease;
+  z-index: 10;
+  padding: 0;
+  line-height: 1;
+}
+
+.carousel-arrow:hover:not(.disabled) {
+  transform: translateY(-50%) scale(1.12);
+  border-color: #d32f2f;
+  color: #d32f2f;
+  box-shadow: 0 6px 24px rgba(211, 47, 47, 0.25);
+}
+
+.carousel-arrow:active:not(.disabled) {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.carousel-arrow.prev {
+  left: 0;
+}
+
+.carousel-arrow.next {
+  right: 0;
+}
+
+.carousel-arrow.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d0d5dd;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot:hover {
+  background: #d32f2f;
+  transform: scale(1.2);
+}
+
+.dot.active {
+  background: #d32f2f;
+  width: 28px;
+  border-radius: 5px;
+}
+
+/* 轮播过渡动画 */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.slide-fade-enter-from {
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+
+/* ===== PC 人物卡片 - 轮播大卡片 ===== */
+.pc-figure-card.large {
+  background: white;
+  border-radius: 24px;
+  padding: 40px;
+  display: flex;
+  gap: 36px;
+  box-shadow: 0 8px 40px rgba(26, 35, 50, 0.1);
+  border-left: 6px solid var(--accent-color);
   position: relative;
   overflow: hidden;
+  max-width: 700px;
+  width: 100%;
 }
 
-.pc-figure-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 50px rgba(26, 35, 50, 0.15);
-}
-
-.pc-figure-portrait {
+.pc-figure-portrait.large {
   flex-shrink: 0;
-  width: 110px;
-  height: 110px;
-  border-radius: 18px;
+  width: 140px;
+  height: 140px;
+  border-radius: 22px;
   background: linear-gradient(135deg, var(--accent-color), #ff8a80);
   position: relative;
   display: flex;
@@ -652,6 +837,21 @@ const { isMobile } = useViewport()
   50% { transform: translateY(-6px); }
 }
 
+.pc-figure-portrait.large .portrait-icon {
+  width: 75px;
+  height: 75px;
+}
+
+.pc-figure-portrait.large .portrait-h {
+  width: 60px;
+  height: 15px;
+}
+
+.pc-figure-portrait.large .portrait-v {
+  width: 15px;
+  height: 60px;
+}
+
 .portrait-h, .portrait-v {
   position: absolute;
   top: 50%;
@@ -659,9 +859,10 @@ const { isMobile } = useViewport()
   background: white;
   border-radius: 3px;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+  transform: translate(-50%, -50%);
 }
-.portrait-h { width: 48px; height: 12px; transform: translate(-50%, -50%); }
-.portrait-v { width: 12px; height: 48px; transform: translate(-50%, -50%); }
+.portrait-h { width: 48px; height: 12px; }
+.portrait-v { width: 12px; height: 48px; }
 
 .portrait-ring {
   position: absolute;
@@ -693,104 +894,97 @@ const { isMobile } = useViewport()
   font-weight: 600;
 }
 
-.pc-figure-name {
-  font-size: clamp(20px, 2vw, 24px);
+.pc-figure-name.large {
+  font-size: clamp(24px, 2.5vw, 30px);
   color: #1a2332;
-  margin: 0 0 4px 0;
+  margin: 0 0 6px 0;
   font-weight: 700;
   word-break: break-word;
-  transition: color 0.3s ease;
 }
 
-.pc-figure-card:hover .pc-figure-name { color: var(--accent-color); }
-
-.figure-en {
-  font-size: 12px;
+.figure-en.large {
+  font-size: 14px;
   color: #a0aec0;
-  margin: 0 0 10px 0;
+  margin: 0 0 14px 0;
   font-style: italic;
 }
 
-.pc-figure-title-line {
-  font-size: 13px;
+.pc-figure-title-line.large {
+  font-size: 15px;
   color: var(--accent-color);
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
   font-weight: 600;
   word-break: break-word;
 }
 
-.pc-figure-desc {
-  font-size: 14px;
+.pc-figure-desc.large {
+  font-size: 15px;
   color: #5a6478;
-  line-height: 1.75;
-  margin: 0 0 14px 0;
+  line-height: 1.85;
+  margin: 0 0 18px 0;
   word-break: break-word;
 }
 
-.pc-figure-achievement {
+.pc-figure-achievement.large {
   background: linear-gradient(135deg, #fff8e1, #ffecb3);
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 13px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
   color: #8a6d00;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   word-break: break-word;
   line-height: 1.6;
 }
 
-.figure-quote {
+.figure-quote.large {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--accent-color);
   font-style: italic;
-  padding-left: 12px;
-  border-left: 3px solid var(--accent-color);
-  line-height: 1.7;
+  padding-left: 14px;
+  border-left: 4px solid var(--accent-color);
+  line-height: 1.75;
   opacity: 0.85;
   word-break: break-word;
 }
 
-/* PC 地点卡片 */
-.pc-locations-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-}
-
-.pc-location-card {
+/* ===== PC 地点卡片 - 轮播大卡片 ===== */
+.pc-location-card.large {
   background: white;
-  border-radius: 22px;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(26, 35, 50, 0.06);
-  transition: all 0.4s ease;
+  box-shadow: 0 8px 40px rgba(26, 35, 50, 0.1);
   position: relative;
   text-decoration: none;
   display: block;
   color: inherit;
+  max-width: 520px;
+  width: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.pc-location-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 24px 60px rgba(26, 35, 50, 0.15);
+.pc-location-card.large:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 50px rgba(26, 35, 50, 0.18);
 }
 
-.pc-location-image {
+.pc-location-image.large {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 10;
   background: linear-gradient(135deg, #fff5f5, #ffe0e0);
   overflow: hidden;
 }
 
-.pc-location-image.has-image img {
+.pc-location-image.large.has-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.6s ease;
 }
 
-.pc-location-card:hover .pc-location-image img {
-  transform: scale(1.08);
+.pc-location-card.large:hover .pc-location-image img {
+  transform: scale(1.05);
 }
 
 .image-placeholder {
@@ -845,7 +1039,7 @@ const { isMobile } = useViewport()
   transition: opacity 0.3s ease;
 }
 
-.pc-location-card:hover .shine-overlay {
+.pc-location-card.large:hover .shine-overlay {
   animation: shineSweep 1.5s ease-out;
   opacity: 1;
 }
@@ -856,30 +1050,30 @@ const { isMobile } = useViewport()
   100% { left: 200%; opacity: 0; }
 }
 
-.location-category {
+.location-category.large {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 20px;
+  left: 20px;
   background: linear-gradient(135deg, var(--accent-color), #b71c1c);
   color: white;
-  padding: 6px 16px;
+  padding: 8px 20px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 3;
   letter-spacing: 0.5px;
 }
 
-.location-checked {
+.location-checked.large {
   position: absolute;
-  bottom: 16px;
-  right: 16px;
+  bottom: 20px;
+  right: 20px;
   background: linear-gradient(135deg, #4caf50, #2e7d32);
   color: white;
-  padding: 8px 18px;
+  padding: 10px 20px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
   z-index: 3;
@@ -888,42 +1082,42 @@ const { isMobile } = useViewport()
   gap: 6px;
 }
 
-.pc-location-body {
-  padding: 26px 24px 24px;
+.pc-location-body.large {
+  padding: 30px 28px 28px;
   position: relative;
 }
 
-.pc-location-name {
-  font-size: clamp(16px, 1.5vw, 20px);
+.pc-location-name.large {
+  font-size: clamp(20px, 2vw, 24px);
   color: #1a2332;
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
   font-weight: 700;
   line-height: 1.4;
   word-break: break-word;
   transition: color 0.3s ease;
 }
 
-.pc-location-card:hover .pc-location-name { color: var(--accent-color); }
+.pc-location-card.large:hover .pc-location-name { color: var(--accent-color); }
 
-.location-place {
-  font-size: 13px;
+.location-place.large {
+  font-size: 14px;
   color: #7a8599;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   word-break: break-word;
 }
 
-.pc-location-desc {
-  font-size: 14px;
+.pc-location-desc.large {
+  font-size: 15px;
   color: #5a6478;
   line-height: 1.8;
-  margin: 0 0 18px 0;
+  margin: 0 0 20px 0;
   word-break: break-word;
 }
 
-.location-highlights {
+.location-highlights.large {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .highlight-tag {
@@ -1145,35 +1339,53 @@ const { isMobile } = useViewport()
   border-radius: 20px;
 }
 
-/* Mobile 人物卡片 - 横向布局 */
-.mobile-figure-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* ===== 移动端横滑通用 ===== */
+.mobile-figure-scroll,
+.mobile-location-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  margin: 0 -18px;
+  padding: 4px 18px 20px;
 }
 
-.mobile-figure-card {
-  background: white;
-  border-radius: 16px;
-  padding: 14px;
+.mobile-figure-scroll::-webkit-scrollbar,
+.mobile-location-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-figure-track,
+.mobile-location-track {
   display: flex;
-  gap: 12px;
-  box-shadow: 0 2px 12px rgba(26, 35, 50, 0.06);
+  gap: 14px;
+}
+
+.mobile-figure-card-snap,
+.mobile-location-card-snap {
+  flex-shrink: 0;
+  width: 85%;
+  scroll-snap-align: start;
+}
+
+/* ===== 移动端人物横滑卡片 ===== */
+.mobile-figure-card-snap {
+  background: white;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  gap: 14px;
+  box-shadow: 0 2px 14px rgba(26, 35, 50, 0.07);
   border-left: 4px solid var(--accent-color);
   align-items: flex-start;
-  transition: all 0.2s ease;
 }
 
-.mobile-figure-card:active {
-  transform: scale(0.98);
-  box-shadow: 0 1px 6px rgba(26, 35, 50, 0.1);
-}
-
-.mobile-figure-avatar {
+.mobile-figure-avatar.large {
   flex-shrink: 0;
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
   background: linear-gradient(135deg, var(--accent-color), #ff8a80);
   position: relative;
   display: flex;
@@ -1187,9 +1399,10 @@ const { isMobile } = useViewport()
   left: 50%;
   background: white;
   border-radius: 2px;
+  transform: translate(-50%, -50%);
 }
-.mobile-avatar-h { width: 28px; height: 8px; transform: translate(-50%, -50%); }
-.mobile-avatar-v { width: 8px; height: 28px; transform: translate(-50%, -50%); }
+.mobile-avatar-h { width: 32px; height: 9px; }
+.mobile-avatar-v { width: 9px; height: 32px; }
 
 .mobile-figure-info {
   flex: 1;
@@ -1232,6 +1445,10 @@ const { isMobile } = useViewport()
   line-height: 1.6;
   margin: 0 0 8px 0;
   word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .mobile-figure-tags {
@@ -1267,14 +1484,8 @@ const { isMobile } = useViewport()
   word-break: break-word;
 }
 
-/* Mobile 地点卡片 - 图文卡片样式 */
-.mobile-location-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.mobile-location-card {
+/* ===== 移动端地点横滑卡片 ===== */
+.mobile-location-card-snap {
   background: white;
   border-radius: 18px;
   overflow: hidden;
@@ -1283,17 +1494,11 @@ const { isMobile } = useViewport()
   flex-direction: column;
   text-decoration: none;
   color: inherit;
-  transition: all 0.2s ease;
-}
-
-.mobile-location-card:active {
-  transform: scale(0.98);
-  box-shadow: 0 1px 6px rgba(26, 35, 50, 0.1);
 }
 
 .mobile-location-image {
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 10;
   background: linear-gradient(135deg, #fff5f5, #ffe0e0);
   display: flex;
   align-items: center;
@@ -1378,6 +1583,10 @@ const { isMobile } = useViewport()
   line-height: 1.65;
   margin: 0 0 10px 0;
   word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .mobile-location-tags {
