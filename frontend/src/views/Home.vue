@@ -156,16 +156,14 @@
                 class="pc-location-card large"
                 :style="{ '--accent-color': locations[locationIndex]?.color }"
               >
-                <div class="pc-location-image large" :class="{ 'has-image': locations[locationIndex]?.image }">
+                <div class="pc-location-image large">
                   <img v-if="locations[locationIndex]?.image" :src="locations[locationIndex]?.image" :alt="locations[locationIndex]?.name" />
-                  <div v-else class="image-placeholder">
+                  <template v-else>
                     <div class="placeholder-cross">
                       <span class="ph-h"></span>
                       <span class="ph-v"></span>
                     </div>
-                    <span class="placeholder-text">图片预留位置</span>
-                  </div>
-                  <div class="shine-overlay"></div>
+                  </template>
                   <div class="location-category large">{{ locations[locationIndex]?.category }}</div>
                   <div v-if="locations[locationIndex] && hasCheckedIn(locations[locationIndex]?.id)" class="location-checked large">
                     <span class="check-icon">✓</span>
@@ -949,57 +947,60 @@ const locationIndex = ref(0)
   word-break: break-word;
 }
 
-/* ===== PC 地点卡片 - 轮播大卡片 ===== */
+/* ===== PC 地点卡片 - 轮播大卡片（横向布局，和人物卡片一致） ===== */
 .pc-location-card.large {
   background: white;
   border-radius: 24px;
+  padding: 36px;
   overflow: hidden;
   box-shadow: 0 8px 40px rgba(26, 35, 50, 0.1);
+  border-left: 6px solid var(--accent-color);
   position: relative;
   text-decoration: none;
-  display: block;
+  display: flex;
+  gap: 28px;
   color: inherit;
-  max-width: 520px;
+  max-width: 700px;
   width: 100%;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .pc-location-card.large:hover {
-  transform: translateY(-6px);
   box-shadow: 0 16px 50px rgba(26, 35, 50, 0.18);
 }
 
 .pc-location-image.large {
-  position: relative;
-  aspect-ratio: 16 / 10;
+  flex-shrink: 0;
+  width: 140px;
+  height: 140px;
+  border-radius: 18px;
   background: linear-gradient(135deg, #fff5f5, #ffe0e0);
+  position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.pc-location-image.large.has-image img {
+.pc-location-image.large.has-image img,
+.pc-location-image.large img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s ease;
-}
-
-.pc-location-card.large:hover .pc-location-image img {
-  transform: scale(1.05);
 }
 
 .image-placeholder {
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
 }
 
 .placeholder-cross {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   position: relative;
   animation: placeholderPulse 2.5s ease-in-out infinite;
 }
@@ -1011,80 +1012,53 @@ const locationIndex = ref(0)
   background: rgba(211, 47, 47, 0.35);
   border-radius: 4px;
 }
-.ph-h { width: 60px; height: 16px; transform: translate(-50%, -50%); }
-.ph-v { width: 16px; height: 60px; transform: translate(-50%, -50%); }
+.ph-h { width: 48px; height: 12px; transform: translate(-50%, -50%); }
+.ph-v { width: 12px; height: 48px; transform: translate(-50%, -50%); }
 
 @keyframes placeholderPulse {
   0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.15); opacity: 1; }
-}
-
-.placeholder-text {
-  font-size: 14px;
-  color: #a0aec0;
-  font-weight: 500;
-}
-
-.shine-overlay {
-  position: absolute;
-  top: -50%;
-  left: -100%;
-  width: 50%;
-  height: 200%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-  transform: rotate(25deg);
-  opacity: 0;
-  z-index: 2;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.pc-location-card.large:hover .shine-overlay {
-  animation: shineSweep 1.5s ease-out;
-  opacity: 1;
-}
-
-@keyframes shineSweep {
-  0% { left: -100%; opacity: 0; }
-  20% { opacity: 1; }
-  100% { left: 200%; opacity: 0; }
+  50% { transform: scale(1.1); opacity: 1; }
 }
 
 .location-category.large {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
   background: linear-gradient(135deg, var(--accent-color), #b71c1c);
   color: white;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 10px;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 3;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .location-checked.large {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+  top: 8px;
+  right: 8px;
   background: linear-gradient(135deg, #4caf50, #2e7d32);
   color: white;
-  padding: 10px 20px;
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 10px;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
   z-index: 3;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .pc-location-body.large {
-  padding: 30px 28px 28px;
-  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .pc-location-name.large {

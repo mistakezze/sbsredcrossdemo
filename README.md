@@ -1,1 +1,135 @@
-﻿# sbsredcrossdemo
+# sbsredcrossdemo
+
+上海红十字会文化游览网站
+
+## 版本历史
+
+### V1.0 - 初始版本
+> 2026-06-24
+
+- 搭建上海红十字地点游览项目脚手架
+- 前端：Vue 3 + Vite
+- 后端：Java Spring Boot
+
+---
+
+### V1.1 - AI 路线推荐
+> 2026-06-24
+
+- 新增 AI 路线推荐详细化功能
+- 后端代理 DeepSeek API（限流 + CORS + Mock 降级）
+- 新增字段：历史背景、参观亮点、最佳时间、门票信息、餐饮推荐、打卡点、实用贴士、交通费用时间等
+
+---
+
+### V1.2 - 安全与部署配置
+> 2026-06-24
+
+- `application.properties` 从 Git 追踪中排除（含敏感 API Key）
+- DeepSeek API Key 使用占位符管理
+- Java 版本升级为 Java 17
+- CORS 放开所有来源（适合部署模式）
+
+---
+
+### V2.0 - 全站移动端适配
+> 2026-06-24
+
+- 全站移动端适配
+- 响应式优化：路线卡片、AI 步骤、打卡时间线、导航栏、首页英雄区
+- 所有页面文字换行 & 布局优化
+- 全局流体字体：所有文字随屏幕宽度自动缩放
+
+---
+
+### V2.1 - PC/移动端双套独立 UI
+> 2026-06-24
+
+- 基于 768px 断点切换 PC 与移动端模板
+- 实现 `useViewport` 组合式函数检测设备类型
+- Home.vue、Routes.vue、Checkins.vue、CheckinDetail.vue 双套独立 UI
+- PC 端顶部导航 + 移动端底部 Tab 栏
+
+---
+
+### V2.2 - DeepSeek 模型配置
+> 2026-06-24
+
+- 模型默认值对齐为 `deepseek-v4-pro`
+- 与 `application.properties` 保持一致
+
+---
+
+### V2.3 - UI 细节优化
+> 2026-06-24
+
+- PC 端导航栏改为 `fixed` 定位，始终固定在顶部
+- 网页 favicon 改为红色十字（透明底），去掉红底圆
+
+---
+
+### V3.0 - 首页卡片滑动轮播
+> 2026-06-24
+
+- 首页人物区改为滑动轮播（PC 单卡片切换 + 移动端横滑）
+- 首页地点区改为滑动轮播
+- 大幅缩短首页页面长度
+- 修复轮播 bug（v-for 与 v-show 冲突）
+- 移动端卡片居中显示
+
+---
+
+### V3.1 - 轮播卡片样式优化
+> 2026-06-24
+
+- PC 端地点卡片尺寸与人物卡片统一（max-width: 700px）
+- PC 端地点卡片改为横向布局（左图右文），与人物卡片结构一致
+- 修复轮播切换效果冲突问题（去除 translateY 和 shine overlay 动画）
+
+---
+
+## 技术栈
+
+### 前端
+- Vue 3 + Composition API
+- Vite 5
+- Vue Router 4
+
+### 后端
+- Java Spring Boot
+- DeepSeek API 集成
+- 限流与 Mock 降级
+
+---
+
+## 快速开始
+
+### 前端
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### 后端
+```bash
+# 配置 DEEPSEEK_API_KEY 环境变量
+# 修改 src/main/resources/application.properties 中的 API Key
+
+# 运行 Spring Boot
+./mvnw spring-boot:run
+```
+
+---
+
+## 环境变量
+
+| 变量名 | 说明 |
+|--------|------|
+| `DEEPSEEK_API_KEY` | DeepSeek API 密钥 |
+
+---
+
+## 部署
+
+前端构建产物在 `frontend/dist/`，后端构建产物为 JAR 文件。
