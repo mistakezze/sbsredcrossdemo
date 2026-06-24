@@ -219,10 +219,10 @@ const { isMobile } = useViewport()
 
 .pc-main {
   flex: 1;
-  max-width: 1280px;
+  max-width: 1440px;
   width: 100%;
   margin: 0 auto;
-  padding: 96px 32px 0;
+  padding: 96px 40px 0;
 }
 
 .pc-footer {

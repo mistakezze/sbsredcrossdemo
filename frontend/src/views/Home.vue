@@ -1,10 +1,21 @@
 <template>
   <div class="home">
-
     <!-- ===================== PC 端 ===================== -->
     <template v-if="!isMobile">
       <!-- 首页英雄区 -->
       <section class="pc-hero">
+        <!-- 两侧装饰 -->
+        <div class="hero-decor-left">
+          <span class="decor-cross decor-1">+</span>
+          <span class="decor-cross decor-2">+</span>
+          <span class="decor-cross decor-3">+</span>
+        </div>
+        <div class="hero-decor-right">
+          <span class="decor-cross decor-4">+</span>
+          <span class="decor-cross decor-5">+</span>
+          <span class="decor-cross decor-6">+</span>
+        </div>
+
         <div class="hero-glow-bg">
           <div class="hero-cross">
             <span class="cross-arm horizontal"></span>
@@ -203,6 +214,74 @@
           </div>
         </div>
       </section>
+
+      <!-- ===================== 历史时间线（PC端） ===================== -->
+      <section class="pc-section pc-timeline-section">
+        <div class="pc-section-header">
+          <div class="section-tag">百年历程</div>
+          <h2 class="pc-section-title">上海红十字大事记</h2>
+          <p class="pc-section-subtitle">从1904到2024，红十字精神在这座城市生生不息</p>
+        </div>
+
+        <div class="pc-timeline">
+          <div class="timeline-line"></div>
+          <div
+            v-for="(event, index) in timelineEvents"
+            :key="index"
+            class="pc-timeline-item"
+            :style="{ '--event-color': event.color }"
+          >
+            <div class="pc-timeline-card">
+              <div class="pc-timeline-year">{{ event.year }}</div>
+              <h4 class="pc-timeline-title">{{ event.title }}</h4>
+              <p class="pc-timeline-desc">{{ event.desc }}</p>
+            </div>
+            <div class="pc-timeline-dot"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== 红十字小知识（PC端） ===================== -->
+      <section class="pc-section pc-facts-section">
+        <div class="pc-section-header">
+          <div class="section-tag">知识科普</div>
+          <h2 class="pc-section-title">红十字小知识</h2>
+          <p class="pc-section-subtitle">了解红十字运动，传递人道精神</p>
+        </div>
+
+        <div class="pc-facts-grid">
+          <div
+            v-for="(fact, index) in redCrossFacts"
+            :key="index"
+            class="pc-fact-card"
+            @click="openFactModal(fact)"
+          >
+            <div class="pc-fact-icon">{{ fact.icon }}</div>
+            <h4 class="pc-fact-title">{{ fact.title }}</h4>
+            <p class="pc-fact-desc">{{ fact.desc }}</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== 小知识详情弹窗 ===================== -->
+      <div v-if="selectedFact" class="fact-modal-overlay" @click.self="closeFactModal">
+        <div class="fact-modal-card" :style="{ '--accent-color': selectedFact.color }">
+          <button class="fact-modal-close" @click="closeFactModal">×</button>
+          
+          <div class="fact-modal-header">
+            <div class="fact-modal-icon">{{ selectedFact.icon }}</div>
+            <h2 class="fact-modal-title">{{ selectedFact.title }}</h2>
+          </div>
+          
+          <div class="fact-modal-body">
+            <p
+              v-for="(para, idx) in selectedFact.detail.split('\n\n')"
+              :key="idx"
+              class="fact-modal-para"
+            >{{ para }}</p>
+          </div>
+        </div>
+      </div>
     </template>
 
     <!-- ===================== 移动端 ===================== -->
@@ -256,7 +335,6 @@
         </div>
 
         <div class="mobile-figure-scroll">
-          <div class="scroll-spacer"></div>
           <div class="mobile-figure-track">
             <div
               v-for="figure in figures"
@@ -282,7 +360,6 @@
               </div>
             </div>
           </div>
-          <div class="scroll-spacer"></div>
         </div>
       </section>
 
@@ -297,7 +374,6 @@
         </div>
 
         <div class="mobile-location-scroll">
-          <div class="scroll-spacer"></div>
           <div class="mobile-location-track">
             <router-link
               v-for="loc in locations"
@@ -325,7 +401,34 @@
               </div>
             </router-link>
           </div>
-          <div class="scroll-spacer"></div>
+        </div>
+      </section>
+
+      <!-- 移动端 红十字小知识 -->
+      <section class="mobile-section">
+        <div class="mobile-section-header">
+          <div class="mobile-section-title-wrap">
+            <span class="mobile-section-emoji">💡</span>
+            <h2 class="mobile-section-title">小知识</h2>
+          </div>
+          <span class="mobile-section-count">{{ redCrossFacts.length }} 条</span>
+        </div>
+
+        <div class="mobile-facts-list">
+          <div
+            v-for="(fact, index) in redCrossFacts"
+            :key="index"
+            class="mobile-fact-item"
+            :style="{ '--accent-color': fact.color }"
+            @click="openFactModal(fact)"
+          >
+            <div class="mobile-fact-icon">{{ fact.icon }}</div>
+            <div class="mobile-fact-info">
+              <h4 class="mobile-fact-title">{{ fact.title }}</h4>
+              <p class="mobile-fact-desc">{{ fact.desc }}</p>
+            </div>
+            <span class="mobile-fact-arrow">›</span>
+          </div>
         </div>
       </section>
 
@@ -338,6 +441,26 @@
           <router-link to="/routes" class="mobile-btn-primary full-width">🚀 立即开始</router-link>
         </div>
       </section>
+
+      <!-- 移动端 小知识详情弹窗 -->
+      <div v-if="selectedFact" class="fact-modal-overlay" @click.self="closeFactModal">
+        <div class="fact-modal-card" :style="{ '--accent-color': selectedFact.color }">
+          <button class="fact-modal-close" @click="closeFactModal">×</button>
+          
+          <div class="fact-modal-header">
+            <div class="fact-modal-icon">{{ selectedFact.icon }}</div>
+            <h2 class="fact-modal-title">{{ selectedFact.title }}</h2>
+          </div>
+          
+          <div class="fact-modal-body">
+            <p
+              v-for="(para, idx) in selectedFact.detail.split('\n\n')"
+              :key="idx"
+              class="fact-modal-para"
+            >{{ para }}</p>
+          </div>
+        </div>
+      </div>
     </template>
   </div>
 </template>
@@ -356,6 +479,114 @@ const { isMobile } = useViewport()
 
 const figureIndex = ref(0)
 const locationIndex = ref(0)
+
+const timelineEvents = [
+  {
+    year: '1904',
+    title: '上海万国红十字会成立',
+    desc: '日俄战争爆发，沈敦和等人发起成立上海万国红十字会，成为中国红十字运动的起点。',
+    color: '#d32f2f'
+  },
+  {
+    year: '1911',
+    title: '辛亥革命战地救护',
+    desc: '辛亥革命爆发后，红十字会组建多支医疗队奔赴前线，救治伤兵数万人。',
+    color: '#e53935'
+  },
+  {
+    year: '1937',
+    title: '淞沪抗战救护行动',
+    desc: '淞沪会战期间，上海红十字会组织大规模战地救护，建立多所临时医院。',
+    color: '#f44336'
+  },
+  {
+    year: '1949',
+    title: '新中国红十字事业新生',
+    desc: '上海解放后，红十字会改组，成为新中国卫生事业和人道救助的重要力量。',
+    color: '#ff5722'
+  },
+  {
+    year: '1978',
+    title: '改革开放后恢复发展',
+    desc: '改革开放后，上海红十字会恢复各项工作，在救灾、救护、救助等领域持续发力。',
+    color: '#ff9800'
+  },
+  {
+    year: '2008',
+    title: '汶川地震救援',
+    desc: '汶川特大地震发生后，上海红十字会迅速行动，募集大量善款物资并派出救援队。',
+    color: '#ffc107'
+  },
+  {
+    year: '2020',
+    title: '新冠疫情防控',
+    desc: '新冠疫情期间，上海红十字会全力参与疫情防控，动员社会力量支援抗疫一线。',
+    color: '#8bc34a'
+  },
+  {
+    year: '2024',
+    title: '新时代新征程',
+    desc: '进入新时代，上海红十字事业持续高质量发展，谱写人道事业新篇章。',
+    color: '#4caf50'
+  }
+]
+
+const redCrossFacts = [
+  {
+    icon: '🏥',
+    title: '红十字的起源',
+    desc: '红十字运动起源于1863年，由亨利·杜南发起，旨在为战争中的伤员提供中立的人道救助。',
+    detail: '1859年，瑞士商人亨利·杜南在意大利索尔费里诺战场上目睹了战争的残酷。四万多名伤病士兵被遗弃在战场上，无人救治。深受触动的杜南撰写了《索尔费里诺回忆录》，呼吁制定国际公约，为战地伤员和医护人员提供中立保护。\n\n1863年，在杜南的倡议下，16个国家的代表在日内瓦召开会议，决定成立红十字国际委员会。1864年，《日内瓦公约》正式签署，红十字运动由此诞生。\n\n红十字标志是将瑞士国旗的颜色翻转而来——红底白十字变为白底红十字，以向红十字运动的发源地瑞士致敬。',
+    color: '#d32f2f'
+  },
+  {
+    icon: '🕊️',
+    title: '七项基本原则',
+    desc: '人道、公正、中立、独立、志愿服务、统一、普遍，是红十字运动的核心价值观。',
+    detail: '红十字与红新月运动的七项基本原则于1965年正式通过，是运动所有成员必须遵守的行为准则：\n\n📌 人道：保护人的生命和健康，保障人类的尊严\n📌 公正：不歧视任何人，仅根据需要提供帮助\n📌 中立：不在争议中选边站队，不参与政治、种族、宗教等纷争\n📌 独立：保持自主性，不受任何政府或势力控制\n📌 志愿服务：以志愿服务为基础，不求回报\n📌 统一：每个国家只有一个红十字会，对所有人开放\n📌 普遍：运动遍及全球，人人地位平等',
+    color: '#e53935'
+  },
+  {
+    icon: '🌍',
+    title: '全球最大人道网络',
+    desc: '红十字与红新月运动是全球最大的人道网络，在192个国家拥有约1400万志愿者。',
+    detail: '红十字与红新月运动是世界上最大的人道网络，由三大部分组成：\n\n🏛️ 红十字国际委员会（ICRC）：负责在武装冲突中保护战争受害者\n🏛️ 红十字会与红新月会国际联合会（IFRC）：协调各国红会开展灾害应对等工作\n🏛️ 各国红十字会与红新月会：在各自国家开展人道服务\n\n运动在全球192个国家拥有成员协会，约1400万名志愿者和数十万工作人员，每年为数亿人提供帮助。无论是自然灾害、武装冲突还是公共卫生危机，哪里有人道需求，哪里就有红十字与红新月的身影。',
+    color: '#f44336'
+  },
+  {
+    icon: '❤️',
+    title: '中国红十字会',
+    desc: '中国红十字会成立于1904年，是国际红十字运动的重要成员，以保护人的生命和健康为宗旨。',
+    detail: '中国红十字会成立于1904年3月10日，是中国近代史上第一个民间人道救助团体，也是国际红十字运动的重要成员。\n\n🔹 1904年：上海万国红十字会成立（中国红十字会前身）\n🔹 1912年：正式加入红十字国际委员会\n🔹 1949年：新中国成立后改组为中国红十字会\n🔹 1993年：《中华人民共和国红十字会法》颁布实施\n\n中国红十字会始终秉承"人道、博爱、奉献"的红十字精神，在应急救援、应急救护、人道救助、无偿献血、造血干细胞捐献、遗体和人体器官捐献、国际人道援助等领域发挥着重要作用。',
+    color: '#ff5722'
+  },
+  {
+    icon: '🩸',
+    title: '三救三献',
+    desc: '应急救援、应急救护、人道救助；献血液、献造血干细胞、献遗体器官，是红十字会的核心业务。',
+    detail: '"三救三献"是中国红十字会的核心业务：\n\n🚑 三救：\n  • 应急救援：参与自然灾害、事故灾难等突发事件救援\n  • 应急救护：开展应急救护培训，普及急救知识技能\n  • 人道救助：帮扶困难群体，开展助学、助医、助老等\n\n💝 三献：\n  • 献血液：推动无偿献血工作，保障临床用血需求\n  • 献造血干细胞：建设中华骨髓库，为白血病患者寻找供者\n  • 献遗体器官：推动遗体和人体器官捐献，延续生命希望\n\n截至目前，中华骨髓库已登记入库志愿者超300万人，累计捐献造血干细胞超1.5万例；全国累计实现人体器官捐献超4万例，挽救了数万濒危患者的生命。',
+    color: '#ff9800'
+  },
+  {
+    icon: '👶',
+    title: '人道救助',
+    desc: '红十字会开展助学、助医、助老、助困等多种人道救助服务，惠及数百万困难群众。',
+    detail: '人道救助是红十字会的重要职责，围绕"改善最易受损害群体的境况"这一目标，开展了多种形式的救助服务：\n\n🎒 助学救助：资助家庭困难学生完成学业，援建博爱学校\n🏥 助医救助：开展大病救助，帮助贫困家庭患者获得治疗\n👴 助老服务：关爱空巢老人，建设博爱养老服务机构\n🏠 助困帮扶：慰问困难家庭，发放生活物资\n\n此外，还有"红十字博爱送万家"品牌项目，每年元旦春节期间走访慰问困难群众，把温暖送到千家万户。\n\n据统计，全国各级红十字会每年投入人道救助资金数十亿元，受益群众数百万，成为政府社会保障体系的重要补充。',
+    color: '#ffc107'
+  }
+]
+
+const selectedFact = ref(null)
+
+const openFactModal = (fact) => {
+  selectedFact.value = fact
+  document.body.style.overflow = 'hidden'
+}
+
+const closeFactModal = () => {
+  selectedFact.value = null
+  document.body.style.overflow = ''
+}
 </script>
 
 <style scoped>
@@ -363,6 +594,8 @@ const locationIndex = ref(0)
   display: flex;
   flex-direction: column;
   gap: 32px;
+  position: relative;
+  z-index: 1;
 }
 
 /* ==========================================================
@@ -518,6 +751,84 @@ const locationIndex = ref(0)
   box-shadow: 0 8px 24px rgba(211, 47, 47, 0.35);
 }
 
+/* 英雄区两侧装饰 */
+.hero-decor-left,
+.hero-decor-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-decor-left {
+  left: 20px;
+}
+
+.hero-decor-right {
+  right: 20px;
+}
+
+.decor-cross {
+  position: absolute;
+  color: rgba(211, 47, 47, 0.25);
+  font-weight: 300;
+  line-height: 1;
+  z-index: 1;
+}
+
+.decor-1 {
+  top: 15%;
+  font-size: 48px;
+  animation: floatDecor1 6s ease-in-out infinite;
+}
+
+.decor-2 {
+  top: 45%;
+  font-size: 36px;
+  animation: floatDecor2 8s ease-in-out infinite;
+}
+
+.decor-3 {
+  top: 75%;
+  font-size: 28px;
+  animation: floatDecor3 7s ease-in-out infinite;
+}
+
+.decor-4 {
+  top: 20%;
+  font-size: 32px;
+  animation: floatDecor2 7s ease-in-out infinite;
+}
+
+.decor-5 {
+  top: 50%;
+  font-size: 44px;
+  animation: floatDecor1 9s ease-in-out infinite;
+}
+
+.decor-6 {
+  top: 80%;
+  font-size: 26px;
+  animation: floatDecor3 6s ease-in-out infinite;
+}
+
+@keyframes floatDecor1 {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+  50% { transform: translateY(-15px) rotate(10deg); opacity: 1; }
+}
+
+@keyframes floatDecor2 {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+  50% { transform: translateY(-12px) rotate(-8deg); opacity: 0.9; }
+}
+
+@keyframes floatDecor3 {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.5; }
+  50% { transform: translateY(-10px) rotate(5deg); opacity: 0.8; }
+}
+
 /* PC Hero 特效 */
 .hero-glow-bg {
   position: absolute;
@@ -604,6 +915,7 @@ const locationIndex = ref(0)
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+  z-index: 1;
 }
 
 .particle {
@@ -670,6 +982,43 @@ const locationIndex = ref(0)
   margin: 0;
   word-break: break-word;
   line-height: 1.6;
+}
+
+/* ===== PC 人物区背景装饰 ===== */
+#pc-figures {
+  position: relative;
+  overflow: visible;
+}
+
+#pc-figures::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(211, 47, 47, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulseDecor 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+#pc-figures::after {
+  content: '';
+  position: absolute;
+  bottom: 20px;
+  right: -40px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(255, 152, 0, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulseDecor 5s ease-in-out infinite 1s;
+  pointer-events: none;
+}
+
+@keyframes pulseDecor {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.15); opacity: 1; }
 }
 
 /* ===== PC 轮播通用样式 ===== */
@@ -947,6 +1296,38 @@ const locationIndex = ref(0)
   word-break: break-word;
 }
 
+/* ===== PC 地点区背景装饰 ===== */
+#pc-locations {
+  position: relative;
+  overflow: visible;
+}
+
+#pc-locations::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -50px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(244, 67, 54, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulseDecor 6s ease-in-out infinite 0.5s;
+  pointer-events: none;
+}
+
+#pc-locations::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulseDecor 5s ease-in-out infinite 2s;
+  pointer-events: none;
+}
+
 /* ===== PC 地点卡片 - 轮播大卡片（横向布局，和人物卡片一致） ===== */
 .pc-location-card.large {
   background: white;
@@ -1106,6 +1487,379 @@ const locationIndex = ref(0)
 .highlight-tag.more {
   background: #f0f2f5;
   color: #7a8599;
+}
+
+/* ===== PC 时间线/小知识区背景装饰 ===== */
+.pc-timeline-section::before,
+.pc-facts-section::before {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: floatBgDecor 8s ease-in-out infinite;
+}
+
+.pc-timeline-section::before {
+  top: -60px;
+  left: 8%;
+  background: radial-gradient(circle, rgba(211, 47, 47, 0.1) 0%, transparent 70%);
+}
+
+.pc-timeline-section::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  right: 12%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 152, 0, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: floatBgDecor 10s ease-in-out infinite 2s;
+  pointer-events: none;
+}
+
+@keyframes floatBgDecor {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-15px) scale(1.08); }
+}
+
+/* ===== PC 时间线（最初版本：横向排列，卡片在上方） ===== */
+.pc-timeline-section {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.pc-timeline {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 60px 60px 50px;
+  gap: 20px;
+  z-index: 2;
+}
+
+.timeline-line {
+  position: absolute;
+  top: calc(50% + 30px);
+  left: 80px;
+  right: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #d32f2f, #ff9800, #ffc107, #8bc34a, #4caf50);
+  border-radius: 2px;
+  transform: translateY(-50%);
+}
+
+.pc-timeline-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.pc-timeline-card {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 4px 20px rgba(26, 35, 50, 0.08);
+  border-top: 4px solid var(--event-color);
+  margin-bottom: 40px;
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+}
+
+.pc-timeline-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(26, 35, 50, 0.15);
+}
+
+.pc-timeline-year {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--event-color);
+  margin-bottom: 6px;
+}
+
+.pc-timeline-title {
+  font-size: 13px;
+  color: #1a2332;
+  margin: 0 0 6px 0;
+  font-weight: 700;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.pc-timeline-desc {
+  font-size: 11px;
+  color: #7a8599;
+  line-height: 1.6;
+  margin: 0;
+  word-break: break-word;
+}
+
+.pc-timeline-dot {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  background: var(--event-color);
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+/* ===== 小知识区额外装饰 ===== */
+.pc-facts-section {
+  position: relative;
+}
+
+.pc-facts-section::before {
+  display: none;
+}
+
+.pc-facts-section::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: 8%;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(139, 195, 74, 0.04) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: floatBgDecor 9s ease-in-out infinite 1s;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== PC 红十字小知识 ===== */
+.pc-facts-section {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.pc-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.pc-fact-card {
+  background: white;
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 4px 20px rgba(26, 35, 50, 0.06);
+  border: 2px solid #f0f2f5;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.pc-fact-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(211, 47, 47, 0.15);
+  border-color: rgba(211, 47, 47, 0.2);
+}
+
+.pc-fact-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.pc-fact-title {
+  font-size: 18px;
+  color: #1a2332;
+  margin: 0 0 10px 0;
+  font-weight: 700;
+  word-break: break-word;
+}
+
+.pc-fact-desc {
+  font-size: 14px;
+  color: #5a6478;
+  line-height: 1.8;
+  margin: 0;
+  word-break: break-word;
+}
+
+/* ===== 小知识弹窗 ===== */
+.fact-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 24px;
+  animation: factFadeIn 0.25s ease;
+}
+
+@keyframes factFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fact-modal-card {
+  background: white;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border-top: 6px solid var(--accent-color);
+  animation: factSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes factSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.fact-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #f0f2f5;
+  color: #5a6478;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.fact-modal-close:hover {
+  background: #e5e9ef;
+  color: #1a2332;
+  transform: rotate(90deg);
+}
+
+.fact-modal-header {
+  text-align: center;
+  padding: 40px 36px 24px;
+  background: linear-gradient(180deg, rgba(211, 47, 47, 0.06), transparent);
+}
+
+.fact-modal-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.fact-modal-title {
+  font-size: clamp(22px, 3vw, 28px);
+  color: #1a2332;
+  margin: 0;
+  font-weight: 800;
+  word-break: break-word;
+}
+
+.fact-modal-body {
+  padding: 24px 36px 40px;
+}
+
+.fact-modal-para {
+  font-size: 15px;
+  color: #5a6478;
+  line-height: 1.9;
+  margin: 0 0 16px 0;
+  word-break: break-word;
+  white-space: pre-line;
+}
+
+.fact-modal-para:last-child {
+  margin-bottom: 0;
+}
+
+/* 弹窗移动端适配 */
+@media (max-width: 768px) {
+  .fact-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .fact-modal-card {
+    max-width: 100%;
+    max-height: 88vh;
+    border-radius: 24px 24px 0 0;
+    border-top: none;
+    border-bottom: 6px solid var(--accent-color);
+    animation: factSlideUpMobile 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes factSlideUpMobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .fact-modal-close {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  .fact-modal-header {
+    padding: 32px 20px 16px;
+  }
+
+  .fact-modal-icon {
+    font-size: 52px;
+  }
+
+  .fact-modal-title {
+    font-size: clamp(18px, 5vw, 22px);
+  }
+
+  .fact-modal-body {
+    padding: 16px 20px 32px;
+  }
+
+  .fact-modal-para {
+    font-size: 14px;
+    line-height: 1.8;
+  }
 }
 
 /* ==========================================================
@@ -1322,9 +2076,7 @@ const locationIndex = ref(0)
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding: 4px 0 20px;
-  /* 第一张卡片居中：scroll-padding 让对齐点偏到中间 */
-  scroll-padding-inline-start: calc((100vw - 18px * 2 - 14px) / 2 - 14px);
-  scroll-padding-inline-end: calc(18px);
+  scroll-snap-stop: always;
 }
 
 .mobile-figure-scroll::-webkit-scrollbar,
@@ -1337,19 +2089,15 @@ const locationIndex = ref(0)
   display: flex;
   gap: 14px;
   width: max-content;
-  padding: 0 18px;
+  padding: 0 calc((100vw - 85vw) / 2);
 }
 
 .mobile-figure-card-snap,
 .mobile-location-card-snap {
   flex-shrink: 0;
-  width: calc(85vw - 18px * 2 + 14px);
-  scroll-snap-align: start;
-}
-
-.scroll-spacer {
-  flex-shrink: 0;
-  width: calc((100vw - 18px * 2 - 14px) / 2 - 14px);
+  width: 85vw;
+  max-width: 360px;
+  scroll-snap-align: center;
 }
 
 /* ===== 移动端人物横滑卡片 ===== */
@@ -1576,6 +2324,68 @@ const locationIndex = ref(0)
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+/* 移动端 小知识列表 */
+.mobile-facts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mobile-fact-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(26, 35, 50, 0.06);
+  border-left: 4px solid var(--accent-color);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.mobile-fact-item:active {
+  transform: scale(0.98);
+  background: #f8fafc;
+}
+
+.mobile-fact-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.mobile-fact-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-fact-title {
+  font-size: clamp(14px, 3.8vw, 16px);
+  color: #1a2332;
+  margin: 0 0 4px 0;
+  font-weight: 700;
+  word-break: break-word;
+}
+
+.mobile-fact-desc {
+  font-size: clamp(11px, 3vw, 13px);
+  color: #7a8599;
+  line-height: 1.5;
+  margin: 0;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mobile-fact-arrow {
+  font-size: 24px;
+  color: #c0c6d0;
+  flex-shrink: 0;
+  font-weight: 300;
 }
 
 /* 移动端底部引导 */
