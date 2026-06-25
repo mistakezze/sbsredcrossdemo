@@ -844,16 +844,17 @@ const confirmDelete = () => {
 
 /* ========== 移动端页面头部 ========== */
 .m-page-header {
-  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
-  border-radius: 16px;
-  padding: clamp(16px, 4.5vw, 24px);
-  margin-bottom: clamp(12px, 3vw, 20px);
+  background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 40%, #fff0f3 100%);
+  border-radius: 18px;
+  padding: clamp(18px, 4.5vw, 26px) clamp(16px, 4vw, 22px);
+  margin-bottom: clamp(14px, 3vw, 20px);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: clamp(8px, 2vw, 12px);
+  gap: clamp(10px, 2vw, 14px);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(211, 47, 47, 0.06);
 }
 
 .m-page-header::before {
@@ -863,28 +864,32 @@ const confirmDelete = () => {
   right: -20%;
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, rgba(211, 47, 47, 0.12), transparent 70%);
+  background: radial-gradient(circle, rgba(211, 47, 47, 0.1), transparent 70%);
   pointer-events: none;
 }
 
 .m-page-tag {
-  display: inline-block;
-  padding: clamp(4px, 1vw, 6px) clamp(10px, 2.5vw, 14px);
-  background: white;
-  border: 1.5px solid #d32f2f;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: clamp(5px, 1vw, 7px) clamp(12px, 2.5vw, 16px);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(211, 47, 47, 0.15);
   color: #d32f2f;
   border-radius: 50px;
   font-size: clamp(10px, 2.5vw, 12px);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.5px;
   position: relative;
   z-index: 1;
-  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.12);
+  box-shadow: 0 2px 10px rgba(211, 47, 47, 0.1);
   word-break: break-word;
 }
 
 .m-page-title {
-  font-size: clamp(18px, 5vw, 24px);
+  font-size: clamp(19px, 5vw, 25px);
   color: #1a2332;
   margin: 0;
   font-weight: 800;
@@ -893,7 +898,7 @@ const confirmDelete = () => {
   word-break: break-word;
   overflow-wrap: break-word;
   line-height: 1.25;
-  background: linear-gradient(135deg, #1a2332, #d32f2f, #1a2332);
+  background: linear-gradient(135deg, #1a2332 30%, #d32f2f 70%, #c62828);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -901,10 +906,12 @@ const confirmDelete = () => {
 }
 
 .m-header-stats-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 14px;
-  padding: clamp(10px, 2.5vw, 14px) clamp(14px, 3.5vw, 20px);
-  box-shadow: 0 4px 16px rgba(211, 47, 47, 0.12);
+  padding: clamp(12px, 2.5vw, 16px) clamp(16px, 3.5vw, 22px);
+  box-shadow: 0 2px 16px rgba(211, 47, 47, 0.08), 0 0 0 1px rgba(211, 47, 47, 0.04);
   text-align: center;
   width: 100%;
   max-width: 200px;
@@ -917,7 +924,7 @@ const confirmDelete = () => {
 }
 
 .m-stats-number {
-  font-size: clamp(20px, 5.5vw, 28px);
+  font-size: clamp(22px, 5.5vw, 30px);
   font-weight: 800;
   color: #d32f2f;
   line-height: 1;
@@ -926,17 +933,21 @@ const confirmDelete = () => {
 
 .m-stats-label {
   font-size: clamp(11px, 2.8vw, 13px);
-  color: #7a8599;
+  color: #8a95a8;
   letter-spacing: 0.5px;
+  font-weight: 600;
 }
 
 /* ========== 移动端空状态 ========== */
 .m-empty-state {
   text-align: center;
   padding: clamp(40px, 10vw, 60px) clamp(16px, 4vw, 24px);
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(26, 35, 50, 0.06);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  border: 1.5px solid rgba(211, 47, 47, 0.04);
+  box-shadow: 0 2px 16px rgba(26, 35, 50, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -987,30 +998,32 @@ const confirmDelete = () => {
 
 .m-empty-desc {
   font-size: clamp(12px, 3vw, 14px);
-  color: #5a6478;
+  color: #8a95a8;
   margin: 0 0 clamp(20px, 5vw, 28px) 0;
-  line-height: 1.6;
+  line-height: 1.65;
   word-break: break-word;
   overflow-wrap: break-word;
+  max-width: 280px;
 }
 
 .m-empty-btn {
   width: 100%;
   max-width: 320px;
-  padding: clamp(12px, 3.2vw, 16px) clamp(16px, 4vw, 24px);
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  padding: clamp(14px, 3.2vw, 16px) clamp(16px, 4vw, 24px);
+  background: linear-gradient(135deg, #d32f2f, #c62828);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: clamp(14px, 3.5vw, 16px);
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(211, 47, 47, 0.25);
-  word-break: break-word;
+  box-shadow: 0 4px 16px rgba(211, 47, 47, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: 0.3px;
 }
 
 .m-empty-btn:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
   box-shadow: 0 2px 8px rgba(211, 47, 47, 0.2);
 }
 
@@ -1076,12 +1089,20 @@ const confirmDelete = () => {
 
 .m-timeline-card {
   flex: 1;
-  background: #fafbfc;
-  border-radius: 12px;
-  padding: clamp(10px, 2.5vw, 14px) clamp(12px, 3vw, 16px);
+  background: #ffffff;
+  border-radius: 16px;
+  padding: clamp(12px, 3vw, 16px) clamp(14px, 3.5vw, 18px);
   margin-bottom: clamp(10px, 2.5vw, 14px);
-  box-shadow: 0 1px 4px rgba(26, 35, 50, 0.04);
+  box-shadow: 0 2px 16px rgba(26, 35, 50, 0.05);
+  border: 1.5px solid rgba(211, 47, 47, 0.04);
   transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.m-timeline-card:active {
+  transform: scale(0.99);
+  border-color: rgba(211, 47, 47, 0.1);
 }
 
 .m-card-top {
@@ -1089,7 +1110,7 @@ const confirmDelete = () => {
   align-items: flex-start;
   justify-content: space-between;
   gap: clamp(8px, 2vw, 12px);
-  margin-bottom: clamp(8px, 2vw, 10px);
+  margin-bottom: clamp(8px, 2vw, 12px);
 }
 
 .m-card-location {
@@ -1106,12 +1127,13 @@ const confirmDelete = () => {
 .m-card-category {
   font-size: clamp(10px, 2.4vw, 11px);
   color: white;
-  background: linear-gradient(135deg, #d32f2f, #ff7043);
+  background: linear-gradient(135deg, #d32f2f, #e53935);
   padding: clamp(3px, 0.8vw, 4px) clamp(8px, 2vw, 10px);
-  border-radius: 6px;
-  font-weight: 600;
+  border-radius: 8px;
+  font-weight: 700;
   flex-shrink: 0;
   word-break: break-word;
+  box-shadow: 0 2px 6px rgba(211, 47, 47, 0.25);
 }
 
 .m-card-info {
@@ -1126,24 +1148,25 @@ const confirmDelete = () => {
   align-items: flex-start;
   gap: clamp(6px, 1.5vw, 8px);
   font-size: clamp(11px, 2.8vw, 13px);
-  color: #7a8599;
+  color: #8a95a8;
   word-break: break-word;
   overflow-wrap: break-word;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .m-card-note {
   background: linear-gradient(135deg, #fff8e1, #ffe9d9);
-  padding: clamp(8px, 2vw, 10px) clamp(10px, 2.5vw, 12px);
-  border-radius: 8px;
+  padding: clamp(8px, 2vw, 10px) clamp(10px, 2.5vw, 14px);
+  border-radius: 10px;
   margin-bottom: clamp(10px, 2.5vw, 12px);
-  border-left: 2px solid #ff9800;
+  border-left: 3px solid #ff9800;
+  box-shadow: 0 1px 6px rgba(255, 152, 0, 0.06);
 }
 
 .m-note-content {
   font-size: clamp(11px, 2.8vw, 13px);
   color: #5d4e00;
-  line-height: 1.6;
+  line-height: 1.65;
   margin: 0;
   word-break: break-word;
   overflow-wrap: break-word;
@@ -1154,34 +1177,36 @@ const confirmDelete = () => {
   align-items: center;
   justify-content: space-between;
   gap: clamp(8px, 2vw, 12px);
-  padding-top: clamp(8px, 2vw, 10px);
-  border-top: 1px solid #e8ecf3;
+  padding-top: clamp(8px, 2vw, 12px);
+  border-top: 1px solid rgba(211, 47, 47, 0.06);
 }
 
 .m-view-detail {
   font-size: clamp(11px, 2.8vw, 13px);
   color: #d32f2f;
-  font-weight: 600;
+  font-weight: 700;
   flex: 1;
   word-break: break-word;
 }
 
 .m-delete-btn {
   background: transparent;
-  border: 1px solid #e5e9ef;
-  color: #7a8599;
+  border: 1.5px solid rgba(211, 47, 47, 0.12);
+  color: #8a95a8;
   padding: clamp(5px, 1.3vw, 7px) clamp(10px, 2.5vw, 14px);
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: clamp(11px, 2.6vw, 12px);
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
 .m-delete-btn:active {
   background: linear-gradient(135deg, #fff5f5, #ffeaea);
   color: #d32f2f;
-  border-color: #d32f2f;
+  border-color: rgba(211, 47, 47, 0.3);
+  transform: scale(0.96);
 }
 
 /* ==============================

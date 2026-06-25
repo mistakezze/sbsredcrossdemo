@@ -1869,21 +1869,28 @@ const closeFactModal = () => {
 /* Mobile Hero */
 .mobile-hero {
   position: relative;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 60%, #ffffff 100%);
-  padding: 24px 18px 20px;
+  background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 40%, #fff0f3 70%, #ffffff 100%);
+  padding: 28px 20px 22px;
   border-radius: 20px;
   overflow: hidden;
-  margin-top: 4px;
+  margin-top: 0;
+  box-shadow: 0 4px 24px rgba(211, 47, 47, 0.08);
 }
 
 .mobile-hero-cross {
   position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 120px;
-  height: 120px;
-  opacity: 0.12;
+  top: -24px;
+  right: -24px;
+  width: 130px;
+  height: 130px;
+  opacity: 0.08;
   pointer-events: none;
+  animation: mobileCrossFloat 6s ease-in-out infinite;
+}
+
+@keyframes mobileCrossFloat {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(8deg) scale(1.05); }
 }
 
 .m-cross-h, .m-cross-v {
@@ -1891,10 +1898,23 @@ const closeFactModal = () => {
   top: 50%;
   left: 50%;
   background: #d32f2f;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 .m-cross-h { width: 100px; height: 24px; transform: translate(-50%, -50%); }
 .m-cross-v { width: 24px; height: 100px; transform: translate(-50%, -50%); }
+
+/* 移动端 Hero 装饰光晕 */
+.mobile-hero::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(211, 47, 47, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
 
 .mobile-hero-content {
   position: relative;
@@ -1903,26 +1923,30 @@ const closeFactModal = () => {
 }
 
 .mobile-hero-badge {
-  display: inline-block;
-  padding: 6px 14px;
-  background: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #d32f2f;
-  border-radius: 30px;
+  border-radius: 50px;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15);
+  letter-spacing: 0.8px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 12px rgba(211, 47, 47, 0.12), 0 0 0 1px rgba(211, 47, 47, 0.06);
 }
 
 .mobile-hero-title {
-  font-size: clamp(24px, 7vw, 32px);
+  font-size: clamp(26px, 7.5vw, 34px);
   line-height: 1.2;
-  margin: 0 0 8px 0;
+  margin: 0 0 10px 0;
   color: #1a2332;
   font-weight: 800;
   word-break: break-word;
-  background: linear-gradient(135deg, #1a2332, #d32f2f);
+  background: linear-gradient(135deg, #1a2332 30%, #d32f2f 70%, #c62828);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1930,9 +1954,9 @@ const closeFactModal = () => {
 
 .mobile-hero-desc {
   font-size: clamp(13px, 3.5vw, 15px);
-  color: #5a6478;
-  line-height: 1.6;
-  margin: 0 0 16px 0;
+  color: #6b7a90;
+  line-height: 1.65;
+  margin: 0 0 18px 0;
   word-break: break-word;
 }
 
@@ -1940,11 +1964,13 @@ const closeFactModal = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: white;
-  padding: 14px 12px;
-  border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(211, 47, 47, 0.1);
-  margin-bottom: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 16px 14px;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(211, 47, 47, 0.08), 0 0 0 1px rgba(211, 47, 47, 0.04);
+  margin-bottom: 16px;
   position: relative;
   z-index: 1;
 }
@@ -1954,10 +1980,15 @@ const closeFactModal = () => {
   flex-direction: column;
   align-items: center;
   flex: 1;
+  transition: transform 0.2s ease;
+}
+
+.mobile-stat:active {
+  transform: scale(0.95);
 }
 
 .mobile-stat-num {
-  font-size: clamp(20px, 5.5vw, 28px);
+  font-size: clamp(22px, 6vw, 30px);
   font-weight: 800;
   color: #d32f2f;
   line-height: 1.2;
@@ -1965,15 +1996,16 @@ const closeFactModal = () => {
 
 .mobile-stat-label {
   font-size: 11px;
-  color: #7a8599;
-  margin-top: 3px;
-  font-weight: 500;
+  color: #8a95a8;
+  margin-top: 4px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .mobile-stat-sep {
   width: 1px;
-  height: 28px;
-  background: #e5e9ef;
+  height: 32px;
+  background: linear-gradient(180deg, transparent, rgba(211, 47, 47, 0.15), transparent);
 }
 
 .mobile-hero-actions {
@@ -1985,20 +2017,22 @@ const closeFactModal = () => {
 
 .mobile-btn-primary {
   flex: 1;
-  padding: 14px 16px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  padding: 15px 16px;
+  background: linear-gradient(135deg, #d32f2f, #c62828);
   color: white;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(211, 47, 47, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: 0.3px;
 }
 
 .mobile-btn-primary:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.25);
 }
 
 .mobile-btn-primary.full-width {
@@ -2010,21 +2044,25 @@ const closeFactModal = () => {
 
 .mobile-btn-secondary {
   flex: 1;
-  padding: 14px 16px;
-  background: white;
+  padding: 15px 16px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #d32f2f;
-  border: 2px solid #d32f2f;
-  border-radius: 12px;
+  border: 1.5px solid rgba(211, 47, 47, 0.2);
+  border-radius: 14px;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   text-align: center;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: 0.3px;
 }
 
 .mobile-btn-secondary:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
   background: #fff5f5;
+  border-color: rgba(211, 47, 47, 0.35);
 }
 
 /* Mobile Section */
@@ -2036,7 +2074,7 @@ const closeFactModal = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   padding: 0 2px;
 }
 
@@ -2047,7 +2085,7 @@ const closeFactModal = () => {
 }
 
 .mobile-section-emoji {
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .mobile-section-title {
@@ -2056,15 +2094,17 @@ const closeFactModal = () => {
   margin: 0;
   font-weight: 800;
   word-break: break-word;
+  letter-spacing: -0.3px;
 }
 
 .mobile-section-count {
   font-size: 12px;
-  color: #7a8599;
-  font-weight: 500;
-  background: #f0f2f5;
-  padding: 4px 10px;
+  color: #8a95a8;
+  font-weight: 600;
+  background: rgba(211, 47, 47, 0.06);
+  padding: 5px 12px;
   border-radius: 20px;
+  border: 1px solid rgba(211, 47, 47, 0.06);
 }
 
 /* ===== 移动端横滑通用 ===== */
@@ -2075,7 +2115,7 @@ const closeFactModal = () => {
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding: 4px 0 20px;
+  padding: 4px 0 24px;
   scroll-snap-stop: always;
 }
 
@@ -2103,25 +2143,31 @@ const closeFactModal = () => {
 /* ===== 移动端人物横滑卡片 ===== */
 .mobile-figure-card-snap {
   background: white;
-  border-radius: 18px;
-  padding: 16px;
+  border-radius: 20px;
+  padding: 18px;
   display: flex;
   gap: 14px;
-  box-shadow: 0 2px 14px rgba(26, 35, 50, 0.07);
+  box-shadow: 0 4px 20px rgba(26, 35, 50, 0.06);
   border-left: 4px solid var(--accent-color);
   align-items: flex-start;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mobile-figure-card-snap:active {
+  transform: scale(0.98);
 }
 
 .mobile-figure-avatar.large {
   flex-shrink: 0;
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
   background: linear-gradient(135deg, var(--accent-color), #ff8a80);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-avatar-h, .mobile-avatar-v {
@@ -2130,6 +2176,7 @@ const closeFactModal = () => {
   left: 50%;
   background: white;
   border-radius: 2px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
   transform: translate(-50%, -50%);
 }
 .mobile-avatar-h { width: 32px; height: 9px; }
@@ -2145,7 +2192,7 @@ const closeFactModal = () => {
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 
 .mobile-figure-name {
@@ -2157,7 +2204,7 @@ const closeFactModal = () => {
 
 .mobile-figure-years {
   font-size: 11px;
-  color: #7a8599;
+  color: #8a95a8;
   font-weight: 500;
   flex-shrink: 0;
 }
@@ -2165,16 +2212,16 @@ const closeFactModal = () => {
 .mobile-figure-title {
   font-size: clamp(11px, 3vw, 12px);
   color: var(--accent-color);
-  margin: 2px 0 6px 0;
+  margin: 3px 0 8px 0;
   font-weight: 600;
   word-break: break-word;
 }
 
 .mobile-figure-desc {
   font-size: clamp(12px, 3vw, 13px);
-  color: #5a6478;
-  line-height: 1.6;
-  margin: 0 0 8px 0;
+  color: #6b7a90;
+  line-height: 1.7;
+  margin: 0 0 10px 0;
   word-break: break-word;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -2191,7 +2238,7 @@ const closeFactModal = () => {
 .mobile-tag {
   font-size: 11px;
   padding: 5px 10px;
-  background: rgba(211, 47, 47, 0.08);
+  background: rgba(211, 47, 47, 0.06);
   color: var(--accent-color);
   border-radius: 12px;
   font-weight: 600;
@@ -2201,30 +2248,40 @@ const closeFactModal = () => {
 .mobile-tag.achievement {
   background: linear-gradient(135deg, #fff8e1, #ffecb3);
   color: #8a6d00;
+  box-shadow: 0 1px 4px rgba(255, 152, 0, 0.08);
 }
 
 .mobile-figure-quote {
-  margin: 6px 0 0 0;
+  margin: 8px 0 0 0;
   font-size: clamp(11px, 2.8vw, 12px);
   color: var(--accent-color);
   font-style: italic;
-  padding-left: 10px;
+  padding-left: 12px;
   border-left: 3px solid var(--accent-color);
-  line-height: 1.6;
+  line-height: 1.7;
   opacity: 0.85;
   word-break: break-word;
+  background: linear-gradient(135deg, rgba(211, 47, 47, 0.02), transparent);
+  padding-top: 6px;
+  padding-bottom: 4px;
+  border-radius: 0 8px 8px 0;
 }
 
 /* ===== 移动端地点横滑卡片 ===== */
 .mobile-location-card-snap {
   background: white;
-  border-radius: 18px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 2px 14px rgba(26, 35, 50, 0.07);
+  box-shadow: 0 4px 20px rgba(26, 35, 50, 0.06);
   display: flex;
   flex-direction: column;
   text-decoration: none;
   color: inherit;
+  transition: transform 0.2s ease;
+}
+
+.mobile-location-card-snap:active {
+  transform: scale(0.97);
 }
 
 .mobile-location-image {
@@ -2340,7 +2397,7 @@ const closeFactModal = () => {
   background: white;
   border-radius: 16px;
   padding: 16px;
-  box-shadow: 0 2px 12px rgba(26, 35, 50, 0.06);
+  box-shadow: 0 2px 16px rgba(26, 35, 50, 0.05);
   border-left: 4px solid var(--accent-color);
   transition: all 0.2s ease;
   cursor: pointer;
@@ -2348,11 +2405,12 @@ const closeFactModal = () => {
 
 .mobile-fact-item:active {
   transform: scale(0.98);
-  background: #f8fafc;
+  box-shadow: 0 1px 8px rgba(211, 47, 47, 0.1);
+  background: linear-gradient(135deg, #fff8f8 0%, #ffffff 100%);
 }
 
 .mobile-fact-icon {
-  font-size: 32px;
+  font-size: 34px;
   flex-shrink: 0;
 }
 
@@ -2364,15 +2422,15 @@ const closeFactModal = () => {
 .mobile-fact-title {
   font-size: clamp(14px, 3.8vw, 16px);
   color: #1a2332;
-  margin: 0 0 4px 0;
+  margin: 0 0 5px 0;
   font-weight: 700;
   word-break: break-word;
 }
 
 .mobile-fact-desc {
   font-size: clamp(11px, 3vw, 13px);
-  color: #7a8599;
-  line-height: 1.5;
+  color: #8a95a8;
+  line-height: 1.55;
   margin: 0;
   word-break: break-word;
   display: -webkit-box;
@@ -2382,35 +2440,41 @@ const closeFactModal = () => {
 }
 
 .mobile-fact-arrow {
-  font-size: 24px;
-  color: #c0c6d0;
+  font-size: 22px;
+  color: #c8d0dc;
   flex-shrink: 0;
   font-weight: 300;
+  transition: transform 0.2s ease;
+}
+
+.mobile-fact-item:active .mobile-fact-arrow {
+  transform: translateX(3px);
 }
 
 /* 移动端底部引导 */
 .mobile-footer-guide {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .mobile-guide-card {
-  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+  background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 50%, #fff0f3 100%);
   border-radius: 20px;
-  padding: 24px 20px;
+  padding: 28px 22px;
   text-align: center;
-  border: 2px solid rgba(211, 47, 47, 0.1);
+  border: 1.5px solid rgba(211, 47, 47, 0.08);
+  box-shadow: 0 4px 20px rgba(211, 47, 47, 0.06);
 }
 
 .mobile-guide-emoji {
-  font-size: 40px;
-  margin-bottom: 10px;
+  font-size: 44px;
+  margin-bottom: 12px;
   display: inline-block;
-  animation: guideBounce 2s ease-in-out infinite;
+  animation: guideBounce 2.5s ease-in-out infinite;
 }
 
 @keyframes guideBounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50% { transform: translateY(-8px); }
 }
 
 .mobile-guide-title {
@@ -2422,8 +2486,8 @@ const closeFactModal = () => {
 
 .mobile-guide-desc {
   font-size: clamp(12px, 3.2vw, 14px);
-  color: #5a6478;
-  margin: 0 0 16px 0;
+  color: #6b7a90;
+  margin: 0 0 18px 0;
   line-height: 1.6;
   word-break: break-word;
 }

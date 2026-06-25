@@ -2200,17 +2200,21 @@ const clearAnswer = () => {
 }
 
 .mobile-page-header .mobile-page-badge {
-  display: inline-block;
-  padding: 6px 14px;
-  background: white;
-  border: 1.5px solid #d32f2f;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(211, 47, 47, 0.15);
   color: #d32f2f;
-  border-radius: 30px;
+  border-radius: 50px;
   font-size: clamp(10px, 2.5vw, 12px);
   font-weight: 700;
   letter-spacing: 1px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.12);
+  margin-bottom: 14px;
+  box-shadow: 0 2px 10px rgba(211, 47, 47, 0.1);
 }
 
 .mobile-page-title {
@@ -2224,9 +2228,9 @@ const clearAnswer = () => {
 
 .mobile-page-subtitle {
   font-size: clamp(11px, 3vw, 13px);
-  color: #7a8599;
+  color: #8a95a8;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.65;
   max-width: 100%;
   word-break: break-word;
 }
@@ -2236,41 +2240,50 @@ const clearAnswer = () => {
   display: flex;
   justify-content: center;
   margin-top: 4px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 8px 0;
+  background: rgba(248, 249, 250, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .mobile-tabs {
   display: flex;
   width: 100%;
-  background: white;
-  padding: 4px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(26, 35, 50, 0.08);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 5px;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(26, 35, 50, 0.06), 0 0 0 1px rgba(211, 47, 47, 0.04);
   gap: 4px;
 }
 
 .mobile-tab-btn {
   flex: 1;
-  padding: 10px 8px;
+  padding: 11px 8px;
   border: none;
   border-radius: 10px;
   background: transparent;
-  color: #7a8599;
+  color: #8a95a8;
   font-size: clamp(12px, 3.5vw, 14px);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mobile-tab-btn:active {
-  background: rgba(211, 47, 47, 0.08);
+  background: rgba(211, 47, 47, 0.06);
   color: #d32f2f;
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 .mobile-tab-btn.active {
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #d32f2f, #c62828);
   color: white;
-  box-shadow: 0 3px 10px rgba(211, 47, 47, 0.3);
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
 }
 
 /* 固定路线 - 单列紧凑卡片 */
@@ -2282,28 +2295,29 @@ const clearAnswer = () => {
 
 .mobile-loc-card {
   background: #ffffff;
-  border-radius: 14px;
-  padding: 14px;
+  border-radius: 16px;
+  padding: 16px;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  border: 1.5px solid #fce4ec;
+  gap: 12px;
+  border: 1.5px solid rgba(211, 47, 47, 0.06);
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(26, 35, 50, 0.04);
+  box-shadow: 0 2px 12px rgba(26, 35, 50, 0.04);
 }
 
 .mobile-loc-card:active {
-  background: #fff5f5;
-  border-color: #ffcdd2;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+  border-color: rgba(211, 47, 47, 0.12);
   transform: scale(0.99);
+  box-shadow: 0 1px 8px rgba(211, 47, 47, 0.08);
 }
 
 .mobile-loc-card.mobile-loc-checked {
-  border-color: #c8e6c9;
-  background: linear-gradient(135deg, #f1f8e9 0%, #ffffff 100%);
+  border-color: rgba(76, 175, 80, 0.15);
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.04) 0%, #ffffff 100%);
 }
 
 .mobile-loc-number {
@@ -2354,8 +2368,8 @@ const clearAnswer = () => {
 
 .mobile-loc-desc {
   font-size: clamp(11px, 3vw, 13px);
-  color: #5a6478;
-  line-height: 1.6;
+  color: #6b7a90;
+  line-height: 1.65;
   margin: 0 0 8px 0;
   word-break: break-word;
 }
@@ -2363,14 +2377,14 @@ const clearAnswer = () => {
 .mobile-loc-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 6px;
 }
 
 .mobile-loc-tag {
   font-size: clamp(9px, 2.5vw, 11px);
   color: #d32f2f;
-  background: rgba(211, 47, 47, 0.1);
-  padding: 3px 8px;
+  background: rgba(211, 47, 47, 0.06);
+  padding: 3px 10px;
   border-radius: 12px;
   font-weight: 600;
 }
@@ -2398,10 +2412,12 @@ const clearAnswer = () => {
 
 /* 路线说明 - 移动端列表样式 */
 .mobile-route-info {
-  background: white;
-  border-radius: 14px;
-  padding: 16px 14px;
-  box-shadow: 0 2px 8px rgba(26, 35, 50, 0.06);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 18px 16px;
+  box-shadow: 0 2px 12px rgba(26, 35, 50, 0.05), 0 0 0 1px rgba(211, 47, 47, 0.04);
   margin-top: 8px;
 }
 
@@ -2410,7 +2426,7 @@ const clearAnswer = () => {
   font-weight: 800;
   color: #1a2332;
   text-align: center;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   letter-spacing: 0.5px;
 }
 
@@ -2424,9 +2440,9 @@ const clearAnswer = () => {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  background: #fafbfc;
-  border-radius: 10px;
+  padding: 11px 12px;
+  background: rgba(250, 251, 252, 0.8);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1.5px solid transparent;
@@ -2434,7 +2450,8 @@ const clearAnswer = () => {
 
 .mobile-step-item:active {
   background: #fff5f5;
-  border-color: #ffcdd2;
+  border-color: rgba(211, 47, 47, 0.1);
+  transform: scale(0.99);
 }
 
 .mobile-step-item.mobile-step-checked {
@@ -2494,10 +2511,12 @@ const clearAnswer = () => {
 
 /* AI 推荐页面 - 移动端 */
 .mobile-ai-card {
-  background: white;
-  border-radius: 14px;
-  padding: 16px 14px;
-  box-shadow: 0 2px 8px rgba(26, 35, 50, 0.06);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 18px;
+  padding: 18px 16px;
+  box-shadow: 0 2px 16px rgba(26, 35, 50, 0.05), 0 0 0 1px rgba(211, 47, 47, 0.04);
   margin-bottom: 14px;
 }
 

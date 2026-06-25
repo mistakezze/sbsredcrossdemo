@@ -821,28 +821,40 @@ const saveNote = () => {
 }
 
 .m-hero-section {
-  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
-  border-radius: 16px;
-  padding: 20px 16px;
+  background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 40%, #fff0f3 100%);
+  border-radius: 20px;
+  padding: clamp(20px, 5vw, 28px) clamp(16px, 4vw, 22px);
   margin-bottom: 16px;
   border-left: 4px solid var(--accent-color);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(26, 35, 50, 0.05);
+  box-shadow: 0 4px 20px rgba(211, 47, 47, 0.06);
+}
+
+.m-hero-section::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(211, 47, 47, 0.08), transparent 70%);
+  pointer-events: none;
 }
 
 .m-hero-category {
   display: inline-block;
-  padding: 4px 12px;
-  background: linear-gradient(135deg, var(--accent-color), #ff7043);
+  padding: 5px 14px;
+  background: linear-gradient(135deg, var(--accent-color), #e53935);
   color: white;
   border-radius: 8px;
   font-size: clamp(10px, 2.5vw, 12px);
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 12px;
   position: relative;
   z-index: 1;
   word-break: break-word;
+  box-shadow: 0 2px 6px rgba(211, 47, 47, 0.25);
 }
 
 .m-hero-title {
@@ -855,11 +867,16 @@ const saveNote = () => {
   z-index: 1;
   word-break: break-word;
   overflow-wrap: break-word;
+  background: linear-gradient(135deg, #1a2332 30%, var(--accent-color) 70%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .m-hero-place {
   font-size: clamp(12px, 3vw, 14px);
-  color: #5a6478;
+  color: #8a95a8;
   margin-bottom: 12px;
   position: relative;
   z-index: 1;
@@ -879,29 +896,30 @@ const saveNote = () => {
 .m-checkin-badge {
   background: linear-gradient(135deg, #4caf50, #2e7d32);
   color: white;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 8px;
   font-size: clamp(10px, 2.5vw, 12px);
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.25);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
 
 .m-checkin-date {
   font-size: clamp(11px, 2.8vw, 13px);
-  color: #7a8599;
+  color: #8a95a8;
   font-weight: 500;
   word-break: break-word;
 }
 
 /* 移动端 info 区块 */
 .m-info-section {
-  background: white;
-  border-radius: 14px;
-  padding: 16px 14px;
-  box-shadow: 0 2px 10px rgba(26, 35, 50, 0.05);
-  margin-bottom: 12px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: clamp(16px, 4vw, 20px) clamp(14px, 3.5vw, 18px);
+  box-shadow: 0 2px 16px rgba(26, 35, 50, 0.05);
+  margin-bottom: 14px;
   position: relative;
   overflow: hidden;
+  border: 1.5px solid rgba(211, 47, 47, 0.04);
 }
 
 .m-section-title {
@@ -921,15 +939,15 @@ const saveNote = () => {
   bottom: -3px;
   left: 0;
   width: 28px;
-  height: 2px;
+  height: 3px;
   background: linear-gradient(90deg, var(--accent-color, #d32f2f), #ff7043);
   border-radius: 2px;
 }
 
 .m-section-text {
   font-size: clamp(12px, 3vw, 14px);
-  color: #5a6478;
-  line-height: 1.75;
+  color: #6b7a90;
+  line-height: 1.8;
   margin: 0;
   word-break: break-word;
   overflow-wrap: break-word;
@@ -946,7 +964,7 @@ const saveNote = () => {
   align-items: flex-start;
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid rgba(211, 47, 47, 0.04);
   position: relative;
 }
 
@@ -957,7 +975,7 @@ const saveNote = () => {
 .m-highlight-marker {
   width: 24px;
   height: 24px;
-  background: linear-gradient(135deg, var(--accent-color, #d32f2f), #ff7043);
+  background: linear-gradient(135deg, var(--accent-color, #d32f2f), #e53935);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -966,13 +984,13 @@ const saveNote = () => {
   font-size: clamp(10px, 2.5vw, 11px);
   font-weight: 700;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(211, 47, 47, 0.2);
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.25);
 }
 
 .m-highlight-text {
   font-size: clamp(12px, 3vw, 14px);
-  color: #5a6478;
-  line-height: 1.65;
+  color: #6b7a90;
+  line-height: 1.7;
   padding-top: 2px;
   word-break: break-word;
   overflow-wrap: break-word;
@@ -981,12 +999,13 @@ const saveNote = () => {
 /* 移动端 Note 区块 */
 .m-note-section {
   background: linear-gradient(135deg, #fff8e1, #ffe9d9);
-  border-radius: 14px;
-  padding: 16px 14px;
-  margin-bottom: 12px;
+  border-radius: 18px;
+  padding: clamp(16px, 4vw, 20px) clamp(14px, 3.5vw, 18px);
+  margin-bottom: 14px;
   border-left: 4px solid #ff9800;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 12px rgba(255, 152, 0, 0.06);
 }
 
 .m-note-header {
@@ -1124,9 +1143,9 @@ const saveNote = () => {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   background: linear-gradient(135deg, #fafbfc, #f5f7fa);
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1.5px solid transparent;
   transition: all 0.2s ease;
 }
@@ -1139,7 +1158,7 @@ const saveNote = () => {
 
 .m-info-label {
   font-size: clamp(10px, 2.5vw, 11px);
-  color: #7a8599;
+  color: #8a95a8;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -1160,20 +1179,23 @@ const saveNote = () => {
 
 @media (max-width: 600px) {
   .checkin-detail {
-    padding: 14px 12px;
+    padding: 16px 14px;
     max-width: 100%;
   }
 
   .back-btn {
-    padding: 8px 14px;
+    padding: 10px 16px;
     font-size: clamp(12px, 3vw, 13px);
-    margin-bottom: 16px;
-    border-radius: 8px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(26, 35, 50, 0.06);
   }
 
   .not-found {
-    padding: 40px 20px;
-    border-radius: 16px;
+    padding: clamp(40px, 10vw, 60px) 20px;
+    border-radius: 20px;
+    box-shadow: 0 2px 16px rgba(26, 35, 50, 0.05);
   }
 
   .nf-icon {
@@ -1190,9 +1212,10 @@ const saveNote = () => {
   }
 
   .nf-btn {
-    padding: 12px 28px;
+    padding: 14px 28px;
     font-size: clamp(13px, 3.3vw, 15px);
     width: 100%;
+    border-radius: 12px;
   }
 }
 

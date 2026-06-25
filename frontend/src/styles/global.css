@@ -37,6 +37,29 @@ body {
   overflow-wrap: break-word;
 }
 
+/* ===== 移动端全局美化 ===== */
+@media (max-width: 768px) {
+  body {
+    background: linear-gradient(180deg, #f8f0f0 0%, #f7f9fc 120px, #f7f9fc 100%);
+  }
+
+  /* 移动端所有页面入场动画 */
+  #app {
+    animation: mobileAppEntry 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes mobileAppEntry {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 全局移动端卡片提升 */
+  /* 给所有有 box-shadow 的元素增加更柔和的阴影 */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
 /* 全局让 flex 子项默认允许文字换行 */
 * {
   box-sizing: border-box;

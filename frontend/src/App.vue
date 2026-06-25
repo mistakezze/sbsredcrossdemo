@@ -254,15 +254,27 @@ const { isMobile } = useViewport()
 .mobile-topbar {
   background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
   color: white;
-  box-shadow: 0 2px 12px rgba(211, 47, 47, 0.25);
   position: sticky;
   top: 0;
   z-index: 100;
   flex-shrink: 0;
+  /* 移除 box-shadow，改用底部渐变融合 */
+}
+
+.mobile-topbar::after {
+  content: '';
+  position: absolute;
+  bottom: -16px;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: linear-gradient(to bottom, rgba(183, 28, 28, 0.12), transparent);
+  pointer-events: none;
 }
 
 .mobile-topbar-inner {
-  padding: 12px 16px;
+  padding: 14px 20px;
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -274,19 +286,24 @@ const { isMobile } = useViewport()
   gap: 10px;
   cursor: pointer;
   user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.mobile-topbar-logo:active {
+  transform: scale(0.96);
 }
 
 .mobile-topbar-icon {
-  width: 34px;
-  height: 34px;
-  background: white;
-  border-radius: 9px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
 }
 
 .mobile-topbar-icon .cross-h {
@@ -294,6 +311,7 @@ const { isMobile } = useViewport()
   width: 16px;
   height: 4px;
   background: #d32f2f;
+  border-radius: 2px;
 }
 
 .mobile-topbar-icon .cross-v {
@@ -301,6 +319,7 @@ const { isMobile } = useViewport()
   width: 4px;
   height: 16px;
   background: #d32f2f;
+  border-radius: 2px;
 }
 
 .mobile-topbar-text {
@@ -311,13 +330,14 @@ const { isMobile } = useViewport()
 .mobile-topbar-text span {
   font-size: 16px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
   line-height: 1.2;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .mobile-main {
   flex: 1;
-  padding: 16px 14px 80px 14px; /* 底部留位给 tabbar */
+  padding: 20px 16px 90px 16px; /* 底部留位给 tabbar */
   width: 100%;
   max-width: 100%;
 }
@@ -328,11 +348,23 @@ const { isMobile } = useViewport()
   left: 0;
   right: 0;
   display: flex;
-  background: white;
-  border-top: 1px solid #e5e9ef;
-  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 0.5px solid rgba(211, 47, 47, 0.08);
   z-index: 100;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mobile-tabbar::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.03), transparent);
+  pointer-events: none;
 }
 
 .mobile-tabbar-item {
@@ -341,10 +373,10 @@ const { isMobile } = useViewport()
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px 4px;
-  color: #7a8599;
+  padding: 10px 4px 8px;
+  color: #a0aab8;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   gap: 3px;
   min-height: 56px;
@@ -353,14 +385,16 @@ const { isMobile } = useViewport()
 .mobile-tabbar-icon {
   font-size: 22px;
   line-height: 1;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: saturate(0);
 }
 
 .mobile-tabbar-label {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  line-height: 1.4;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  line-height: 1.3;
+  transition: color 0.25s ease;
 }
 
 .mobile-tabbar-item.active {
@@ -368,21 +402,49 @@ const { isMobile } = useViewport()
 }
 
 .mobile-tabbar-item.active .mobile-tabbar-icon {
-  transform: scale(1.15);
+  transform: scale(1.18) translateY(-1px);
+  filter: saturate(1);
+}
+
+.mobile-tabbar-item.active .mobile-tabbar-label {
+  font-weight: 700;
+}
+
+/* Tab 点击涟漪效果 */
+.mobile-tabbar-item:active {
+  transform: scale(0.92);
+}
+
+.mobile-tabbar-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: linear-gradient(90deg, #d32f2f, #ff5252);
+  border-radius: 0 0 3px 3px;
 }
 
 .mobile-tabbar-badge {
   position: absolute;
-  top: 6px;
-  right: calc(50% - 22px);
-  background: #d32f2f;
+  top: 4px;
+  right: calc(50% - 24px);
+  background: linear-gradient(135deg, #ff5252, #d32f2f);
   color: white;
   font-size: 10px;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 1px 6px;
   border-radius: 10px;
   min-width: 16px;
-  line-height: 1.3;
-  box-shadow: 0 1px 4px rgba(211, 47, 47, 0.35);
+  line-height: 1.4;
+  box-shadow: 0 2px 6px rgba(211, 47, 47, 0.35);
+  animation: badgePop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes badgePop {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
 }
 </style>
