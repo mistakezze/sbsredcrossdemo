@@ -142,14 +142,311 @@
 ## 技术栈
 
 ### 前端
-- Vue 3 + Composition API
-- Vite 5
-- Vue Router 4
+- **Vue 3.4** - Composition API（`<script setup>`）
+- **Vite 5** - 构建工具
+- **Vue Router 4** - 路由
+- **Pinia 风格的轻量 store** - 数据状态管理（基于 `ref` + 模块单例）
 
 ### 后端
-- Java Spring Boot
-- DeepSeek API 集成
-- 限流与 Mock 降级
+- **Java 17**
+- **Spring Boot 4.1.0** - Web MVC
+- **RestTemplate** - 调用 DeepSeek
+- **Jackson** - JSON 序列化/反序列化
+- **DeepSeek API** (`deepseek-v4-pro`) - AI 路线生成
+- **滑动窗口限流** - 防止 AI 接口被刷
+- **Mock 降级** - 真实 API 不可用时自动使用本地推荐
+
+### 工程约束
+- 双 UI 模板：PC（≥768px）+ 移动端（<768px），断点统一在 `useViewport.js`
+- 文字容器必须包含 `word-break: break-word` + `overflow-wrap: break-word`，字号使用 `clamp()` 流体缩放
+- 移动端交互用 `:active`，PC 端用 `:hover`
+- API Key 仅在后端，前端零密钥
+
+---
+
+## 项目结构
+
+```
+redcross/
+├── frontend/                          # 前端
+│   ├── index.html
+│   ├── package.json                   # vue / vue-router / vite
+│   ├── vite.config.js
+│   ├── .env.example
+│   └── src/
+│       ├── main.js                    # 入口（createApp + 路由 + 全局样式）
+│       ├── App.vue                    # 顶层布局（PC 顶部导航 / 移动端底部 Tab）
+│       ├── styles/global.css          # 全局样式
+│       ├── router/index.js            # 路由表（4 个页面）
+│       ├── composables/
+│       │   └── useViewport.js         # 视口检测（768px 断点）
+│       ├── stores/                    # 前端数据层（localStorage 持久化）
+│       │   ├── figureStore.js         # 6 位红十字人物
+│       │   ├── locationStore.js       # 8 个上海红十字地点
+│       │   └── checkinStore.js        # 打卡记录（localStorage）
+│       └── views/
+│           ├── Home.vue               # 首页（人物/地点轮播 + 时间线 + 小知识）
+│           ├── Routes.vue             # 路线推荐（固定 + AI）
+│           ├── Checkins.vue           # 打卡列表
+│           └── CheckinDetail.vue      # 打卡详情
+│
+├── src/main/java/com/example/redcross/  # 后端
+│   ├── RedcrossApplication.java       # 启动类
+│   ├── controller/AiController.java   # AI 接口
+│   ├── service/
+│   │   ├── DeepSeekService.java       # DeepSeek 调用 + Prompt + 降级
+│   │   └── RateLimitService.java      # 滑动窗口限流
+│   ├── dto/                           # 请求/响应 DTO
+│   │   ├── AiRouteRequest.java
+│   │   ├── AiRouteResponse.java
+│   │   ├── RouteStep.java
+│   │   ├── TransitInfo.java
+│   │   └── LocationItem.java
+│   ├── deepseek/                      # DeepSeek API 数据结构
+│   │   ├── DeepSeekRequest.java
+│   │   └── DeepSeekResponse.java
+│   └── config/                        # CORS / RestTemplate
+│
+├── src/main/resources/application.properties
+├── pom.xml                            # Maven 配置
+└── README.md
+```
+
+---
+
+## 前端架构
+
+### 路由表
+
+| 路径 | 名称 | 组件 | 说明 |
+|------|------|------|------|
+| `/` | Home | `Home.vue` | 首页（轮播 + 时间线 + 小知识） |
+| `/routes` | Routes | `Routes.vue` | 路线推荐（固定 / AI） |
+| `/checkins` | Checkins | `Checkins.vue` | 打卡列表 |
+| `/checkins/:id` | CheckinDetail | `CheckinDetail.vue` | 打卡详情（按 locationId 查询） |
+
+跳转行为：每次路由切换后平滑滚动到顶部（`scrollBehavior`）。
+
+### 核心 Composable
+
+#### `useViewport()` - 视口检测
+
+```js
+// frontend/src/composables/useViewport.js
+const { isMobile, width, height, breakpoint } = useViewport()
+// isMobile: boolean（<768px 为 true）
+// width/height: ref 响应式
+// breakpoint: 768
+```
+
+监听 `resize` 和 `orientationchange`，全应用共享单例。
+
+### 数据 Store
+
+所有 store 都基于 `ref` + 模块单例实现，无 Pinia 依赖。
+
+#### `useFigureStore()` - 人物数据
+
+```js
+const { figures } = useFigureStore()
+// figures: Ref<Array<{id, name, enName, title, years, description, achievement, quote, color}>>
+```
+
+内置 6 位上海红十字代表人物（沈敦和、任鸿隽、宋庆龄、钱信忠、吴贻芳、颜福庆）。
+
+#### `useLocationStore()` - 地点数据
+
+```js
+const { locations, getLocationById } = useLocationStore()
+// locations: Ref<Array<Location>>
+// getLocationById(id): Location | undefined
+```
+
+内置 8 个上海红十字地点（博物馆 / 机构 / 救灾中心 / 医院 / 国际代表处 / 青少年中心 / 骨髓库 / 博爱园）。
+
+#### `useCheckinStore()` - 打卡数据
+
+| API | 说明 |
+|-----|------|
+| `checkins` | 全部打卡记录（`Ref<Array<Checkin>>`） |
+| `checkinCount` | 打卡总数（computed） |
+| `addCheckin(locationId, note)` | 添加/更新打卡，返回 boolean |
+| `removeCheckin(id)` | 删除打卡 |
+| `hasCheckedIn(locationId)` | 是否已打卡 |
+| `getCheckinById(id)` | 按 id 或 locationId 查找 |
+| `getCheckinNote(locationId)` | 备注内容 |
+| `getCheckinTime(locationId)` | 打卡时间 |
+| `updateNote(id, note)` | 修改备注 |
+
+**数据格式**：
+```ts
+Checkin = {
+  id: number                // timestamp
+  locationId: number
+  locationName: string
+  location: string          // "上海市 · 徐汇区"
+  note: string
+  checkinTime: string       // "2026/06/25 14:30:00"
+  timestamp: number
+  category: string
+}
+```
+
+**持久化**：`localStorage` key = `redcross_checkins`，自动同步。
+
+### 环境变量
+
+```bash
+# frontend/.env（参考 .env.example）
+VITE_BACKEND_URL=http://localhost:8080   # 后端地址
+```
+
+---
+
+## 后端架构
+
+### 配置项 `application.properties`
+
+```properties
+server.port=8080
+
+# DeepSeek API
+deepseek.api.key=${DEEPSEEK_API_KEY:}                          # 必须配置环境变量
+deepseek.api.url=https://api.deepseek.com/chat/completions
+deepseek.api.model=deepseek-v4-pro
+deepseek.api.timeout-seconds=30
+
+# CORS（空 = 允许所有来源）
+app.cors.allowed-origins=
+
+# 限流：每 IP 每 60 秒最多 N 次 AI 调用
+app.rate-limit.requests-per-minute=10
+```
+
+### 关键 Bean
+
+- **`DeepSeekService`**：调用 DeepSeek；未配置 API Key 时自动走 mock；调用失败时降级
+- **`RateLimitService`**：滑动窗口限流（HashMap<ip, Deque<Long>>）
+- **`CorsConfig`**：根据 `app.cors.allowed-origins` 配置 CORS
+- **`RestTemplateConfig`**：配置 RestTemplate Bean
+
+---
+
+## API 接口
+
+### 1. POST `/api/ai/route` - 生成 AI 路线
+
+调用 DeepSeek 生成上海红十字文化游览路线。未配置 API Key 或调用失败时返回本地 mock。
+
+**请求体**：
+```json
+{
+  "question": "半天能走完的精华路线",
+  "locations": [
+    {
+      "name": "上海红十字会博物馆",
+      "category": "博物馆",
+      "location": "上海市 · 徐汇区",
+      "description": "中国第一座红十字主题博物馆..."
+    }
+  ]
+}
+```
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `question` | string | 是 | 用户问题（如："半天能走完的精华路线"） |
+| `locations` | LocationItem[] | 否 | 候选地点列表；为空时使用后端内置默认 6 个 |
+
+**响应体（成功）**：
+```json
+{
+  "question": "半天能走完的精华路线",
+  "mocked": false,
+  "errorMessage": null,
+  "steps": [
+    {
+      "name": "上海红十字会博物馆",
+      "meta": "博物馆 · 约2小时",
+      "desc": "本馆是上海红十字运动的起点...",
+      "history": "2005年开馆...",
+      "bestTime": "建议工作日上午9:00-11:00",
+      "ticket": "免费开放，需提前3天在公众号预约",
+      "highlights": ["百年红十字史展", "人道救援实物展", "沈敦和故居复原", "互动体验区"],
+      "photoSpots": ["场馆正门的红十字主题雕塑", "一楼大厅的光辉历程展区"],
+      "nearbyFood": "出门右转200米岳阳路有多家本帮菜馆...",
+      "practicalTips": ["场馆周边停车困难，建议地铁", "馆内设无障碍通道"],
+      "tips": ["请遵守场馆规定", "部分展品需预约才能近距离观看"],
+      "transit": {
+        "fromPrev": "地铁1号线人民广场站→黄陂南路站，2站约8分钟",
+        "routeHint": "从7号口出，沿西藏中路向北步行约300米",
+        "mode": "subway",
+        "cost": "约4元",
+        "duration": "约15分钟"
+      }
+    }
+  ],
+  "summary": ["按行政区串联上海红十字地标", "交通路线为参考建议"]
+}
+```
+
+**响应字段说明**：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `question` | string | 回显原始问题 |
+| `mocked` | boolean | true = 走 mock 降级；false = 真实 DeepSeek 返回 |
+| `errorMessage` | string \| null | 调用失败时的错误描述（成功时为 null） |
+| `steps` | RouteStep[] | 路线步骤（3-6 个） |
+| `summary` | string[] | 路线要点总结 |
+
+**transit.mode 取值**：`walk` | `subway` | `bus` | `taxi`
+
+**响应（限流触发）**：
+```json
+{
+  "error": "请求过于频繁，请稍后再试",
+  "rateLimit": "每 60 秒最多 10 次",
+  "remaining": 0
+}
+```
+HTTP 429。
+
+### 2. GET `/api/ai/status` - 健康检查
+
+查询服务状态与当前 IP 剩余配额。
+
+**响应**：
+```json
+{
+  "ok": true,
+  "remainingInWindow": 8,
+  "ip": "127.0.0.1"
+}
+```
+
+---
+
+## AI Prompt 设计
+
+后端在 `DeepSeekService#buildPrompt` 中构造四段式 Prompt：
+
+1. **【地点数据库】** - 列出所有候选地点（含区域、类别、简介），强制 AI 只能从中选择
+2. **【用户需求】** - 用户原始问题
+3. **【输出要求】** - 严格 JSON Schema（含字段名、类型、示例）
+4. **【硬性规则】** - 7 条约束（地点必须存在、不能编造门牌号、transit 只能 4 种模式、必须返回合法 JSON 等）
+
+DeepSeek 使用 `response_format: json_object` 强制 JSON 输出，简化解析。
+
+---
+
+## 限流 & 降级
+
+- **限流**：`RateLimitService` 使用 HashMap<ip, Deque<Long>> 实现滑动窗口，每 60s 默认 10 次
+- **降级 1**：`apiKey` 为空时直接走 `generateMockSteps`（本地 5 步路线）
+- **降级 2**：DeepSeek 抛 `HttpClientErrorException` / 任意 Exception 时，返回 mock + `errorMessage`
+- **降级 3**：JSON 解析失败时返回 mock + `errorMessage`
+- 所有降级都会把 `mocked=true` 返回给前端
 
 ---
 
