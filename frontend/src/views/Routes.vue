@@ -143,6 +143,25 @@
           </div>
         </div>
 
+        <!-- AI 加载中：实时显示生成过程 -->
+        <div v-if="aiLoading && !aiAnswer" class="pc-ai-card pc-ai-loading-card">
+          <div class="pc-ai-loading-header">
+            <span class="pc-loading-orb"></span>
+            <span class="pc-loading-title">AI 正在为您规划路线</span>
+          </div>
+          <ul class="pc-loading-steps">
+            <li
+              v-for="(step, i) in loadingPhases"
+              :key="i"
+              class="pc-loading-step"
+              :class="{ active: loadingPhaseIndex === i, done: loadingPhaseIndex > i }"
+            >
+              <span class="pc-loading-step-dot"></span>
+              <span class="pc-loading-step-text">{{ step }}</span>
+            </li>
+          </ul>
+        </div>
+
         <!-- AI 回答结果区域 -->
         <div v-if="aiAnswer" class="pc-ai-card pc-ai-result-card">
           <div class="pc-ai-result-header">
@@ -157,7 +176,8 @@
 
           <div v-if="aiAnswer.routeGenerationProcess" class="pc-ai-process">
             <div class="pc-process-title">🧠 路线生成过程</div>
-            <p class="pc-process-text">{{ aiAnswer.routeGenerationProcess }}</p>
+            <p class="pc-process-text">{{ displayedProcess }}</p>
+            <span v-if="isTyping" class="pc-process-cursor">▍</span>
           </div>
 
           <div v-if="aiAnswer.steps && aiAnswer.steps.length > 0" class="pc-ai-steps">
@@ -370,6 +390,25 @@
           </div>
         </div>
 
+        <!-- AI 加载中：实时显示生成过程 -->
+        <div v-if="aiLoading && !aiAnswer" class="mobile-ai-card mobile-ai-loading-card">
+          <div class="mobile-ai-loading-header">
+            <span class="mobile-loading-orb"></span>
+            <span class="mobile-loading-title">AI 正在为您规划路线</span>
+          </div>
+          <ul class="mobile-loading-steps">
+            <li
+              v-for="(step, i) in loadingPhases"
+              :key="i"
+              class="mobile-loading-step"
+              :class="{ active: loadingPhaseIndex === i, done: loadingPhaseIndex > i }"
+            >
+              <span class="mobile-loading-step-dot"></span>
+              <span class="mobile-loading-step-text">{{ step }}</span>
+            </li>
+          </ul>
+        </div>
+
         <!-- AI 结果（紧凑） -->
         <div v-if="aiAnswer" class="mobile-ai-card mobile-ai-result-card">
           <div class="mobile-ai-result-header">
@@ -383,7 +422,8 @@
 
           <div v-if="aiAnswer.routeGenerationProcess" class="mobile-ai-process">
             <div class="mobile-process-title">🧠 路线生成过程</div>
-            <p class="mobile-process-text">{{ aiAnswer.routeGenerationProcess }}</p>
+            <p class="mobile-process-text">{{ displayedProcess }}</p>
+            <span v-if="isTyping" class="mobile-process-cursor">▍</span>
           </div>
 
           <div v-if="aiAnswer.steps && aiAnswer.steps.length > 0" class="mobile-ai-steps">
@@ -590,6 +630,70 @@ const customQuestion = ref('')
 const isCustomAsk = ref(false)
 const aiAnswer = ref(null)
 
+// 加载阶段文案（用于实时展示 AI 思考过程）
+const loadingPhases = [
+  '分析您的需求与偏好...',
+  '从地点库中筛选符合主题的场馆...',
+  '设计浏览顺序与参观动线...',
+  '估算每站参观时长并匹配您的可用时间...',
+  '补充亮点、餐饮与拍照点等实用信息...',
+]
+const loadingPhaseIndex = ref(0)
+let loadingTimer = null
+
+// 打字机：把 routeGenerationProcess 逐字显示
+const displayedProcess = ref('')
+const isTyping = ref(false)
+let typingTimer = null
+
+const startLoadingProgress = () => {
+  loadingPhaseIndex.value = 0
+  if (loadingTimer) clearInterval(loadingTimer)
+  // 每隔 1.2 秒推进一个阶段，循环到最后一个后保持
+  loadingTimer = setInterval(() => {
+    if (loadingPhaseIndex.value < loadingPhases.length - 1) {
+      loadingPhaseIndex.value += 1
+    } else {
+      clearInterval(loadingTimer)
+      loadingTimer = null
+    }
+  }, 1200)
+}
+
+const stopLoadingProgress = () => {
+  if (loadingTimer) {
+    clearInterval(loadingTimer)
+    loadingTimer = null
+  }
+}
+
+const startTypingProcess = (fullText) => {
+  stopTypingProcess()
+  displayedProcess.value = ''
+  isTyping.value = true
+  if (!fullText) {
+    isTyping.value = false
+    return
+  }
+  let i = 0
+  // 每 18ms 输出一字，兼顾速度与可读性
+  typingTimer = setInterval(() => {
+    i += 1
+    displayedProcess.value = fullText.slice(0, i)
+    if (i >= fullText.length) {
+      stopTypingProcess()
+    }
+  }, 18)
+}
+
+const stopTypingProcess = () => {
+  if (typingTimer) {
+    clearInterval(typingTimer)
+    typingTimer = null
+  }
+  isTyping.value = false
+}
+
 const selectAndAsk = async (q) => {
   await askAI(q.label, false)
 }
@@ -609,6 +713,11 @@ const askAI = async (question, isCustom) => {
 
   aiLoading.value = true
   aiAnswer.value = null
+  stopTypingProcess()
+  displayedProcess.value = ''
+
+  // 启动加载阶段进度提示（实时显示思考过程）
+  startLoadingProgress()
 
   const body = {
     question: question,
@@ -643,6 +752,10 @@ const askAI = async (question, isCustom) => {
         routeGenerationProcess: generateMockRoute(question).process,
         raw: data.error || '请求失败：HTTP ' + res.status,
       }
+      // 触发打字机效果显示路线生成过程
+      if (aiAnswer.value.routeGenerationProcess) {
+        startTypingProcess(aiAnswer.value.routeGenerationProcess)
+      }
       return
     }
 
@@ -669,6 +782,10 @@ const askAI = async (question, isCustom) => {
       errorMessage: data.errorMessage,
       raw: '',
     }
+    // 触发打字机效果显示路线生成过程
+    if (aiAnswer.value.routeGenerationProcess) {
+      startTypingProcess(aiAnswer.value.routeGenerationProcess)
+    }
   } catch (err) {
     const fallback = generateMockRoute(question)
     aiAnswer.value = {
@@ -682,7 +799,12 @@ const askAI = async (question, isCustom) => {
       routeGenerationProcess: fallback.process,
       raw: '无法连接后端服务：' + (err?.message || '网络错误') + '\n\n提示：请启动 Spring Boot 后端服务，或在 .env 中配置 VITE_BACKEND_URL。',
     }
+    if (aiAnswer.value.routeGenerationProcess) {
+      startTypingProcess(aiAnswer.value.routeGenerationProcess)
+    }
   } finally {
+    stopLoadingProgress()
+    loadingPhaseIndex.value = loadingPhases.length - 1
     aiLoading.value = false
     isCustomAsk.value = false
   }
@@ -960,6 +1082,10 @@ const clearAnswer = () => {
   aiAnswer.value = null
   selectedQuestion.value = ''
   customQuestion.value = ''
+  stopLoadingProgress()
+  stopTypingProcess()
+  displayedProcess.value = ''
+  loadingPhaseIndex.value = 0
 }
 </script>
 
@@ -2189,6 +2315,18 @@ const clearAnswer = () => {
   white-space: pre-wrap;
 }
 
+.pc-process-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: #5b6bff;
+  font-weight: 800;
+  animation: cursorBlink 0.8s steps(2, start) infinite;
+}
+
+@keyframes cursorBlink {
+  to { visibility: hidden; }
+}
+
 /* 摘要 */
 .pc-ai-summary {
   background: linear-gradient(135deg, #fff8e1, #ffe9d9);
@@ -2928,6 +3066,14 @@ const clearAnswer = () => {
   margin: 0;
   word-break: break-word;
   white-space: pre-wrap;
+}
+
+.mobile-process-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: #5b6bff;
+  font-weight: 800;
+  animation: cursorBlink 0.8s steps(2, start) infinite;
 }
 
 /* AI 原始内容 - 移动端 */
