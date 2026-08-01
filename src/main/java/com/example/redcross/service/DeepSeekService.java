@@ -75,9 +75,12 @@ public class DeepSeekService {
             String prompt = buildPrompt(question, locations);
             DeepSeekRequest request = new DeepSeekRequest();
             request.setModel(model);
-            request.setTemperature(0.7);
+            // 较高的 temperature + 频率/主题惩罚，让每次生成的内容更具多样性和新鲜感
+            request.setTemperature(0.9);
+            request.setFrequencyPenalty(0.5);
+            request.setPresencePenalty(0.3);
             request.setMessages(List.of(
-                new DeepSeekRequest.Message("system", "你是一名严谨的上海红十字文化导游，必须根据下方提供的真实地点生成路线，绝对不能编造不存在的地点。"),
+                new DeepSeekRequest.Message("system", "你是一名严谨且富有文采的上海红十字文化导游，必须根据下方提供的真实地点生成路线，绝对不能编造不存在的地点。每次回答都要使用不同的表达方式、句式和切入角度，避免重复、模板化、套路化的描述。"),
                 new DeepSeekRequest.Message("user", prompt)
             ));
             // 让 DeepSeek 返回 JSON
@@ -170,6 +173,8 @@ public class DeepSeekService {
         sb.append("4. history、nearbyFood、bestTime 必须真实合理，不得编造门牌号、具体餐厅名称（使用'XX路'等模糊描述即可）或闭馆日。\n");
         sb.append("5. routeGenerationProcess 必须清晰描述思考过程，不要重复路线步骤的内容，要体现『为什么这样安排』。\n");
         sb.append("6. 返回的必须是合法 JSON，不要有任何额外文字。\n");
+        sb.append("7. 【表达多样化】每个字段的措辞、句式、切入角度必须随场景变化，不要使用'本场馆是''承载着''绝佳''不可错过'等高频模板句。每条 desc 至少有一处独特视角（例如历史细节、人道主义故事、参观动线、对比反差等）。highlights、photoSpots、practicalTips 也要避免与历史输出雷同。\n");
+        sb.append("8. 【结合上下文】根据用户问题的具体场景（亲子/拍照/深度/半天/一天/医疗等）调整语言风格：亲子场景语气活泼，深度场景强调历史厚重感，拍照场景突出视觉亮点，半天场景突出节奏紧凑。\n");
 
         return sb.toString();
     }
