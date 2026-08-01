@@ -65,6 +65,7 @@ public class DeepSeekService {
             logger.info("DeepSeek API Key 未配置，使用本地 mock 数据");
             response.setSteps(generateMockSteps(locations));
             response.setSummary(generateMockSummary());
+            response.setRouteGenerationProcess(generateMockProcess());
             response.setMocked(true);
             return response;
         }
@@ -76,7 +77,7 @@ public class DeepSeekService {
             request.setModel(model);
             request.setTemperature(0.7);
             request.setMessages(List.of(
-                new DeepSeekRequest.Message("system", "你是一名严谨的上海红十字文化导游，必须根据下方提供的真实地点生成路线，绝对不能编造不存在的地点或交通方式。"),
+                new DeepSeekRequest.Message("system", "你是一名严谨的上海红十字文化导游，必须根据下方提供的真实地点生成路线，绝对不能编造不存在的地点。"),
                 new DeepSeekRequest.Message("user", prompt)
             ));
             // 让 DeepSeek 返回 JSON
@@ -107,6 +108,7 @@ public class DeepSeekService {
             logger.error("DeepSeek API 返回错误: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString());
             response.setSteps(generateMockSteps(locations));
             response.setSummary(generateMockSummary());
+            response.setRouteGenerationProcess(generateMockProcess());
             response.setMocked(true);
             response.setErrorMessage("调用 DeepSeek 失败（" + e.getStatusCode() + "），已降级为本地推荐");
             return response;
@@ -114,6 +116,7 @@ public class DeepSeekService {
             logger.error("调用 DeepSeek API 异常: {}", e.getMessage(), e);
             response.setSteps(generateMockSteps(locations));
             response.setSummary(generateMockSummary());
+            response.setRouteGenerationProcess(generateMockProcess());
             response.setMocked(true);
             response.setErrorMessage("调用 DeepSeek 异常：" + e.getMessage());
             return response;
@@ -140,6 +143,7 @@ public class DeepSeekService {
         // 第三部分：输出要求（超级详细）
         sb.append("请为用户生成一份详尽的专业游览方案，必须严格按照以下 JSON 格式返回，只返回 JSON，不要任何解释文字：\n\n");
         sb.append("{\n");
+        sb.append("  \"routeGenerationProcess\": \"用 3-6 句话详细描述本次路线生成的过程：第一步分析用户需求（时间/兴趣/出行场景）；第二步从地点数据库中筛选符合主题的地点，说明筛选理由；第三步确定浏览顺序，解释为什么这样安排（例如按时间线、主题相关性、地理位置等）；第四步估算每站参观时长并与用户可用时间匹配；第五步补充亮点推荐与注意事项。\",\n");
         sb.append("  \"steps\": [\n");
         sb.append("    {\n");
         sb.append("      \"name\": \"地点全称（必须与上方数据库中的名称完全一致）\",\n");
@@ -152,14 +156,7 @@ public class DeepSeekService {
         sb.append("      \"photoSpots\": [\"打卡点1\", \"打卡点2\", \"打卡点3\"],\n");
         sb.append("      \"nearbyFood\": \"附近餐饮推荐（具体到街名或商场名，例如：'出门左转200米淮海中路有光明邨大酒家，招牌蟹粉小笼约68元；H5商场B1层有实惠的工作套餐约35元'）\",\n");
         sb.append("      \"practicalTips\": [\"实用贴士1（如：停车不便，建议地铁）\", \"实用贴士2（如：有免费行李寄存）\", \"实用贴士3（如：馆内设无障碍通道）\"],\n");
-        sb.append("      \"tips\": [\"快速贴士1\", \"快速贴士2\"],\n");
-        sb.append("      \"transit\": {\n");
-        sb.append("        \"fromPrev\": \"从上一站到本站的完整交通描述（例如：'地铁1号线人民广场站→黄陂南路站，2站约8分钟，出站步行5分钟'）\",\n");
-        sb.append("        \"routeHint\": \"出站后如何步行到达（例如：'从7号口出，沿西藏中路向北步行约300米，左转进入淮海中路'）\",\n");
-        sb.append("        \"mode\": \"walk / subway / bus / taxi 四选一\",\n");
-        sb.append("        \"cost\": \"预估费用（例如：'约4元（地铁）'、'约25元（出租车）'、'步行0元'）\",\n");
-        sb.append("        \"duration\": \"预估时长（例如：'约25分钟'、'约15分钟步行'）\"\n");
-        sb.append("      }\n");
+        sb.append("      \"tips\": [\"快速贴士1\", \"快速贴士2\"]\n");
         sb.append("    }\n");
         sb.append("  ],\n");
         sb.append("  \"summary\": [\"路线亮点总结1（30字以内）\", \"路线亮点总结2（30字以内）\", \"路线亮点总结3（30字以内）\"]\n");
@@ -171,9 +168,8 @@ public class DeepSeekService {
         sb.append("2. name 必须与【地点数据库】中的名称完全一致，不得修改、不得编造。\n");
         sb.append("3. desc 必须基于【地点数据库】中的简介展开，每条 desc 不低于 3 句话。\n");
         sb.append("4. history、nearbyFood、bestTime 必须真实合理，不得编造门牌号、具体餐厅名称（使用'XX路'等模糊描述即可）或闭馆日。\n");
-        sb.append("5. transit 只能使用 walk / subway / bus / taxi 四种模式，不得出现机场、火车、高铁等。\n");
-        sb.append("6. transit 的 routeHint 基于行政区做合理推断（相邻行政区用'步行5-10分钟'，跨区用'地铁1-3站+步行'），不要编造具体站名。\n");
-        sb.append("7. 返回的必须是合法 JSON，不要有任何额外文字。\n");
+        sb.append("5. routeGenerationProcess 必须清晰描述思考过程，不要重复路线步骤的内容，要体现『为什么这样安排』。\n");
+        sb.append("6. 返回的必须是合法 JSON，不要有任何额外文字。\n");
 
         return sb.toString();
     }
@@ -186,6 +182,7 @@ public class DeepSeekService {
             JsonNode root = objectMapper.readTree(content);
             JsonNode stepsNode = root.get("steps");
             JsonNode summaryNode = root.get("summary");
+            JsonNode processNode = root.get("routeGenerationProcess");
 
             List<RouteStep> stepList = new ArrayList<>();
             if (stepsNode != null && stepsNode.isArray()) {
@@ -213,17 +210,6 @@ public class DeepSeekService {
                         step.setTips(tips);
                     }
 
-                    // transit
-                    JsonNode transitNode = s.get("transit");
-                    if (transitNode != null) {
-                        TransitInfo ti = new TransitInfo();
-                        ti.setFromPrev(textOrEmpty(transitNode, "fromPrev"));
-                        ti.setRouteHint(textOrEmpty(transitNode, "routeHint"));
-                        ti.setMode(textOrEmpty(transitNode, "mode"));
-                        ti.setCost(textOrEmpty(transitNode, "cost"));
-                        ti.setDuration(textOrEmpty(transitNode, "duration"));
-                        step.setTransit(ti);
-                    }
                     stepList.add(step);
                 }
             }
@@ -233,14 +219,19 @@ public class DeepSeekService {
                 for (JsonNode s : summaryNode) summaryList.add(s.asText());
             }
 
+            // 路线生成过程描述
+            String processText = (processNode != null && !processNode.isNull()) ? processNode.asText("") : "";
+
             result.setSteps(stepList);
             result.setSummary(summaryList);
+            result.setRouteGenerationProcess(processText);
             result.setMocked(false);
-            logger.info("解析成功：{} 个步骤，{} 条要点", stepList.size(), summaryList.size());
+            logger.info("解析成功：{} 个步骤，{} 条要点，路线生成过程 {} 字", stepList.size(), summaryList.size(), processText.length());
         } catch (Exception e) {
             logger.error("解析 DeepSeek JSON 响应失败，回退为 mock 数据: {}", e.getMessage());
             result.setSteps(generateMockSteps(defaultLocations()));
             result.setSummary(generateMockSummary());
+            result.setRouteGenerationProcess(generateMockProcess());
             result.setMocked(true);
             result.setErrorMessage("AI 返回的 JSON 解析失败，已降级为本地推荐");
         }
@@ -264,7 +255,6 @@ public class DeepSeekService {
     private List<RouteStep> generateMockSteps(List<LocationItem> locations) {
         List<RouteStep> steps = new ArrayList<>();
         int take = Math.min(locations.size(), 5);
-        String[] modes = {"subway", "walk", "bus", "taxi", "walk"};
 
         for (int i = 0; i < take; i++) {
             LocationItem loc = locations.get(i);
@@ -298,20 +288,6 @@ public class DeepSeekService {
             ));
             step.setTips(List.of("请遵守场馆规定，勿使用闪光灯拍照", "部分展品需预约才能近距离观看"));
 
-            TransitInfo ti = new TransitInfo();
-            if (i == 0) {
-                ti.setFromPrev("从您的出发点前往本地点");
-                ti.setRouteHint("建议使用手机地图导航，输入地点名称即可规划最优路线");
-                ti.setCost("请以实际导航为准");
-                ti.setDuration("请以实际导航为准");
-            } else {
-                ti.setFromPrev("根据两地点位置，建议选择地铁或公交出行");
-                ti.setRouteHint("两地点位于相邻区域，可通过地铁或公交直达，请以地图导航为准");
-                ti.setCost("约 " + (4 + i * 2) + " 元（地铁）");
-                ti.setDuration("约 " + (15 + i * 5) + " 分钟");
-            }
-            ti.setMode(modes[i % modes.length]);
-            step.setTransit(ti);
             steps.add(step);
         }
         return steps;
@@ -321,8 +297,16 @@ public class DeepSeekService {
         return List.of(
             "路线经过精心编排，按行政区串联上海红十字地标",
             "每站都有红十字文化特色亮点，适合深度游览",
-            "交通路线为参考建议，实际出行请以地图导航为准"
+            "建议结合实际出行时间灵活调整参观顺序"
         );
+    }
+
+    /** Mock 模式下的路线生成过程描述 */
+    private String generateMockProcess() {
+        return "首先分析用户偏好与可用时间，从地点库中挑选与主题契合的代表性场馆；"
+            + "其次按照主题相关性与参观节奏确定浏览顺序，避免主题重复并保持体验连贯；"
+            + "然后根据每个地点的常规参观时长估算总耗时，确保与用户的可用时间相匹配；"
+            + "最后补充参观亮点、餐饮与拍照点等实用信息，方便用户落地执行。";
     }
 
     /** 内置默认地点列表（当前端未传入时使用） */

@@ -155,9 +155,9 @@
             <span class="pc-q-text">{{ aiAnswer.question }}</span>
           </div>
 
-          <div class="pc-ai-disclaimer">
-            <span class="pc-disclaimer-icon">⚠️</span>
-            <span class="pc-disclaimer-text">路线中的交通方式由 AI 基于地点所在行政区推断生成，仅作游览参考。实际出行请以地图导航（高德/百度地图）提供的实时线路为准。</span>
+          <div v-if="aiAnswer.routeGenerationProcess" class="pc-ai-process">
+            <div class="pc-process-title">🧠 路线生成过程</div>
+            <p class="pc-process-text">{{ aiAnswer.routeGenerationProcess }}</p>
           </div>
 
           <div v-if="aiAnswer.steps && aiAnswer.steps.length > 0" class="pc-ai-steps">
@@ -227,24 +227,6 @@
 
                 <div v-if="step.tips" class="pc-ai-step-tips">
                   <span v-for="(tip, ti) in step.tips" :key="ti" class="pc-step-chip">{{ tip }}</span>
-                </div>
-
-                <div v-if="step.transit" class="pc-ai-step-transit">
-                  <div class="pc-transit-head">
-                    <span class="pc-transit-icon" :class="`pc-mode-${step.transit.mode}`">
-                      {{ modeIcon(step.transit.mode) }}
-                    </span>
-                    <span class="pc-transit-label">🚗 交通路线</span>
-                    <span class="pc-transit-text">{{ step.transit.from_prev || step.transit.fromPrev }}</span>
-                  </div>
-                  <div v-if="step.transit.route_hint || step.transit.routeHint" class="pc-transit-hint">
-                    <span class="pc-hint-arrow">→</span>
-                    <span class="pc-hint-text">{{ step.transit.route_hint || step.transit.routeHint }}</span>
-                  </div>
-                  <div v-if="step.transit.cost || step.transit.duration" class="pc-transit-meta">
-                    <span v-if="step.transit.duration" class="pc-transit-meta-item">⏱️ {{ step.transit.duration }}</span>
-                    <span v-if="step.transit.cost" class="pc-transit-meta-item">💰 {{ step.transit.cost }}</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -399,6 +381,11 @@
             <span class="mobile-q-text">{{ aiAnswer.question }}</span>
           </div>
 
+          <div v-if="aiAnswer.routeGenerationProcess" class="mobile-ai-process">
+            <div class="mobile-process-title">🧠 路线生成过程</div>
+            <p class="mobile-process-text">{{ aiAnswer.routeGenerationProcess }}</p>
+          </div>
+
           <div v-if="aiAnswer.steps && aiAnswer.steps.length > 0" class="mobile-ai-steps">
             <div
               v-for="(step, idx) in aiAnswer.steps"
@@ -433,21 +420,6 @@
                 <div v-if="step.photo_spots && step.photo_spots.length > 0" class="mobile-food-photo-item mobile-photo-item">
                   <span>📷</span>
                   <div class="mobile-item-value">{{ step.photo_spots.join('、') }}</div>
-                </div>
-              </div>
-
-              <div v-if="step.transit" class="mobile-ai-step-transit">
-                <div class="mobile-transit-head">
-                  <span class="mobile-transit-icon">{{ modeIcon(step.transit.mode) }}</span>
-                  <span class="mobile-transit-label">交通</span>
-                  <span class="mobile-transit-text">{{ step.transit.from_prev || step.transit.fromPrev }}</span>
-                </div>
-                <div v-if="step.transit.route_hint || step.transit.routeHint" class="mobile-transit-hint">
-                  <span>{{ step.transit.route_hint || step.transit.routeHint }}</span>
-                </div>
-                <div v-if="step.transit.cost || step.transit.duration" class="mobile-transit-meta">
-                  <span v-if="step.transit.duration">⏱️ {{ step.transit.duration }}</span>
-                  <span v-if="step.transit.cost"> 💰 {{ step.transit.cost }}</span>
                 </div>
               </div>
             </div>
@@ -662,12 +634,13 @@ const askAI = async (question, isCustom) => {
     if (!res.ok) {
       aiAnswer.value = {
         question: question,
-        steps: generateMockRoute(question),
+        steps: generateMockRoute(question).steps,
         summary: [
           '后端暂不可用，以下为本地参考路线',
           '请稍后重试以获得 AI 智能推荐',
           '路线经过精心编排，符合您的时间与兴趣',
         ],
+        routeGenerationProcess: generateMockRoute(question).process,
         raw: data.error || '请求失败：HTTP ' + res.status,
       }
       return
@@ -685,49 +658,34 @@ const askAI = async (question, isCustom) => {
       nearby_food: s.nearby_food || s.nearbyFood,
       practical_tips: s.practical_tips || s.practicalTips || [],
       tips: s.tips || [],
-      transit: s.transit ? {
-        from_prev: s.transit.from_prev || s.transit.fromPrev,
-        route_hint: s.transit.route_hint || s.transit.routeHint,
-        mode: s.transit.mode,
-        cost: s.transit.cost,
-        duration: s.transit.duration,
-      } : null
     }))
 
     aiAnswer.value = {
       question: question,
       steps: normalizedSteps,
       summary: data.summary || [],
+      routeGenerationProcess: data.routeGenerationProcess || data.route_generation_process || '',
       mocked: !!data.mocked,
       errorMessage: data.errorMessage,
       raw: '',
     }
   } catch (err) {
+    const fallback = generateMockRoute(question)
     aiAnswer.value = {
       question: question,
-      steps: generateMockRoute(question),
+      steps: fallback.steps,
       summary: [
         '无法连接到 AI 服务，以下为本地参考路线',
         '请确认后端服务已启动（http://localhost:8080）',
-        '实际出行请以地图导航为准',
+        '请稍后重试以获得 AI 智能推荐',
       ],
+      routeGenerationProcess: fallback.process,
       raw: '无法连接后端服务：' + (err?.message || '网络错误') + '\n\n提示：请启动 Spring Boot 后端服务，或在 .env 中配置 VITE_BACKEND_URL。',
     }
   } finally {
     aiLoading.value = false
     isCustomAsk.value = false
   }
-}
-
-// 交通方式图标映射
-const modeIcon = (mode) => {
-  const map = {
-    walk: '🚶',
-    subway: '🚇',
-    bus: '🚌',
-    taxi: '🚕',
-  }
-  return map[mode] || '🚗'
 }
 
 // 本地 mock 路线生成
@@ -747,82 +705,7 @@ const generateMockRoute = (question) => {
 
   const picked = sortedLocs.slice(0, takeCount)
 
-  const transitByDistrict = (prevLoc, currLoc) => {
-    if (!prevLoc) return {
-      from_prev: '从您的出发点前往本地点',
-      route_hint: '建议使用手机地图导航，输入地点名称即可规划最优路线',
-      mode: 'subway',
-      cost: '请以实际导航为准',
-      duration: '请以实际导航为准',
-    }
-
-    const getDist = (l) => {
-      const parts = (l.location || '').split('·').map(s => s.trim())
-      return parts[parts.length - 1] || '上海'
-    }
-
-    const prevDist = getDist(prevLoc)
-    const currDist = getDist(currLoc)
-
-    if (prevDist === currDist) {
-      return {
-        from_prev: '步行约 10-15 分钟，或公交 2 站',
-        route_hint: `两地点都位于${currDist}，沿主要道路步行或乘区内公交即可到达`,
-        mode: 'walk',
-      }
-    }
-
-    const adjacentPairs = [
-      ['黄浦区', '静安区'], ['静安区', '长宁区'], ['静安区', '徐汇区'],
-      ['徐汇区', '长宁区'], ['徐汇区', '黄浦区'], ['徐汇区', '杨浦区'],
-      ['黄浦区', '浦东新区'], ['静安区', '杨浦区'], ['浦东新区', '杨浦区'],
-      ['静安区', '闵行区'], ['徐汇区', '闵行区'],
-    ]
-    const isAdjacent = adjacentPairs.some(([a, b]) =>
-      (a === prevDist && b === currDist) || (a === currDist && b === prevDist)
-    )
-
-    if (isAdjacent) {
-      return {
-        from_prev: '地铁 1-2 站 + 步行约 5 分钟，约 15 分钟',
-        route_hint: `从${prevDist}乘坐地铁前往${currDist}，出站后步行几分钟到达`,
-        mode: 'subway',
-        cost: '约4元',
-        duration: '约15分钟',
-      }
-    }
-
-    if (prevDist === '浦东新区' || currDist === '浦东新区') {
-      return {
-        from_prev: '地铁 3-5 站，约 25 分钟',
-        route_hint: `从${prevDist}经地铁过江线路前往${currDist}，具体线路请以地图导航为准`,
-        mode: 'subway',
-        cost: '约6元',
-        duration: '约25分钟',
-      }
-    }
-    if (prevDist === '闵行区' || currDist === '闵行区') {
-      return {
-        from_prev: '地铁 4-6 站，约 30 分钟',
-        route_hint: `从${prevDist}乘坐地铁前往${currDist}，具体线路请以地图导航为准`,
-        mode: 'subway',
-        cost: '约7元',
-        duration: '约30分钟',
-      }
-    }
-
-    return {
-      from_prev: '公交或地铁换乘，约 20-30 分钟',
-      route_hint: `从${prevDist}前往${currDist}，建议使用地图导航查询最优换乘方案`,
-      mode: 'bus',
-      cost: '约3元',
-      duration: '约25分钟',
-    }
-  }
-
-  return picked.map((loc, idx) => {
-    const prev = idx === 0 ? null : picked[idx - 1]
-    const transit = transitByDistrict(prev, loc)
+  const steps = picked.map((loc, idx) => {
     return {
       name: loc.name,
       meta: `预计参观 ${40 + idx * 10} 分钟（${loc.category}）`,
@@ -837,9 +720,17 @@ const generateMockRoute = (question) => {
         : '附近商场 B1 层有实惠快餐，约 30-45 元；路边有连锁便利店，可购买简餐。',
       practical_tips: ['场馆周边停车困难，建议搭乘地铁或公交前往', '馆内设有无障碍通道及轮椅免费借用服务', '可携带饮用水，但请勿携带食品进入展厅', '参观时长建议预留 1-2 小时'],
       tips: ['请遵守场馆规定，勿使用闪光灯拍照', '部分展品需预约才能近距离观看'],
-      transit,
     }
   })
+
+  const process = `首先根据您的提问（"${question || '默认推荐'}"）识别主题与可用时间，`
+    + `从地点库中按主题相关性挑选了 ${picked.length} 个代表性场馆；`
+    + `接着按主题连续性与参观节奏由浅入深地排列浏览顺序，`
+    + `避免主题重复并保持体验连贯；`
+    + `然后估算每站参观时长，确保总耗时与您的时间相匹配；`
+    + `最后补充参观亮点、餐饮与拍照点等实用信息，方便落地执行。`
+
+  return { steps, process }
 }
 
 const clearAnswer = () => {
@@ -1789,30 +1680,6 @@ const clearAnswer = () => {
   font-weight: 700;
 }
 
-.pc-ai-disclaimer {
-  background: linear-gradient(135deg, #fffbe6, #fff3cd);
-  border-left: 3px solid #f5a623;
-  border-radius: 10px;
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 13px;
-  line-height: 1.7;
-  color: #7a5a00;
-}
-
-.pc-disclaimer-icon {
-  font-size: 16px;
-  flex-shrink: 0;
-  line-height: 1.7;
-}
-
-.pc-disclaimer-text {
-  flex: 1;
-}
-
 /* AI 步骤列表 */
 .pc-ai-steps {
   display: flex;
@@ -2051,100 +1918,6 @@ const clearAnswer = () => {
   font-weight: 500;
 }
 
-/* 交通路线展示 */
-.pc-ai-step-transit {
-  margin-top: 14px;
-  padding: 14px 16px;
-  background: linear-gradient(135deg, #fff8f5, #fff3eb);
-  border-left: 3px solid #ff9800;
-  border-radius: 10px;
-  animation: transitIn 0.4s ease-out backwards;
-}
-
-.pc-ai-step-item:nth-child(1) .pc-ai-step-transit { animation-delay: 0.15s; }
-.pc-ai-step-item:nth-child(2) .pc-ai-step-transit { animation-delay: 0.25s; }
-.pc-ai-step-item:nth-child(3) .pc-ai-step-transit { animation-delay: 0.35s; }
-.pc-ai-step-item:nth-child(4) .pc-ai-step-transit { animation-delay: 0.45s; }
-.pc-ai-step-item:nth-child(5) .pc-ai-step-transit { animation-delay: 0.55s; }
-.pc-ai-step-item:nth-child(6) .pc-ai-step-transit { animation-delay: 0.65s; }
-
-@keyframes transitIn {
-  from { opacity: 0; transform: translateX(-8px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.pc-transit-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 6px;
-}
-
-.pc-transit-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: #fff;
-  border-radius: 8px;
-  font-size: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  flex-shrink: 0;
-}
-
-.pc-transit-label {
-  font-size: 12px;
-  color: #e65100;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.pc-transit-text {
-  font-size: 13px;
-  color: #5d4037;
-  font-weight: 600;
-}
-
-.pc-transit-hint {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-top: 4px;
-  padding-left: 38px;
-}
-
-.pc-hint-arrow {
-  color: #ff9800;
-  font-size: 14px;
-  font-weight: 700;
-  flex-shrink: 0;
-  line-height: 1.6;
-}
-
-.pc-hint-text {
-  font-size: 12px;
-  color: #795548;
-  line-height: 1.6;
-}
-
-/* 交通费用/时间元信息 */
-.pc-transit-meta {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
-  flex-wrap: wrap;
-}
-
-.pc-transit-meta-item {
-  font-size: 12px;
-  color: #777;
-  background: rgba(255,152,0,0.1);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
 /* 原始文本内容区 */
 .pc-ai-raw-content {
   background: #f8fafc;
@@ -2158,6 +1931,38 @@ const clearAnswer = () => {
   color: #5a6478;
   line-height: 1.9;
   margin: 0;
+  white-space: pre-wrap;
+}
+
+/* 路线生成过程 - PC */
+.pc-ai-process {
+  background: linear-gradient(135deg, #eef4ff, #e3ecff);
+  border-left: 4px solid #5b6bff;
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 22px;
+  animation: processIn 0.5s ease-out;
+}
+
+@keyframes processIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pc-process-title {
+  font-size: 14px;
+  color: #283593;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.pc-process-text {
+  font-size: 14px;
+  color: #2c3e66;
+  line-height: 1.85;
+  margin: 0;
+  word-break: break-word;
   white-space: pre-wrap;
 }
 
@@ -2876,68 +2681,30 @@ const clearAnswer = () => {
   flex-shrink: 0;
 }
 
-/* 交通路线 - 移动端 */
-.mobile-ai-step-transit {
-  margin-top: 10px;
-  padding: 10px 12px;
-  background: linear-gradient(135deg, #fff8f5, #fff3eb);
-  border-left: 2.5px solid #ff9800;
+/* 路线生成过程 - 移动端 */
+.mobile-ai-process {
+  background: linear-gradient(135deg, #eef4ff, #e3ecff);
+  border-left: 3px solid #5b6bff;
   border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
 }
 
-.mobile-transit-head {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 4px;
-}
-
-.mobile-transit-icon {
-  font-size: clamp(12px, 3.5vw, 14px);
-}
-
-.mobile-transit-label {
-  font-size: clamp(9px, 2.5vw, 11px);
-  color: #e65100;
-  font-weight: 700;
+.mobile-process-title {
+  font-size: clamp(11px, 3vw, 13px);
+  color: #283593;
+  font-weight: 800;
+  margin-bottom: 6px;
   letter-spacing: 0.3px;
 }
 
-.mobile-transit-text {
+.mobile-process-text {
   font-size: clamp(11px, 3vw, 13px);
-  color: #5d4037;
-  font-weight: 600;
+  color: #2c3e66;
+  line-height: 1.7;
+  margin: 0;
   word-break: break-word;
-  line-height: 1.45;
-}
-
-.mobile-transit-hint {
-  margin-top: 4px;
-  padding-left: 0;
-}
-
-.mobile-transit-hint span {
-  font-size: clamp(10px, 2.8vw, 12px);
-  color: #795548;
-  line-height: 1.55;
-  word-break: break-word;
-}
-
-.mobile-transit-meta {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
-  flex-wrap: wrap;
-}
-
-.mobile-transit-meta span {
-  font-size: clamp(9px, 2.5vw, 11px);
-  color: #777;
-  background: rgba(255, 152, 0, 0.12);
-  padding: 3px 6px;
-  border-radius: 4px;
-  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 /* AI 原始内容 - 移动端 */

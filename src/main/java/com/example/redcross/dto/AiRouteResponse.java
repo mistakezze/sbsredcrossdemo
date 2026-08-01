@@ -16,6 +16,12 @@ public class AiRouteResponse {
     /** 路线要点总结 */
     private List<String> summary;
 
+    /**
+     * 路线生成过程描述
+     * AI 在生成路线时的思考过程：例如用户需求分析、地点筛选理由、顺序安排逻辑、时间分配依据等
+     */
+    private String routeGenerationProcess;
+
     /** 是否来自 mock 数据（未配置 API Key 或调用失败时为 true） */
     private boolean mocked;
 
@@ -30,6 +36,9 @@ public class AiRouteResponse {
 
     public List<String> getSummary() { return summary; }
     public void setSummary(List<String> summary) { this.summary = summary; }
+
+    public String getRouteGenerationProcess() { return routeGenerationProcess; }
+    public void setRouteGenerationProcess(String routeGenerationProcess) { this.routeGenerationProcess = routeGenerationProcess; }
 
     public boolean isMocked() { return mocked; }
     public void setMocked(boolean mocked) { this.mocked = mocked; }
