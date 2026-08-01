@@ -645,6 +645,7 @@ let loadingTimer = null
 const displayedProcess = ref('')
 const isTyping = ref(false)
 let typingTimer = null
+const TYPE_SPEED_MS = 45 // 每字 45ms，肉眼可清楚看到逐字效果
 
 const startLoadingProgress = () => {
   loadingPhaseIndex.value = 0
@@ -667,28 +668,33 @@ const stopLoadingProgress = () => {
   }
 }
 
+// 链式 setTimeout 实现打字机：每字 45ms，避免 setInterval 在频繁更新时的合并/跳字问题
 const startTypingProcess = (fullText) => {
   stopTypingProcess()
   displayedProcess.value = ''
-  isTyping.value = true
   if (!fullText) {
     isTyping.value = false
     return
   }
+  isTyping.value = true
   let i = 0
-  // 每 18ms 输出一字，兼顾速度与可读性
-  typingTimer = setInterval(() => {
+  const totalLen = fullText.length
+  const tick = () => {
     i += 1
     displayedProcess.value = fullText.slice(0, i)
-    if (i >= fullText.length) {
+    if (i < totalLen) {
+      typingTimer = setTimeout(tick, TYPE_SPEED_MS)
+    } else {
       stopTypingProcess()
     }
-  }, 18)
+  }
+  // 延迟 200ms 再开始打字，让用户先看到标题与空白，再开始逐字输出
+  typingTimer = setTimeout(tick, 200)
 }
 
 const stopTypingProcess = () => {
   if (typingTimer) {
-    clearInterval(typingTimer)
+    clearTimeout(typingTimer)
     typingTimer = null
   }
   isTyping.value = false
