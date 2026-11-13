@@ -1,75 +1,582 @@
 # sbsredcrossdemo
 
-## 上海红十字文化游览网站
+## 上海红十字文化游览与推荐平台
 
 > 一座城市的红十字记忆，从这里开始。
 
-本项目是一个面向公众的 **上海红十字文化游览网站**，旨在以数字化、互动化的方式，向用户介绍上海这座"红十字之城"的历史脉络、代表人物、重要地点与人道主义精神。
+本项目是一个面向公众的上海红十字文化游览网站，通过地图、文化内容、活动、打卡和可解释的推荐算法，向用户介绍上海红十字运动的历史脉络、代表人物、重要地点与人道主义精神。
 
-### 核心功能
+项目采用前后端分离架构：
 
-- 🏠 **首页**：以滑动轮播形式展示红十字代表人物与重要地点，下方配有历史时间线与红十字小知识卡片，让用户快速建立对红十字运动的整体认知。
-- 🗺️ **路线推荐**：内置多条精心编排的上海红十字地点游览路线（固定路线 + AI 智能推荐），每条路线包含参观顺序、最佳时间、门票信息、餐饮推荐、拍照打卡点、实用贴士与交通方式。
-- 🤖 **AI 智能推荐**：基于 **DeepSeek** 大模型，根据用户的时间、起点、兴趣偏好等个性化生成游览路线，附带交通方式与费用估算；后端内置限流与 Mock 降级，保证服务稳定可用。
-- 🔖 **地点打卡**：用户可在每个红十字地点详情页记录打卡时间与游览感受，形成自己的"红十字足迹"。
-- 📱 **PC / 移动端双套 UI**：基于 768px 断点自动切换两套独立 UI 模板，PC 端信息密度高、移动端单列紧凑；标签栏吸顶、卡片横滑居中等细节针对触屏优化。
+- **前端**：Vue 3 + Vite + Vue Router + Leaflet
+- **后端**：Java 17 + Spring Boot 4.1
+- **推荐**：UserCF、低秩隐因子模型、内容特征加权排序
+- **生成式 AI**：DeepSeek 地点推荐与路线规划，后端代理调用
+- **数据存储**：当前演示版主要使用浏览器 `localStorage`
 
-### 适用人群
+---
 
-- 想了解上海红十字运动历史的游客与本地居民
-- 学校、机构组织红十字主题研学与团队参观
-- 对人道主义精神、公益文化感兴趣的所有人
+## 核心功能
 
-### 项目亮点
+### 🏠 红十字文化首页
 
-- ✅ **前后端分离**：Vue 3 + Vite 前端，Java Spring Boot 后端
-- ✅ **API Key 安全**：DeepSeek 密钥仅存在于后端配置，前端零密钥
-- ✅ **响应式设计**：所有文字使用 `clamp()` 流体缩放，卡片使用 `scroll-snap` 居中
-- ✅ **AI 降级保障**：后端不可用时自动切换为本地推荐路线，服务永不离线
+- 通过轮播展示 6 位红十字代表人物和上海红十字地点
+- 展示红十字运动历史时间线
+- 提供红十字起源、七项基本原则等知识卡片及详情弹窗
+- 显示当前角色的浏览与打卡进度
+
+### 🗺️ 地点地图
+
+- 使用 Leaflet 和高德地图底图展示上海红十字地点
+- 支持历史地点、现代地点筛选
+- 使用 MarkerCluster 聚合密集标记
+- 支持浏览器 GPS 定位、距离计算和按距离排序
+- 提供地点详情、打卡、评价摘要和高德地图外部导航
+- 地图标记会根据打卡状态改变颜色
+
+### 📍 地点管理与审核
+
+- 管理员和企业/地点用户可以提交自定义地点
+- 支持填写名称、区域、类别、时代、简介、历史与亮点
+- 可在地图上选点，保存 WGS84 坐标并在展示时转换为 GCJ-02
+- 地点提交状态包括待审核、已通过、已驳回
+- 管理员可通过或驳回地点，并可删除提交记录
+- 审核通过的地点会自动合并进地图和路线使用的地点库
+
+该页面仅允许管理员和企业/地点用户访问，其他角色访问时会返回地图页。
+
+### 📋 路线推荐
+
+提供固定路线和 AI 智能推荐两种模式：
+
+- **固定路线**：按当前地点库顺序展示地点，支持查看详情、评价与打卡
+- **AI 路线**：支持预设问题和自定义问题，由 DeepSeek 生成 3–6 站路线
+- 路线结果包含推荐顺序、参观亮点、历史背景、最佳时间、预约信息、附近餐饮、拍照点和实用贴士
+- 展示 AI 路线生成过程，并使用打字机效果逐字呈现
+- 后端或网络不可用时，前端会生成本地参考路线
+
+### 🎪 红十字活动
+
+- 按即将开始、进行中、已结束筛选
+- 支持急救培训、志愿服务、人道讲座、无偿献血、公益筹款五类活动
+- 支持活动报名、取消报名、查看报名人数与剩余名额
+- 支持活动评分与文字评价
+- 管理员和企业/地点用户可以发布活动
+- 管理员可以删除活动和不当评价
+- 根据角色行为提供个性化活动推荐或冷启动推荐
+
+### ⭐ 地点评价
+
+- 支持 1–5 星评分和文字评价
+- 同一角色对同一地点只保留最新一条评价
+- 展示平均分、评价数量和星级分布
+- 管理员可删除不当评价
+- 评价会作为协同过滤模型的显式反馈
+
+### 📋 打卡足迹
+
+- 在地点详情或地图中完成打卡
+- 每个地点只保留一条打卡记录，重复打卡会更新时间与备注
+- 支持编辑游览感受、查看打卡详情和删除记录
+- 打卡记录按时间线展示，并区分历史地点与现代地点
+
+### 👥 演示角色与权限
+
+当前项目使用角色切换器模拟不同用户身份，不包含真实登录系统。
+
+| 角色 | 浏览 | 评价 | 打卡 | 报名活动 | 发布活动 | 上传地点 | 审核/删除 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 管理员 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 企业/地点用户 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| 游客用户 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 注册用户 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| 志愿者 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+
+当前角色保存在 `redcross_current_role` 中。志愿者同时显示星级荣誉标识。
+
+### 📱 响应式双 UI
+
+- 以 768px 为断点自动切换桌面端和移动端模板
+- 桌面端使用顶部导航，移动端使用底部 Tab 栏
+- 主要页面分别提供 PC 和移动端布局
+- 支持移动端安全区域、横滑卡片、底部抽屉和吸顶筛选栏
+
+---
+
+## 页面与路由
+
+| 路径 | 页面 | 主要功能 |
+| --- | --- | --- |
+| `/` | 首页 | 人物、地点、时间线、红十字知识 |
+| `/map` | 地图 | 地点地图、定位、筛选、算法推荐、AI 地点推荐 |
+| `/routes` | 路线 | 固定路线、地点详情、评价、打卡、AI 路线 |
+| `/activities` | 活动 | 活动浏览、筛选、报名、评价、发布 |
+| `/places` | 地点管理 | 地点上传、地图选点、审核与状态管理 |
+| `/checkins` | 个人打卡 | 打卡时间线与删除 |
+| `/checkins/:id` | 打卡详情 | 查看和编辑打卡备注 |
+
+`/places` 配置了角色访问限制，仅管理员和企业/地点用户可以进入。
+
+---
+
+## 项目结构
+
+```text
+redcross/
+├── frontend/
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── .env.example
+│   └── src/
+│       ├── main.js
+│       ├── App.vue
+│       ├── components/
+│       │   ├── RoleSwitcher.vue      # 角色切换器
+│       │   └── StarRating.vue        # 星级评分组件
+│       ├── composables/
+│       │   └── useViewport.js        # 768px 响应式断点
+│       ├── router/
+│       │   └── index.js              # 页面路由与访问限制
+│       ├── stores/
+│       │   ├── activityStore.js      # 活动、报名、活动推荐
+│       │   ├── checkinStore.js       # 打卡记录
+│       │   ├── figureStore.js        # 红十字人物数据
+│       │   ├── locationStore.js      # 地点库
+│       │   ├── locationSubmitStore.js# 地点提交与审核
+│       │   ├── reviewStore.js        # 地点评价
+│       │   └── userStore.js          # 演示角色与权限
+│       ├── styles/
+│       │   └── global.css
+│       ├── utils/
+│       │   ├── cfBlend.js            # 协同过滤信号融合
+│       │   ├── coordTransform.js     # 坐标转换与距离计算
+│       │   ├── lowRankModel.js       # 低秩隐因子模型
+│       │   ├── placeRecommend.js     # 地点综合推荐
+│       │   ├── preferenceMatrix.js   # 统一偏好矩阵
+│       │   └── userCF.js             # 基于用户的协同过滤
+│       └── views/
+│           ├── Home.vue
+│           ├── Map.vue
+│           ├── Routes.vue
+│           ├── Activities.vue
+│           ├── Places.vue
+│           ├── Checkins.vue
+│           └── CheckinDetail.vue
+│
+├── src/
+│   ├── main/
+│   │   ├── java/com/example/redcross/
+│   │   │   ├── RedcrossApplication.java
+│   │   │   ├── config/
+│   │   │   │   ├── CorsConfig.java
+│   │   │   │   └── RestTemplateConfig.java
+│   │   │   ├── controller/
+│   │   │   │   └── AiController.java
+│   │   │   ├── deepseek/
+│   │   │   │   ├── DeepSeekRequest.java
+│   │   │   │   └── DeepSeekResponse.java
+│   │   │   ├── dto/                   # AI 请求、响应与路线数据
+│   │   │   └── service/
+│   │   │       ├── DeepSeekService.java
+│   │   │       └── RateLimitService.java
+│   │   └── resources/
+│   │       └── application.properties
+│   └── test/
+│       └── java/com/example/redcross/
+│           └── RedcrossApplicationTests.java
+│
+├── 推荐算法解析.md
+├── 红十字文化推荐算法研究_论文.docx
+├── pom.xml
+├── mvnw
+└── mvnw.cmd
+```
+
+---
+
+## 技术栈
+
+### 前端
+
+- Vue 3.4，使用 Composition API 和 `<script setup>`
+- Vite 5
+- Vue Router 4
+- Leaflet 1.9 与 Leaflet.markercluster
+- 轻量模块级 Store，使用 Vue `ref` / `computed` 和 `localStorage`
+
+### 后端
+
+- Java 17
+- Spring Boot 4.1.0
+- Spring Web MVC
+- RestTemplate
+- Jackson
+- DeepSeek Chat Completions API
+- 内存滑动窗口限流
+
+---
+
+## 前端数据层
+
+当前演示版没有数据库和真实账号系统，主要业务数据保存在浏览器本地。
+
+| Store | 数据内容 | `localStorage` Key |
+| --- | --- | --- |
+| `userStore` | 当前演示角色与权限 | `redcross_current_role` |
+| `locationStore` | 内置地点与审核通过的地点 | 基础数据在代码中，审核数据复用 `redcross_place_submissions` |
+| `locationSubmitStore` | 地点提交与审核状态 | `redcross_place_submissions` |
+| `reviewStore` | 地点评分与评价 | `redcross_reviews` |
+| `checkinStore` | 打卡时间、备注与分类 | `redcross_checkins` |
+| `activityStore` | 活动、报名、活动评价 | `redcross_activity_state_v2` |
+| `figureStore` | 6 位红十字代表人物 | 静态数据 |
+
+默认地点库包含 8 个内置红十字地点，并会合并审核通过的自定义地点。项目还包含少量种子评价、活动和地点审核数据，便于首次打开时直接体验完整界面。
+
+所有状态按浏览器和域名隔离，不会同步到其他设备，也不由后端持久化。清除对应 `localStorage` Key 可以恢复该模块的演示数据。
+
+---
+
+## 推荐系统
+
+项目中有四类推荐入口：
+
+| 推荐类型 | 入口 | 实现 |
+| --- | --- | --- |
+| 地点算法推荐 | `/map` | 协同过滤 + 内容特征 |
+| 活动算法推荐 | `/activities` | 类型维度协同过滤 + 内容特征 |
+| AI 地点推荐 | `/map` | DeepSeek + 用户足迹 |
+| AI 路线推荐 | `/routes` | DeepSeek + 候选地点库 |
+
+### 统一偏好矩阵
+
+地点算法推荐和活动算法推荐复用同一套协同过滤基础能力：
+
+```text
+显式评价（1–5 星） + 隐式正反馈（打卡/报名，计 4 分）
+                         │
+                         ▼
+                  统一偏好矩阵
+                         │
+             ┌───────────┴───────────┐
+             ▼                       ▼
+      UserCF 邻域模型         低秩隐因子模型
+     （相似访客怎么做）       （隐因子重建评分）
+             └───────────┬───────────┘
+                         ▼
+                 协同过滤融合信号
+                         │
+                         ▼
+          内容特征加权、排序与推荐理由
+```
+
+协同过滤融合默认配置为：
+
+- UserCF：60%
+- 低秩隐因子模型：40%
+- 某一路不可用时由另一路独占权重
+- 两路都不可用时，协同过滤项退出，其余内容特征按可用权重重新归一化
+
+### 地点推荐
+
+```text
+总分 =
+  协同过滤 30%
+  + 兴趣匹配 25%
+  + 口碑评分 15%
+  + 评价热度 10%
+  + 探索价值 10%
+  + 距离 10%
+```
+
+- 兴趣来自打卡类别和高分评价类别
+- 热度按评价数量相对归一化
+- 未打卡地点获得探索加分
+- 有定位时使用距离衰减，无定位时使用中性分
+- 每张推荐卡展示最多 2 条可解释推荐理由
+
+### 活动推荐
+
+活动数量较少，因此协同过滤聚合到“活动类型”维度，再映射回具体活动。
+
+个性化模式：
+
+```text
+总分 =
+  协同过滤 30%
+  + 兴趣匹配 30%
+  + 口碑评分 20%
+  + 报名热度 10%
+  + 时间临近 10%
+```
+
+用户既没有报名也没有评价时进入冷启动模式：
+
+```text
+总分 =
+  报名热度 50%
+  + 时间临近 30%
+  + 口碑评分 20%
+```
+
+冷启动推荐会对活动类型进行打散，同一类型默认最多出现 2 场。用户产生报名或评价后，会自动切换到个性化模式。
+
+完整的公式、参数、复杂度和冷启动策略见 [推荐算法解析.md](./推荐算法解析.md)。
+
+---
+
+## AI 服务
+
+### 接口
+
+#### 1. 获取服务状态
+
+```http
+GET /api/ai/status
+```
+
+返回服务状态、当前 IP 和限流窗口剩余次数。
+
+#### 2. 生成游览路线
+
+```http
+POST /api/ai/route
+Content-Type: application/json
+```
+
+请求体：
+
+```json
+{
+  "question": "半天能走完的精华路线",
+  "locations": [
+    {
+      "name": "上海红十字会博物馆",
+      "category": "博物馆",
+      "location": "上海市 · 徐汇区",
+      "description": "中国第一座红十字主题博物馆……"
+    }
+  ]
+}
+```
+
+主要响应字段：
+
+- `question`：原始问题
+- `steps`：路线步骤
+- `summary`：路线要点
+- `routeGenerationProcess`：路线生成过程说明
+- `mocked`：是否使用本地 Mock 降级
+- `errorMessage`：调用失败信息
+
+#### 3. 根据足迹推荐地点
+
+```http
+POST /api/ai/places
+Content-Type: application/json
+```
+
+请求体包含：
+
+- `preference`：可选偏好描述
+- `checkedNames`：已打卡地点名称
+- `checkedCategories`：已到访类别
+- `likedCategories`：高分评价类别
+- `locations`：当前候选地点
+
+响应包含推荐摘要和地点推荐列表。每个推荐地点包括名称、类别、推荐理由、亮点、最佳时间和实用提示。
+
+### DeepSeek 调用策略
+
+- API Key 只保存在后端配置或环境变量中，前端不接触密钥
+- 使用 `response_format: json_object` 约束结构化输出
+- 支持路线推荐和地点推荐两组 Prompt
+- API Key 未配置时直接返回本地 Mock
+- HTTP 错误、调用异常、JSON 解析失败或空结果会自动降级
+- 降级结果通过 `mocked=true` 标识，并尽量附带 `errorMessage`
+- CORS 允许的请求方法为 `GET`、`POST`、`OPTIONS`
+
+### 限流
+
+`RateLimitService` 使用每个 IP 独立的 60 秒滑动窗口，默认最多 10 次请求。超过限制时返回 HTTP 429。
+
+IP 优先从 `X-Forwarded-For` 的第一个地址读取，未提供时使用连接地址。
+
+---
+
+## 后端配置
+
+主要配置位于 `src/main/resources/application.properties`：
+
+```properties
+server.port=8080
+
+deepseek.api.key=${DEEPSEEK_API_KEY:}
+deepseek.api.url=https://api.deepseek.com/chat/completions
+deepseek.api.model=deepseek-v4-pro
+deepseek.api.timeout-seconds=30
+
+app.cors.allowed-origins=
+app.rate-limit.requests-per-minute=10
+```
+
+如果 `app.cors.allowed-origins` 为空，开发配置会允许所有来源。生产部署时建议填写明确的前端域名白名单。
+
+---
+
+## 本地运行
+
+### 环境要求
+
+- JDK 17
+- Node.js 与 npm
+- Maven Wrapper 已包含在仓库中
+
+### 1. 启动后端
+
+Windows PowerShell：
+
+```powershell
+$env:DEEPSEEK_API_KEY="sk-your-key"
+.\mvnw.cmd spring-boot:run
+```
+
+macOS / Linux：
+
+```bash
+export DEEPSEEK_API_KEY="sk-your-key"
+./mvnw spring-boot:run
+```
+
+不配置 `DEEPSEEK_API_KEY` 也可以启动，此时 AI 接口会返回本地 Mock 数据。
+
+后端默认地址：
+
+```text
+http://localhost:8080
+```
+
+### 2. 启动前端
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+前端开发服务器默认地址：
+
+```text
+http://localhost:5173
+```
+
+如果后端地址不是 `http://localhost:8080`，在 `frontend/.env` 中配置：
+
+```env
+VITE_BACKEND_URL=http://localhost:8080
+```
+
+前端当前只读取后端地址。不要在 Vite 环境变量中填写 DeepSeek API Key，所有 AI 请求都应通过 Spring Boot 代理。
+
+### 3. 构建
+
+前端：
+
+```bash
+cd frontend
+npm run build
+```
+
+构建产物位于 `frontend/dist/`。
+
+后端：
+
+```powershell
+.\mvnw.cmd clean package
+```
+
+构建产物位于 `target/`。
+
+---
+
+## 常用调试
+
+检查后端状态：
+
+```powershell
+Invoke-RestMethod http://localhost:8080/api/ai/status
+```
+
+重置前端演示数据：
+
+```js
+localStorage.removeItem('redcross_current_role')
+localStorage.removeItem('redcross_checkins')
+localStorage.removeItem('redcross_reviews')
+localStorage.removeItem('redcross_place_submissions')
+localStorage.removeItem('redcross_activity_state_v2')
+location.reload()
+```
+
+---
+
+## 当前限制
+
+- 演示角色不是真实账号，权限判断仅用于前端交互演示
+- 业务数据保存在浏览器 `localStorage`，没有统一数据库和多设备同步
+- 地点审核、活动发布和评价管理均未接入后端持久化
+- 协同过滤数据规模较小，冷启动和信号退化是已知问题
+- AI 推荐与算法推荐目前分开展示，尚未进入同一排序链路
+- AI 结果依赖外部模型服务；无 Key 或服务异常时使用 Mock 数据
 
 ---
 
 ## 版本历史
 
 ### V1.0 - 初始版本
+
 > 2026-06-24
 
 - 搭建上海红十字地点游览项目脚手架
-- 前端：Vue 3 + Vite
-- 后端：Java Spring Boot
+- 前端使用 Vue 3 + Vite
+- 后端使用 Java Spring Boot
 
 ---
 
 ### V1.1 - AI 路线推荐
+
 > 2026-06-24
 
 - 新增 AI 路线推荐详细化功能
 - 后端代理 DeepSeek API（限流 + CORS + Mock 降级）
-- 新增字段：历史背景、参观亮点、最佳时间、门票信息、餐饮推荐、打卡点、实用贴士、交通费用时间等
+- 新增历史背景、参观亮点、最佳时间、门票信息、餐饮推荐、打卡点、实用贴士、交通费用与时间等字段
 
 ---
 
 ### V1.2 - 安全与部署配置
+
 > 2026-06-24
 
 - `application.properties` 从 Git 追踪中排除（含敏感 API Key）
 - DeepSeek API Key 使用占位符管理
 - Java 版本升级为 Java 17
-- CORS 放开所有来源（适合部署模式）
+- CORS 支持部署模式配置
 
 ---
 
 ### V2.0 - 全站移动端适配
+
 > 2026-06-24
 
 - 全站移动端适配
 - 响应式优化：路线卡片、AI 步骤、打卡时间线、导航栏、首页英雄区
-- 所有页面文字换行 & 布局优化
+- 所有页面文字换行与布局优化
 - 全局流体字体：所有文字随屏幕宽度自动缩放
 
 ---
 
 ### V2.1 - PC/移动端双套独立 UI
+
 > 2026-06-24
 
 - 基于 768px 断点切换 PC 与移动端模板
@@ -80,6 +587,7 @@
 ---
 
 ### V2.2 - DeepSeek 模型配置
+
 > 2026-06-24
 
 - 模型默认值对齐为 `deepseek-v4-pro`
@@ -88,396 +596,77 @@
 ---
 
 ### V2.3 - UI 细节优化
+
 > 2026-06-24
 
 - PC 端导航栏改为 `fixed` 定位，始终固定在顶部
-- 网页 favicon 改为红色十字（透明底），去掉红底圆
+- 网页 favicon 改为红十字图标（透明底）
 
 ---
 
 ### V3.0 - 首页卡片滑动轮播
+
 > 2026-06-24
 
 - 首页人物区改为滑动轮播（PC 单卡片切换 + 移动端横滑）
 - 首页地点区改为滑动轮播
 - 大幅缩短首页页面长度
-- 修复轮播 bug（v-for 与 v-show 冲突）
+- 修复轮播 bug（`v-for` 与 `v-show` 冲突）
 - 移动端卡片居中显示
 
 ---
 
 ### V3.1 - 轮播卡片样式优化
+
 > 2026-06-24
 
-- PC 端地点卡片尺寸与人物卡片统一（max-width: 700px）
-- PC 端地点卡片改为横向布局（左图右文），与人物卡片结构一致
-- 修复轮播切换效果冲突问题（去除 translateY 和 shine overlay 动画）
+- PC 端地点卡片尺寸与人物卡片统一
+- PC 端地点卡片改为横向布局，与人物卡片结构一致
+- 修复轮播切换效果冲突
 
 ---
 
 ### V3.2 - 首页内容扩充
+
 > 2026-06-25
 
 - 首页新增红十字历史时间线
 - 首页新增红十字小知识卡片（红十字起源、七项基本原则等）
-- 小知识卡片支持弹窗详情（PC 居中弹窗 + 移动端底部抽屉）
-- 首页主区域 max-width 由 1280px 调整到 1440px
-- 人物/地点卡片 max-width 由 700px 调整到 900px
-- 移除页面两侧固定装饰元素，保留区块内部装饰
-- 移动端人物/地点卡片使用 `scroll-snap-align: center` + `scroll-snap-stop: always`，滑动后自动居中
-- 移动端卡片宽度固定为 85vw
+- 小知识卡片支持详情弹窗
+- 首页主区域最大宽度调整为 1440px
+- 人物/地点卡片最大宽度调整为 900px
+- 移动端人物/地点卡片支持自动居中
 
 ---
 
 ### V3.3 - 移动端 Routes 标签栏吸顶
+
 > 2026-06-25
 
-- 移动端 Routes 页面 `.mobile-tabs-wrap` 添加 `position: sticky; top: 0`
-- 标签栏添加半透明背景 + 背景模糊（`backdrop-filter: blur(12px)`）
-- 下滑浏览路线列表时，标签栏始终固定在顶部可见位置
-- 解决"滑下去后看不到标签、需滚回顶部才能切换 Tab"的问题
+- 移动端 Routes 标签栏添加吸顶定位
+- 标签栏添加半透明背景与背景模糊
+- 下滑浏览路线列表时，标签栏始终固定在顶部可见
 
 ---
 
-## 技术栈
-
-### 前端
-- **Vue 3.4** - Composition API（`<script setup>`）
-- **Vite 5** - 构建工具
-- **Vue Router 4** - 路由
-- **Pinia 风格的轻量 store** - 数据状态管理（基于 `ref` + 模块单例）
-
-### 后端
-- **Java 17**
-- **Spring Boot 4.1.0** - Web MVC
-- **RestTemplate** - 调用 DeepSeek
-- **Jackson** - JSON 序列化/反序列化
-- **DeepSeek API** (`deepseek-v4-pro`) - AI 路线生成
-- **滑动窗口限流** - 防止 AI 接口被刷
-- **Mock 降级** - 真实 API 不可用时自动使用本地推荐
-
-### 工程约束
-- 双 UI 模板：PC（≥768px）+ 移动端（<768px），断点统一在 `useViewport.js`
-- 文字容器必须包含 `word-break: break-word` + `overflow-wrap: break-word`，字号使用 `clamp()` 流体缩放
-- 移动端交互用 `:active`，PC 端用 `:hover`
-- API Key 仅在后端，前端零密钥
-
----
-
-## 项目结构
-
-```
-redcross/
-├── frontend/                          # 前端
-│   ├── index.html
-│   ├── package.json                   # vue / vue-router / vite
-│   ├── vite.config.js
-│   ├── .env.example
-│   └── src/
-│       ├── main.js                    # 入口（createApp + 路由 + 全局样式）
-│       ├── App.vue                    # 顶层布局（PC 顶部导航 / 移动端底部 Tab）
-│       ├── styles/global.css          # 全局样式
-│       ├── router/index.js            # 路由表（4 个页面）
-│       ├── composables/
-│       │   └── useViewport.js         # 视口检测（768px 断点）
-│       ├── stores/                    # 前端数据层（localStorage 持久化）
-│       │   ├── figureStore.js         # 6 位红十字人物
-│       │   ├── locationStore.js       # 8 个上海红十字地点
-│       │   └── checkinStore.js        # 打卡记录（localStorage）
-│       └── views/
-│           ├── Home.vue               # 首页（人物/地点轮播 + 时间线 + 小知识）
-│           ├── Routes.vue             # 路线推荐（固定 + AI）
-│           ├── Checkins.vue           # 打卡列表
-│           └── CheckinDetail.vue      # 打卡详情
-│
-├── src/main/java/com/example/redcross/  # 后端
-│   ├── RedcrossApplication.java       # 启动类
-│   ├── controller/AiController.java   # AI 接口
-│   ├── service/
-│   │   ├── DeepSeekService.java       # DeepSeek 调用 + Prompt + 降级
-│   │   └── RateLimitService.java      # 滑动窗口限流
-│   ├── dto/                           # 请求/响应 DTO
-│   │   ├── AiRouteRequest.java
-│   │   ├── AiRouteResponse.java
-│   │   ├── RouteStep.java
-│   │   ├── TransitInfo.java
-│   │   └── LocationItem.java
-│   ├── deepseek/                      # DeepSeek API 数据结构
-│   │   ├── DeepSeekRequest.java
-│   │   └── DeepSeekResponse.java
-│   └── config/                        # CORS / RestTemplate
-│
-├── src/main/resources/application.properties
-├── pom.xml                            # Maven 配置
-└── README.md
-```
-
----
-
-## 前端架构
-
-### 路由表
-
-| 路径 | 名称 | 组件 | 说明 |
-|------|------|------|------|
-| `/` | Home | `Home.vue` | 首页（轮播 + 时间线 + 小知识） |
-| `/routes` | Routes | `Routes.vue` | 路线推荐（固定 / AI） |
-| `/checkins` | Checkins | `Checkins.vue` | 打卡列表 |
-| `/checkins/:id` | CheckinDetail | `CheckinDetail.vue` | 打卡详情（按 locationId 查询） |
-
-跳转行为：每次路由切换后平滑滚动到顶部（`scrollBehavior`）。
-
-### 核心 Composable
-
-#### `useViewport()` - 视口检测
-
-```js
-// frontend/src/composables/useViewport.js
-const { isMobile, width, height, breakpoint } = useViewport()
-// isMobile: boolean（<768px 为 true）
-// width/height: ref 响应式
-// breakpoint: 768
-```
-
-监听 `resize` 和 `orientationchange`，全应用共享单例。
-
-### 数据 Store
-
-所有 store 都基于 `ref` + 模块单例实现，无 Pinia 依赖。
-
-#### `useFigureStore()` - 人物数据
-
-```js
-const { figures } = useFigureStore()
-// figures: Ref<Array<{id, name, enName, title, years, description, achievement, quote, color}>>
-```
-
-内置 6 位上海红十字代表人物（沈敦和、任鸿隽、宋庆龄、钱信忠、吴贻芳、颜福庆）。
-
-#### `useLocationStore()` - 地点数据
-
-```js
-const { locations, getLocationById } = useLocationStore()
-// locations: Ref<Array<Location>>
-// getLocationById(id): Location | undefined
-```
-
-内置 8 个上海红十字地点（博物馆 / 机构 / 救灾中心 / 医院 / 国际代表处 / 青少年中心 / 骨髓库 / 博爱园）。
-
-#### `useCheckinStore()` - 打卡数据
-
-| API | 说明 |
-|-----|------|
-| `checkins` | 全部打卡记录（`Ref<Array<Checkin>>`） |
-| `checkinCount` | 打卡总数（computed） |
-| `addCheckin(locationId, note)` | 添加/更新打卡，返回 boolean |
-| `removeCheckin(id)` | 删除打卡 |
-| `hasCheckedIn(locationId)` | 是否已打卡 |
-| `getCheckinById(id)` | 按 id 或 locationId 查找 |
-| `getCheckinNote(locationId)` | 备注内容 |
-| `getCheckinTime(locationId)` | 打卡时间 |
-| `updateNote(id, note)` | 修改备注 |
-
-**数据格式**：
-```ts
-Checkin = {
-  id: number                // timestamp
-  locationId: number
-  locationName: string
-  location: string          // "上海市 · 徐汇区"
-  note: string
-  checkinTime: string       // "2026/06/25 14:30:00"
-  timestamp: number
-  category: string
-}
-```
-
-**持久化**：`localStorage` key = `redcross_checkins`，自动同步。
-
-### 环境变量
-
-```bash
-# frontend/.env（参考 .env.example）
-VITE_BACKEND_URL=http://localhost:8080   # 后端地址
-```
-
----
-
-## 后端架构
-
-### 配置项 `application.properties`
-
-```properties
-server.port=8080
-
-# DeepSeek API
-deepseek.api.key=${DEEPSEEK_API_KEY:}                          # 必须配置环境变量
-deepseek.api.url=https://api.deepseek.com/chat/completions
-deepseek.api.model=deepseek-v4-pro
-deepseek.api.timeout-seconds=30
-
-# CORS（空 = 允许所有来源）
-app.cors.allowed-origins=
-
-# 限流：每 IP 每 60 秒最多 N 次 AI 调用
-app.rate-limit.requests-per-minute=10
-```
-
-### 关键 Bean
-
-- **`DeepSeekService`**：调用 DeepSeek；未配置 API Key 时自动走 mock；调用失败时降级
-- **`RateLimitService`**：滑动窗口限流（HashMap<ip, Deque<Long>>）
-- **`CorsConfig`**：根据 `app.cors.allowed-origins` 配置 CORS
-- **`RestTemplateConfig`**：配置 RestTemplate Bean
-
----
-
-## API 接口
-
-### 1. POST `/api/ai/route` - 生成 AI 路线
-
-调用 DeepSeek 生成上海红十字文化游览路线。未配置 API Key 或调用失败时返回本地 mock。
-
-**请求体**：
-```json
-{
-  "question": "半天能走完的精华路线",
-  "locations": [
-    {
-      "name": "上海红十字会博物馆",
-      "category": "博物馆",
-      "location": "上海市 · 徐汇区",
-      "description": "中国第一座红十字主题博物馆..."
-    }
-  ]
-}
-```
-
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `question` | string | 是 | 用户问题（如："半天能走完的精华路线"） |
-| `locations` | LocationItem[] | 否 | 候选地点列表；为空时使用后端内置默认 6 个 |
-
-**响应体（成功）**：
-```json
-{
-  "question": "半天能走完的精华路线",
-  "mocked": false,
-  "errorMessage": null,
-  "steps": [
-    {
-      "name": "上海红十字会博物馆",
-      "meta": "博物馆 · 约2小时",
-      "desc": "本馆是上海红十字运动的起点...",
-      "history": "2005年开馆...",
-      "bestTime": "建议工作日上午9:00-11:00",
-      "ticket": "免费开放，需提前3天在公众号预约",
-      "highlights": ["百年红十字史展", "人道救援实物展", "沈敦和故居复原", "互动体验区"],
-      "photoSpots": ["场馆正门的红十字主题雕塑", "一楼大厅的光辉历程展区"],
-      "nearbyFood": "出门右转200米岳阳路有多家本帮菜馆...",
-      "practicalTips": ["场馆周边停车困难，建议地铁", "馆内设无障碍通道"],
-      "tips": ["请遵守场馆规定", "部分展品需预约才能近距离观看"],
-      "transit": {
-        "fromPrev": "地铁1号线人民广场站→黄陂南路站，2站约8分钟",
-        "routeHint": "从7号口出，沿西藏中路向北步行约300米",
-        "mode": "subway",
-        "cost": "约4元",
-        "duration": "约15分钟"
-      }
-    }
-  ],
-  "summary": ["按行政区串联上海红十字地标", "交通路线为参考建议"]
-}
-```
-
-**响应字段说明**：
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `question` | string | 回显原始问题 |
-| `mocked` | boolean | true = 走 mock 降级；false = 真实 DeepSeek 返回 |
-| `errorMessage` | string \| null | 调用失败时的错误描述（成功时为 null） |
-| `steps` | RouteStep[] | 路线步骤（3-6 个） |
-| `summary` | string[] | 路线要点总结 |
-
-**transit.mode 取值**：`walk` | `subway` | `bus` | `taxi`
-
-**响应（限流触发）**：
-```json
-{
-  "error": "请求过于频繁，请稍后再试",
-  "rateLimit": "每 60 秒最多 10 次",
-  "remaining": 0
-}
-```
-HTTP 429。
-
-### 2. GET `/api/ai/status` - 健康检查
-
-查询服务状态与当前 IP 剩余配额。
-
-**响应**：
-```json
-{
-  "ok": true,
-  "remainingInWindow": 8,
-  "ip": "127.0.0.1"
-}
-```
-
----
-
-## AI Prompt 设计
-
-后端在 `DeepSeekService#buildPrompt` 中构造四段式 Prompt：
-
-1. **【地点数据库】** - 列出所有候选地点（含区域、类别、简介），强制 AI 只能从中选择
-2. **【用户需求】** - 用户原始问题
-3. **【输出要求】** - 严格 JSON Schema（含字段名、类型、示例）
-4. **【硬性规则】** - 7 条约束（地点必须存在、不能编造门牌号、transit 只能 4 种模式、必须返回合法 JSON 等）
-
-DeepSeek 使用 `response_format: json_object` 强制 JSON 输出，简化解析。
-
----
-
-## 限流 & 降级
-
-- **限流**：`RateLimitService` 使用 HashMap<ip, Deque<Long>> 实现滑动窗口，每 60s 默认 10 次
-- **降级 1**：`apiKey` 为空时直接走 `generateMockSteps`（本地 5 步路线）
-- **降级 2**：DeepSeek 抛 `HttpClientErrorException` / 任意 Exception 时，返回 mock + `errorMessage`
-- **降级 3**：JSON 解析失败时返回 mock + `errorMessage`
-- 所有降级都会把 `mocked=true` 返回给前端
-
----
-
-## 快速开始
-
-### 前端
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### 后端
-```bash
-# 配置 DEEPSEEK_API_KEY 环境变量
-# 修改 src/main/resources/application.properties 中的 API Key
-
-# 运行 Spring Boot
-./mvnw spring-boot:run
-```
-
----
-
-## 环境变量
-
-| 变量名 | 说明 |
-|--------|------|
-| `DEEPSEEK_API_KEY` | DeepSeek API 密钥 |
-
----
-
-## 部署
-
-前端构建产物在 `frontend/dist/`，后端构建产物为 JAR 文件。
+### V4.0 - 地图、活动与个性化推荐
+
+> 2026-11-13
+
+- 新增 `/map` 地点地图页面，支持高德底图、Leaflet 标记、地点聚合、历史/现代地点筛选、GPS 定位、距离计算和外部导航
+- 新增地点算法推荐，综合协同过滤、兴趣、口碑、热度、探索价值和距离，并展示匹配分与推荐理由
+- 新增 DeepSeek AI 地点推荐，根据当前角色的打卡记录和高分评价生成个性化地点、理由、亮点、最佳时间和实用提示
+- 新增 `/activities` 活动页面，支持活动筛选、详情查看、报名、取消报名、名额展示、活动评分和文字评价
+- 新增活动推荐；没有报名或评价记录时使用热门、时效和口碑冷启动策略，并限制同一类型活动的出现数量
+- 新增 `/places` 地点管理页面，管理员和企业/地点用户可以上传地点、填写详情并在地图上选择位置
+- 新增地点审核流程，支持待审核、已通过和已驳回状态；审核通过的地点会自动进入地图、路线和推荐地点库
+- 新增管理员、企业/地点用户、游客、注册用户和志愿者五种演示角色，提供统一角色切换器及权限判断
+- 新增地点星级评价，支持平均分、评价数量、星级分布和文字评价；管理员可以删除不当评价
+- 新增 UserCF 邻域模型、低秩隐因子模型和统一偏好矩阵，打卡与报名作为隐式正反馈参与推荐
+- 新增协同过滤融合逻辑：UserCF 占 60%，低秩模型占 40%；信号不足时自动缩减权重或退出协同过滤项
+- 新增 `POST /api/ai/places` 接口，并在 `DeepSeekService` 中补充地点推荐 Prompt、JSON 解析、Mock 生成和异常降级
+- 扩展桌面端顶部导航和移动端底部 Tab，加入地图、活动及按角色显示的地点管理入口
+- 地点库改为“内置地点 + 审核通过的自定义地点”，打卡记录增加历史/现代地点分类
+- 新增坐标转换、活动/评价/地点提交/用户角色 Store，以及地点审核、活动和评价种子数据
+- 新增 `leaflet`、`leaflet.markercluster`、`RoleSwitcher`、`StarRating` 等依赖与组件
+- 更新 README，并新增推荐算法解析文档和红十字文化推荐算法研究论文稿

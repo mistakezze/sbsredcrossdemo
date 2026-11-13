@@ -1,5 +1,7 @@
 package com.example.redcross.controller;
 
+import com.example.redcross.dto.AiRecommendRequest;
+import com.example.redcross.dto.AiRecommendResponse;
 import com.example.redcross.dto.AiRouteRequest;
 import com.example.redcross.dto.AiRouteResponse;
 import com.example.redcross.service.DeepSeekService;
@@ -61,6 +63,36 @@ public class AiController {
 
         if (response.getErrorMessage() != null) {
             logger.warn("AI 路线请求返回(含错误信息): {}", response.getErrorMessage());
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 根据用户画像推荐红十字地点
+     * POST /api/ai/places
+     */
+    @PostMapping(value = "/places", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> recommendPlaces(
+            @RequestBody AiRecommendRequest request,
+            HttpServletRequest httpRequest) {
+
+        String clientIp = resolveIp(httpRequest);
+        if (!rateLimitService.allow(clientIp)) {
+            logger.warn("IP [{}] 触发限流（AI 地点推荐）", clientIp);
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(Map.of(
+                    "error", "请求过于频繁，请稍后再试",
+                    "rateLimit", "每 60 秒最多 10 次",
+                    "remaining", rateLimitService.remaining(clientIp)
+                ));
+        }
+
+        int checkedCount = (request.getCheckedNames() == null) ? 0 : request.getCheckedNames().size();
+        logger.info("AI 地点推荐请求: IP={}, 已打卡数量={}", clientIp, checkedCount);
+
+        AiRecommendResponse response = deepSeekService.recommendPlaces(request);
+        if (response.getErrorMessage() != null) {
+            logger.warn("AI 地点推荐返回(含错误信息): {}", response.getErrorMessage());
         }
         return ResponseEntity.ok(response);
     }

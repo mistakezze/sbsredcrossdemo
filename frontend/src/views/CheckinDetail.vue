@@ -1,11 +1,11 @@
 <template>
   <div class="checkin-detail">
     <button class="back-btn" @click="goBack">
-      ← 返回打卡列表
+      <AppIcon name="arrowLeft" size="15" /> 返回打卡列表
     </button>
 
     <div v-if="!checkin" class="not-found">
-      <div class="nf-icon">❌</div>
+      <div class="nf-icon"><AppIcon name="alert" size="42" /></div>
       <h2>未找到该打卡记录</h2>
       <p>该地点可能尚未打卡或记录已被删除。</p>
       <button class="nf-btn" @click="goBack">返回</button>
@@ -17,26 +17,26 @@
           <div class="hero-content">
             <span class="hero-category">{{ checkin.category }}</span>
             <h1 class="hero-title">{{ checkin.locationName }}</h1>
-            <div class="hero-place">📍 {{ checkin.location }}</div>
+            <div class="hero-place"><AppIcon name="pin" size="14" /> {{ checkin.location }}</div>
             <div class="hero-checkin-time">
-              <span class="checkin-badge">✓ 已打卡</span>
+              <span class="checkin-badge"><AppIcon name="check" size="13" /> 已打卡</span>
               <span class="checkin-date">{{ checkin.checkinTime }}</span>
             </div>
           </div>
         </section>
 
         <section v-if="location" class="info-section">
-          <h2 class="section-title">📖 地点介绍</h2>
+          <h2 class="section-title"><AppIcon name="book" size="17" /> 地点介绍</h2>
           <p class="section-text">{{ location.description }}</p>
         </section>
 
         <section v-if="location" class="info-section">
-          <h2 class="section-title">📜 历史背景</h2>
+          <h2 class="section-title"><AppIcon name="history" size="17" /> 历史背景</h2>
           <p class="section-text">{{ location.history }}</p>
         </section>
 
         <section v-if="location" class="info-section">
-          <h2 class="section-title">✨ 推荐看点</h2>
+          <h2 class="section-title"><AppIcon name="sparkles" size="17" /> 推荐看点</h2>
           <ul class="highlights">
             <li v-for="(h, i) in location.highlights" :key="i">
               <span class="highlight-marker">{{ i + 1 }}</span>
@@ -47,7 +47,7 @@
 
         <section class="note-section">
           <div class="note-header">
-            <h2 class="section-title">✍️ 我的备注</h2>
+            <h2 class="section-title"><AppIcon name="note" size="17" /> 我的备注</h2>
             <button
               v-if="!isEditing"
               class="edit-btn"
@@ -77,7 +77,7 @@
         </section>
 
         <section class="info-section">
-          <h2 class="section-title">📋 打卡信息</h2>
+          <h2 class="section-title"><AppIcon name="clipboard" size="17" /> 打卡信息</h2>
           <div class="info-grid">
             <div class="info-item">
               <span class="info-label">地点名称</span>
@@ -105,25 +105,25 @@
         <section class="m-hero-section" :style="{ '--accent-color': location?.color || '#d32f2f' }">
           <span class="m-hero-category">{{ checkin.category }}</span>
           <h1 class="m-hero-title">{{ checkin.locationName }}</h1>
-          <div class="m-hero-place">📍 {{ checkin.location }}</div>
+          <div class="m-hero-place"><AppIcon name="pin" size="13" /> {{ checkin.location }}</div>
           <div class="m-hero-checkin-time">
-            <span class="m-checkin-badge">✓ 已打卡</span>
+            <span class="m-checkin-badge"><AppIcon name="check" size="12" /> 已打卡</span>
             <span class="m-checkin-date">{{ checkin.checkinTime }}</span>
           </div>
         </section>
 
         <section v-if="location" class="m-info-section">
-          <h2 class="m-section-title">📖 地点介绍</h2>
+          <h2 class="m-section-title"><AppIcon name="book" size="15" /> 地点介绍</h2>
           <p class="m-section-text">{{ location.description }}</p>
         </section>
 
         <section v-if="location" class="m-info-section">
-          <h2 class="m-section-title">📜 历史背景</h2>
+          <h2 class="m-section-title"><AppIcon name="history" size="15" /> 历史背景</h2>
           <p class="m-section-text">{{ location.history }}</p>
         </section>
 
         <section v-if="location" class="m-info-section">
-          <h2 class="m-section-title">✨ 推荐看点</h2>
+          <h2 class="m-section-title"><AppIcon name="sparkles" size="15" /> 推荐看点</h2>
           <ul class="m-highlights">
             <li v-for="(h, i) in location.highlights" :key="i">
               <span class="m-highlight-marker">{{ i + 1 }}</span>
@@ -134,7 +134,7 @@
 
         <section class="m-note-section">
           <div class="m-note-header">
-            <h2 class="m-section-title">✍️ 我的备注</h2>
+            <h2 class="m-section-title"><AppIcon name="note" size="15" /> 我的备注</h2>
             <button
               v-if="!isEditing"
               class="m-edit-btn"
@@ -164,7 +164,7 @@
         </section>
 
         <section class="m-info-section">
-          <h2 class="m-section-title">📋 打卡信息</h2>
+          <h2 class="m-section-title"><AppIcon name="clipboard" size="15" /> 打卡信息</h2>
           <div class="m-info-grid">
             <div class="m-info-item">
               <span class="m-info-label">地点名称</span>
@@ -1222,6 +1222,89 @@ const saveNote = () => {
 @media (max-width: 480px) {
   .m-info-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* 统一视觉语言 */
+.hero-section,
+.m-hero-section {
+  border: 1px solid rgba(147, 51, 66, 0.09);
+  background:
+    radial-gradient(circle at 92% 8%, rgba(255, 255, 255, 0.82) 0 7%, transparent 7.3%),
+    radial-gradient(circle at 82% 24%, rgba(197, 34, 55, 0.09), transparent 24%),
+    linear-gradient(145deg, #a11329 0%, #c52237 58%, #d84a58 100%);
+  box-shadow: 0 20px 48px rgba(110, 20, 38, 0.2);
+}
+
+.m-hero-section {
+  border-radius: 24px;
+}
+
+.hero-title,
+.m-hero-title {
+  letter-spacing: -0.8px;
+}
+
+.hero-category,
+.m-hero-category,
+.checkin-badge,
+.m-checkin-badge {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.back-btn,
+.info-section,
+.m-info-section,
+.note-section,
+.m-note-section,
+.not-found {
+  border-color: rgba(138, 65, 79, 0.09);
+  box-shadow: 0 10px 30px rgba(45, 32, 37, 0.055);
+}
+
+.back-btn {
+  border-radius: 12px;
+}
+
+.info-section,
+.m-info-section,
+.note-section,
+.m-note-section {
+  border-radius: 20px;
+}
+
+.edit-btn,
+.m-edit-btn,
+.nf-btn,
+.note-btn.save,
+.m-note-btn.save {
+  background: linear-gradient(135deg, #c52237, #901528);
+  border-radius: 11px;
+}
+
+.m-info-item {
+  border-color: rgba(138, 65, 79, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.m-note-input {
+  border-color: rgba(138, 65, 79, 0.12);
+  background: #fffdfb;
+}
+
+@media (max-width: 600px) {
+  .checkin-detail {
+    padding-top: 18px;
+  }
+
+  .m-hero-section {
+    padding: 22px 18px;
+  }
+
+  .m-info-section,
+  .m-note-section {
+    padding: 18px 16px;
   }
 }
 </style>

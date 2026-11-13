@@ -19,7 +19,7 @@
             :class="{ active: currentTab === 'fixed' }"
             @click="switchTab('fixed')"
           >
-            <span class="pc-tab-icon">📋</span>
+            <span class="pc-tab-icon"><AppIcon name="clipboard" size="16" /></span>
             <span class="pc-tab-text">固定路线推荐</span>
           </button>
           <button
@@ -27,7 +27,7 @@
             :class="{ active: currentTab === 'ai' }"
             @click="switchTab('ai')"
           >
-            <span class="pc-tab-icon">✨</span>
+            <span class="pc-tab-icon"><AppIcon name="sparkles" size="16" /></span>
             <span class="pc-tab-text">AI 智能推荐</span>
           </button>
         </div>
@@ -52,22 +52,31 @@
             </div>
             <div class="pc-loc-info">
               <h3 class="pc-loc-name">{{ loc.name }}</h3>
-              <div class="pc-loc-meta">{{ loc.location }} · {{ loc.category }}</div>
+              <div class="pc-loc-meta">
+                {{ loc.location }} · {{ loc.category }}
+                <span v-if="getAvgRating(loc.id)" class="pc-loc-rating">
+                  <AppIcon name="starFill" size="11" /> {{ getAvgRating(loc.id) }}
+                </span>
+              </div>
               <p class="pc-loc-desc">{{ loc.description }}</p>
               <div class="pc-loc-tags">
                 <span v-for="tag in loc.highlights" :key="tag" class="pc-loc-tag">{{ tag }}</span>
               </div>
             </div>
             <div class="pc-loc-status">
-              <span v-if="hasCheckedIn(loc.id)" class="pc-status-done">✓ 已打卡</span>
-              <span v-else class="pc-status-todo">点击打卡 →</span>
+              <span v-if="hasCheckedIn(loc.id)" class="pc-status-done">
+                <AppIcon name="check" size="14" /> 已打卡
+              </span>
+              <span v-else class="pc-status-todo">
+                点击打卡 <AppIcon name="arrowRight" size="13" />
+              </span>
             </div>
           </div>
         </div>
 
         <!-- 路线说明 -->
         <div class="pc-route-info">
-          <div class="pc-info-title">📋 推荐游览顺序</div>
+          <div class="pc-info-title"><AppIcon name="clipboard" size="18" /> 推荐游览顺序</div>
           <div class="pc-info-steps">
             <div
               v-for="(loc, index) in sortedLocations"
@@ -81,7 +90,10 @@
                 <div class="pc-step-name">{{ loc.name }}</div>
                 <div class="pc-step-place">{{ loc.location }} · {{ loc.category }}</div>
               </div>
-              <div class="pc-step-status">{{ hasCheckedIn(loc.id) ? '✓ 已打卡' : '点击打卡' }}</div>
+              <div class="pc-step-status">
+                <AppIcon :name="hasCheckedIn(loc.id) ? 'check' : 'chevronRight'" size="14" />
+                {{ hasCheckedIn(loc.id) ? '已打卡' : '点击打卡' }}
+              </div>
             </div>
           </div>
         </div>
@@ -90,34 +102,61 @@
       <!-- Tab 2：AI 智能推荐 -->
       <div v-if="currentTab === 'ai'" class="pc-tab-content">
         <!-- 预设问题区域 -->
-        <div class="pc-ai-card pc-ai-question-card">
-          <div class="pc-ai-card-header">
-            <div class="pc-ai-icon">🤖</div>
-            <div class="pc-ai-header-text">
-              <h3 class="pc-ai-title">选择你感兴趣的方向</h3>
-              <p class="pc-ai-subtitle">从下方预设问题中选一个，AI 将为你智能生成个性化游览路线</p>
+        <div class="pc-ai-card pc-ai-question-card route-ai-panel">
+          <div class="route-ai-hero">
+            <div class="route-ai-hero-icon"><AppIcon name="sparkles" size="24" /></div>
+            <div class="route-ai-hero-copy">
+              <span class="route-ai-eyebrow">AI ROUTE PLANNER</span>
+              <h3>把一天交给更聪明的路线</h3>
+              <p>告诉 AI 你的时间、起点和兴趣，它会筛选地点、安排顺序并补充交通与实用信息。</p>
+            </div>
+            <div class="route-ai-orbit" aria-hidden="true">
+              <AppIcon name="brain" size="22" />
             </div>
           </div>
 
+          <div class="route-ai-capabilities">
+            <span><AppIcon name="route" size="13" /> 智能动线</span>
+            <span><AppIcon name="clock" size="13" /> 时间匹配</span>
+            <span><AppIcon name="lightbulb" size="13" /> 实用信息</span>
+          </div>
+
+          <div class="route-ai-section-head">
+            <div>
+              <span>精选旅行主题</span>
+              <small>选一个方向，立即生成专属路线</small>
+            </div>
+            <span class="route-ai-section-count">{{ presetQuestions.length }} 个方向</span>
+          </div>
+
           <div class="pc-preset-questions">
-            <div
+            <button
               v-for="(q, idx) in presetQuestions"
               :key="idx"
+              type="button"
               class="pc-preset-item"
               :class="{ selected: selectedQuestion === q.label, loading: aiLoading && selectedQuestion === q.label }"
               @click="selectAndAsk(q)"
             >
-              <span class="pc-preset-emoji">{{ q.emoji }}</span>
-              <span class="pc-preset-label">{{ q.label }}</span>
+              <span class="pc-preset-icon"><AppIcon :name="q.icon" size="19" /></span>
+              <span class="pc-preset-copy">
+                <span class="pc-preset-label">{{ q.label }}</span>
+                <span class="pc-preset-hint">{{ q.hint }}</span>
+              </span>
+              <span v-if="q.tag" class="pc-preset-tag">{{ q.tag }}</span>
+              <span class="pc-preset-arrow"><AppIcon name="chevronRight" size="15" /></span>
               <span v-if="aiLoading && selectedQuestion === q.label" class="pc-preset-spinner"></span>
-            </div>
+            </button>
           </div>
 
           <!-- 自定义提问区 -->
-          <div class="pc-custom-ask">
+          <div class="pc-custom-ask route-ai-composer">
             <div class="pc-custom-ask-label">
-              <span class="pc-ask-emoji">💬</span>
-              <span>或直接描述您的需求，AI 将为您量身规划</span>
+              <span class="pc-ask-emoji"><AppIcon name="message" size="17" /></span>
+              <span class="route-ai-composer-title">
+                <strong>还有更具体的计划？</strong>
+                <small>直接描述时间、起点和同行人，AI 会继续理解。</small>
+              </span>
             </div>
             <div class="pc-custom-ask-input">
               <textarea
@@ -133,12 +172,15 @@
                 @click="submitCustom"
               >
                 <span v-if="aiLoading && isCustomAsk" class="pc-submit-spinner"></span>
-                <span v-else class="pc-submit-arrow">➤</span>
+                <span v-else class="pc-submit-arrow"><AppIcon name="arrowRight" size="16" /></span>
                 <span class="pc-submit-text">{{ aiLoading && isCustomAsk ? '生成中...' : '生成路线' }}</span>
               </button>
             </div>
             <div class="pc-custom-ask-tip">
               小提示：Ctrl + Enter 快捷提交 · 可告诉 AI 您的起点、时间、兴趣偏好等
+            </div>
+            <div class="route-ai-composer-note">
+              <AppIcon name="lock" size="12" /> 仅基于当前红十字地点库生成，不会编造场馆
             </div>
           </div>
         </div>
@@ -165,7 +207,7 @@
         <!-- AI 回答结果区域 -->
         <div v-if="aiAnswer" class="pc-ai-card pc-ai-result-card">
           <div class="pc-ai-result-header">
-            <span class="pc-result-badge">✨ AI 推荐路线</span>
+            <span class="pc-result-badge"><AppIcon name="sparkles" size="13" /> AI 推荐路线</span>
             <button class="pc-btn-refresh" @click="clearAnswer">清空重新生成</button>
           </div>
 
@@ -175,7 +217,7 @@
           </div>
 
           <div v-if="aiAnswer.routeGenerationProcess" class="pc-ai-process">
-            <div class="pc-process-title">🧠 路线生成过程</div>
+            <div class="pc-process-title"><AppIcon name="brain" size="15" /> 路线生成过程</div>
             <p class="pc-process-text">{{ displayedProcess }}</p>
             <span v-if="isTyping" class="pc-process-cursor">▍</span>
           </div>
@@ -193,7 +235,7 @@
                 <p class="pc-ai-step-desc">{{ step.desc }}</p>
 
                 <div v-if="step.history" class="pc-ai-step-section pc-history-section">
-                  <div class="pc-section-label">📜 历史故事</div>
+                  <div class="pc-section-label"><AppIcon name="history" size="13" /> 历史故事</div>
                   <p class="pc-section-text">{{ step.history }}</p>
                 </div>
 
@@ -206,14 +248,14 @@
 
                 <div class="pc-time-ticket-row">
                   <div v-if="step.best_time || step.bestTime" class="pc-time-ticket-item">
-                    <span class="pc-item-icon">🕐</span>
+                    <span class="pc-item-icon"><AppIcon name="clock" size="15" /></span>
                     <div class="pc-item-content">
                       <div class="pc-item-label">最佳时间</div>
                       <div class="pc-item-value">{{ step.best_time || step.bestTime }}</div>
                     </div>
                   </div>
                   <div v-if="step.ticket" class="pc-time-ticket-item">
-                    <span class="pc-item-icon">🎟️</span>
+                    <span class="pc-item-icon"><AppIcon name="ticket" size="15" /></span>
                     <div class="pc-item-content">
                       <div class="pc-item-label">门票预约</div>
                       <div class="pc-item-value">{{ step.ticket }}</div>
@@ -223,14 +265,14 @@
 
                 <div class="pc-food-photo-row">
                   <div v-if="step.nearby_food || step.nearbyFood" class="pc-food-photo-item pc-food-item">
-                    <span class="pc-item-icon">🍜</span>
+                    <span class="pc-item-icon"><AppIcon name="food" size="15" /></span>
                     <div class="pc-item-content">
                       <div class="pc-item-label">附近餐饮</div>
                       <div class="pc-item-value">{{ step.nearby_food || step.nearbyFood }}</div>
                     </div>
                   </div>
                   <div v-if="step.photo_spots && step.photo_spots.length > 0" class="pc-food-photo-item pc-photo-item">
-                    <span class="pc-item-icon">📷</span>
+                    <span class="pc-item-icon"><AppIcon name="camera" size="15" /></span>
                     <div class="pc-item-content">
                       <div class="pc-item-label">拍照打卡点</div>
                       <div class="pc-item-value">{{ step.photo_spots.join('、') }}</div>
@@ -239,7 +281,7 @@
                 </div>
 
                 <div v-if="step.practical_tips && step.practical_tips.length > 0" class="pc-ai-step-section pc-practical-section">
-                  <div class="pc-section-label">💡 实用贴士</div>
+                  <div class="pc-section-label"><AppIcon name="lightbulb" size="13" /> 实用贴士</div>
                   <ul class="pc-practical-list">
                     <li v-for="(pt, pti) in step.practical_tips" :key="pti">{{ pt }}</li>
                   </ul>
@@ -257,7 +299,7 @@
           </div>
 
           <div v-if="aiAnswer.summary" class="pc-ai-summary">
-            <div class="pc-summary-title">📝 路线要点</div>
+            <div class="pc-summary-title"><AppIcon name="note" size="14" /> 路线要点</div>
             <ul class="pc-summary-list">
               <li v-for="(s, i) in aiAnswer.summary" :key="i">{{ s }}</li>
             </ul>
@@ -310,22 +352,27 @@
             <div class="mobile-loc-number">{{ index + 1 }}</div>
             <div class="mobile-loc-info">
               <h3 class="mobile-loc-name">{{ loc.name }}</h3>
-              <div class="mobile-loc-meta">{{ loc.location }}</div>
+              <div class="mobile-loc-meta">
+                {{ loc.location }}
+                <span v-if="getAvgRating(loc.id)" class="mobile-loc-rating">
+                  <AppIcon name="starFill" size="10" /> {{ getAvgRating(loc.id) }}
+                </span>
+              </div>
               <p class="mobile-loc-desc">{{ loc.description }}</p>
               <div v-if="loc.highlights && loc.highlights.length > 0" class="mobile-loc-tags">
                 <span v-for="tag in loc.highlights.slice(0, 2)" :key="tag" class="mobile-loc-tag">{{ tag }}</span>
               </div>
             </div>
             <div class="mobile-loc-status">
-              <span v-if="hasCheckedIn(loc.id)" class="mobile-status-done">✓</span>
-              <span v-else class="mobile-status-todo">›</span>
+              <span v-if="hasCheckedIn(loc.id)" class="mobile-status-done"><AppIcon name="check" size="13" /></span>
+              <span v-else class="mobile-status-todo"><AppIcon name="chevronRight" size="14" /></span>
             </div>
           </div>
         </div>
 
         <!-- 路线说明（简化为列表样式） -->
         <div class="mobile-route-info">
-          <div class="mobile-info-title">📋 游览顺序</div>
+          <div class="mobile-info-title"><AppIcon name="clipboard" size="15" /> 游览顺序</div>
           <div class="mobile-info-steps">
             <div
               v-for="(loc, index) in sortedLocations"
@@ -339,7 +386,9 @@
                 <div class="mobile-step-name">{{ loc.name }}</div>
                 <div class="mobile-step-place">{{ loc.location }}</div>
               </div>
-              <div class="mobile-step-status">{{ hasCheckedIn(loc.id) ? '✓' : '›' }}</div>
+              <div class="mobile-step-status">
+                <AppIcon :name="hasCheckedIn(loc.id) ? 'check' : 'chevronRight'" size="15" />
+              </div>
             </div>
           </div>
         </div>
@@ -348,29 +397,58 @@
       <!-- Tab 2：AI 智能推荐（移动端紧凑） -->
       <div v-if="currentTab === 'ai'" class="mobile-tab-content">
         <!-- 预设问题区域（单列卡片） -->
-        <div class="mobile-ai-card mobile-ai-question-card">
-          <div class="mobile-ai-card-header">
-            <span class="mobile-ai-icon">🤖</span>
-            <span class="mobile-ai-title">选择方向</span>
+        <div class="mobile-ai-card mobile-ai-question-card route-ai-panel">
+          <div class="route-ai-hero is-mobile">
+            <div class="route-ai-hero-icon"><AppIcon name="sparkles" size="21" /></div>
+            <div class="route-ai-hero-copy">
+              <span class="route-ai-eyebrow">AI ROUTE PLANNER</span>
+              <h3>你的专属红十字半日游</h3>
+              <p>选择旅行主题，AI 会结合时间与兴趣安排地点顺序和参观节奏。</p>
+            </div>
+            <div class="route-ai-orbit" aria-hidden="true">
+              <AppIcon name="brain" size="18" />
+            </div>
+          </div>
+
+          <div class="route-ai-capabilities is-mobile">
+            <span><AppIcon name="route" size="12" /> 智能动线</span>
+            <span><AppIcon name="clock" size="12" /> 时间匹配</span>
+            <span><AppIcon name="lightbulb" size="12" /> 实用信息</span>
+          </div>
+
+          <div class="route-ai-section-head is-mobile">
+            <div>
+              <span>从这里开始</span>
+              <small>选择最接近你想法的方向</small>
+            </div>
+            <span class="route-ai-section-count">{{ presetQuestions.length }} 个灵感</span>
           </div>
 
           <div class="mobile-preset-questions">
-            <div
+            <button
               v-for="(q, idx) in presetQuestions"
               :key="idx"
+              type="button"
               class="mobile-preset-item"
               :class="{ selected: selectedQuestion === q.label, loading: aiLoading && selectedQuestion === q.label }"
               @click="selectAndAsk(q)"
             >
-              <span class="mobile-preset-emoji">{{ q.emoji }}</span>
-              <span class="mobile-preset-label">{{ q.label }}</span>
+              <span class="mobile-preset-icon"><AppIcon :name="q.icon" size="18" /></span>
+              <span class="mobile-preset-copy">
+                <span class="mobile-preset-label">{{ q.label }}</span>
+                <span class="mobile-preset-hint">{{ q.hint }}</span>
+              </span>
+              <span v-if="q.tag" class="mobile-preset-tag">{{ q.tag }}</span>
+              <span class="mobile-preset-arrow"><AppIcon name="chevronRight" size="14" /></span>
               <span v-if="aiLoading && selectedQuestion === q.label" class="mobile-preset-spinner"></span>
-            </div>
+            </button>
           </div>
 
-          <div class="mobile-custom-ask">
+          <div class="mobile-custom-ask route-ai-composer">
             <div class="mobile-custom-ask-label">
-              <span>💬 或直接描述需求</span>
+              <span class="route-ai-composer-icon"><AppIcon name="message" size="14" /></span>
+              <span class="route-ai-mobile-composer-title">或直接描述需求</span>
+              <small>时间 · 起点 · 同行人</small>
             </div>
             <textarea
               v-model="customQuestion"
@@ -385,8 +463,12 @@
               @click="submitCustom"
             >
               <span v-if="aiLoading && isCustomAsk" class="mobile-submit-spinner"></span>
+              <span v-else><AppIcon name="arrowRight" size="15" /></span>
               <span class="mobile-submit-text">{{ aiLoading && isCustomAsk ? '生成中...' : '生成路线' }}</span>
             </button>
+            <div class="route-ai-composer-note">
+              <AppIcon name="lock" size="12" /> 仅使用当前地点库，结果可继续调整
+            </div>
           </div>
         </div>
 
@@ -412,7 +494,7 @@
         <!-- AI 结果（紧凑） -->
         <div v-if="aiAnswer" class="mobile-ai-card mobile-ai-result-card">
           <div class="mobile-ai-result-header">
-            <span class="mobile-result-badge">✨ AI 推荐</span>
+            <span class="mobile-result-badge"><AppIcon name="sparkles" size="12" /> AI 推荐</span>
             <button class="mobile-btn-refresh" @click="clearAnswer">清空</button>
           </div>
 
@@ -421,7 +503,7 @@
           </div>
 
           <div v-if="aiAnswer.routeGenerationProcess" class="mobile-ai-process">
-            <div class="mobile-process-title">🧠 路线生成过程</div>
+            <div class="mobile-process-title"><AppIcon name="brain" size="14" /> 路线生成过程</div>
             <p class="mobile-process-text">{{ displayedProcess }}</p>
             <span v-if="isTyping" class="mobile-process-cursor">▍</span>
           </div>
@@ -443,22 +525,22 @@
 
               <div v-if="step.best_time || step.bestTime || step.ticket" class="mobile-time-ticket-row">
                 <div v-if="step.best_time || step.bestTime" class="mobile-time-ticket-item">
-                  <span>🕐</span>
+                  <span><AppIcon name="clock" size="14" /></span>
                   <div class="mobile-item-value">{{ step.best_time || step.bestTime }}</div>
                 </div>
                 <div v-if="step.ticket" class="mobile-time-ticket-item">
-                  <span>🎟️</span>
+                  <span><AppIcon name="ticket" size="14" /></span>
                   <div class="mobile-item-value">{{ step.ticket }}</div>
                 </div>
               </div>
 
               <div v-if="step.nearby_food || step.nearbyFood || (step.photo_spots && step.photo_spots.length > 0)" class="mobile-food-photo-row">
                 <div v-if="step.nearby_food || step.nearbyFood" class="mobile-food-photo-item mobile-food-item">
-                  <span>🍜</span>
+                  <span><AppIcon name="food" size="14" /></span>
                   <div class="mobile-item-value">{{ step.nearby_food || step.nearbyFood }}</div>
                 </div>
                 <div v-if="step.photo_spots && step.photo_spots.length > 0" class="mobile-food-photo-item mobile-photo-item">
-                  <span>📷</span>
+                  <span><AppIcon name="camera" size="14" /></span>
                   <div class="mobile-item-value">{{ step.photo_spots.join('、') }}</div>
                 </div>
               </div>
@@ -470,7 +552,7 @@
           </div>
 
           <div v-if="aiAnswer.summary && aiAnswer.summary.length > 0" class="mobile-ai-summary">
-            <div class="mobile-summary-title">📝 要点</div>
+            <div class="mobile-summary-title"><AppIcon name="note" size="13" /> 要点</div>
             <ul class="mobile-summary-list">
               <li v-for="(s, i) in aiAnswer.summary" :key="i">{{ s }}</li>
             </ul>
@@ -482,44 +564,125 @@
     <!-- ==============================
          地点详情弹窗（通用）
          ============================== -->
-    <div v-if="selectedLocation" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-card" :style="{ '--accent-color': selectedLocation.color }">
+    <transition name="route-detail">
+      <div v-if="selectedLocation" class="modal-overlay" @click.self="closeModal">
+        <div class="modal-card" :style="{ '--accent-color': selectedLocation.color }">
         <div class="modal-header">
           <div class="modal-image" :class="{ 'has-image': selectedLocation.image }">
             <img v-if="selectedLocation.image" :src="selectedLocation.image" :alt="selectedLocation.name" />
             <div v-else class="modal-image-placeholder">
-              <span class="placeholder-badge">图片预留位置</span>
+              <span class="placeholder-badge">场馆图片 · 待补充</span>
             </div>
             <div class="modal-category">{{ selectedLocation.category }}</div>
-            <button class="modal-close" @click="closeModal">×</button>
+            <button class="modal-close" aria-label="关闭地点详情" @click="closeModal">
+              <AppIcon name="x" size="18" />
+            </button>
           </div>
         </div>
 
         <div class="modal-body">
           <h2 class="modal-title">{{ selectedLocation.name }}</h2>
-          <div class="modal-place">📍 {{ selectedLocation.location }}</div>
+          <div class="modal-place"><AppIcon name="pin" size="13" /> {{ selectedLocation.location }}</div>
           <p class="modal-desc">{{ selectedLocation.description }}</p>
 
           <div class="modal-history">
-            <div class="history-label">📖 历史背景</div>
+            <div class="history-label"><AppIcon name="book" size="13" /> 历史背景</div>
             <div class="history-text">{{ selectedLocation.history }}</div>
           </div>
 
           <div class="modal-highlights">
-            <div class="highlights-label">✨ 亮点内容</div>
+            <div class="highlights-label"><AppIcon name="sparkles" size="13" /> 亮点内容</div>
             <div class="highlights-list">
               <span v-for="(h, i) in selectedLocation.highlights" :key="i" class="highlight-item">{{ h }}</span>
             </div>
           </div>
 
+          <!-- ====== 地点评价与打分 ====== -->
+          <div class="modal-reviews">
+            <div class="reviews-head">
+              <div class="reviews-head-left">
+                <span class="reviews-title"><AppIcon name="starFill" size="14" /> 地点评价</span>
+                <span class="reviews-count">{{ reviewStats.count }} 条</span>
+              </div>
+              <div class="reviews-head-right">
+                <StarRating :model-value="reviewStats.avg" readonly size="small" />
+                <span class="reviews-avg">{{ reviewStats.count ? reviewStats.avg.toFixed(1) : '—' }}</span>
+              </div>
+            </div>
+
+            <!-- 各星级分布 -->
+            <div v-if="reviewStats.count > 0" class="reviews-dist">
+              <div v-for="star in [5, 4, 3, 2, 1]" :key="star" class="dist-row">
+                <span class="dist-star"><AppIcon name="starFill" size="10" /> {{ star }}</span>
+                <span class="dist-track">
+                  <span class="dist-fill" :style="{ width: distPercent(star) }"></span>
+                </span>
+                <span class="dist-num">{{ reviewStats.distribution[star - 1] }}</span>
+              </div>
+            </div>
+
+            <!-- 当前角色可评价且尚未评价 -->
+            <div v-if="can('review') && !myReview" class="review-form">
+              <div class="review-form-head">
+                <span class="review-form-label">我的打分</span>
+                <StarRating v-model="draftRating" size="normal" />
+                <span v-if="draftRating" class="review-form-score">{{ draftRating }} 分</span>
+              </div>
+              <textarea
+                v-model="draftContent"
+                class="review-textarea"
+                rows="3"
+                placeholder="分享你的参观体验，帮助更多人了解这里..."
+              ></textarea>
+              <button class="review-submit" :disabled="!draftRating" @click="submitReview">
+                {{ draftRating ? '发布评价' : '请先选择星级' }}
+              </button>
+            </div>
+
+            <!-- 当前角色已评价 -->
+            <div v-else-if="can('review') && myReview" class="review-mine-tip">
+              <span class="mine-avatar" :style="{ background: currentUser.color }">
+                <AppIcon :name="currentUser.icon" size="15" />
+              </span>
+              <span>你已用「{{ currentUser.name }}」身份给出 <strong>{{ myReview.rating }} 星</strong> 评价</span>
+            </div>
+
+            <!-- 游客无评价权限 -->
+            <div v-else class="review-guest-tip">
+              <AppIcon name="user" size="14" /> 游客身份仅可浏览评价，切换到「注册用户」或「志愿者」即可打分
+            </div>
+
+            <!-- 评论列表 -->
+            <div class="review-list">
+              <div v-for="r in locationReviews" :key="r.id" class="review-item">
+                <div class="review-item-head">
+                  <span class="review-avatar" :style="{ background: roleOf(r.roleKey).color }">
+                    <AppIcon :name="roleOf(r.roleKey).icon" size="14" />
+                  </span>
+                  <span class="review-user">{{ r.userName }}</span>
+                  <span v-if="roleOf(r.roleKey).starred" class="review-star-tag">
+                    <AppIcon name="starFill" size="10" />{{ roleOf(r.roleKey).starLevel }}
+                  </span>
+                  <StarRating :model-value="r.rating" readonly size="small" />
+                  <span class="review-time">{{ formatReviewTime(r.timestamp) }}</span>
+                  <button v-if="can('moderate')" class="review-del" @click="deleteReview(r.id)">删除</button>
+                </div>
+                <p v-if="r.content" class="review-content">{{ r.content }}</p>
+              </div>
+              <div v-if="locationReviews.length === 0" class="review-empty">
+                还没有人评价过这里，来写下第一条吧
+              </div>
+            </div>
+          </div>
+
           <div v-if="hasCheckedIn(selectedLocation.id)" class="modal-note-box">
-            <div class="note-label">📝 我的打卡备注</div>
+            <div class="note-label"><AppIcon name="note" size="13" /> 我的打卡备注</div>
             <div class="note-content">{{ getCheckinNote(selectedLocation.id) }}</div>
             <div class="note-time">打卡时间: {{ getCheckinTime(selectedLocation.id) }}</div>
           </div>
 
           <div v-else class="modal-note-input">
-            <div class="note-label">📝 游览感受（选填）</div>
+            <div class="note-label"><AppIcon name="note" size="13" /> 游览感受（选填）</div>
             <textarea
               v-model="noteText"
               class="note-input"
@@ -529,48 +692,125 @@
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button v-if="!hasCheckedIn(selectedLocation.id)" class="btn-checkin" @click="doCheckin">
-            🔖 立即打卡
-          </button>
-          <button v-else class="btn-checked" disabled>
-            ✓ 已打卡
-          </button>
+          <div class="modal-footer">
+            <button v-if="!hasCheckedIn(selectedLocation.id)" class="btn-checkin" @click="doCheckin">
+              <AppIcon name="bookmark" size="15" /> 立即打卡
+            </button>
+            <button v-else class="btn-checked" disabled>
+              <AppIcon name="check" size="15" /> 已打卡
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useLocationStore } from '../stores/locationStore'
 import { useCheckinStore } from '../stores/checkinStore'
 import { useViewport } from '../composables/useViewport'
+import { useUserStore, ROLES } from '../stores/userStore'
+import { useReviewStore, formatReviewTime } from '../stores/reviewStore'
+import StarRating from '../components/StarRating.vue'
 
 const { isMobile } = useViewport()
+const route = useRoute()
+const router = useRouter()
 
 const { locations } = useLocationStore()
 const { hasCheckedIn, addCheckin, getCheckinNote, getCheckinTime } = useCheckinStore()
+const { currentRoleKey, currentUser, can } = useUserStore()
+const {
+  getReviewsByLocation,
+  getStats,
+  getAvgRating,
+  getReviewByRole,
+  addReview,
+  removeReview
+} = useReviewStore()
 
 const selectedLocation = ref(null)
 const noteText = ref('')
+
+// 评价打分草稿
+const draftRating = ref(0)
+const draftContent = ref('')
 
 const sortedLocations = computed(() => {
   return locations.value
 })
 
+// ==============================
+// 评价数据（跟随当前弹窗地点）
+// ==============================
+const EMPTY_STATS = { count: 0, avg: 0, distribution: [0, 0, 0, 0, 0] }
+
+const locationReviews = computed(() =>
+  selectedLocation.value ? getReviewsByLocation(selectedLocation.value.id) : []
+)
+
+const reviewStats = computed(() =>
+  selectedLocation.value ? getStats(selectedLocation.value.id) : EMPTY_STATS
+)
+
+const myReview = computed(() =>
+  selectedLocation.value ? getReviewByRole(selectedLocation.value.id, currentRoleKey.value) : null
+)
+
+const distPercent = (star) => {
+  const total = reviewStats.value.count
+  if (!total) return '0%'
+  return ((reviewStats.value.distribution[star - 1] / total) * 100).toFixed(0) + '%'
+}
+
+const roleOf = (key) => ROLES.find(r => r.key === key) || ROLES[3]
+
+const submitReview = () => {
+  if (!selectedLocation.value || !draftRating.value) return
+  addReview(selectedLocation.value.id, {
+    roleKey: currentRoleKey.value,
+    userName: currentUser.value.name,
+    rating: draftRating.value,
+    content: draftContent.value
+  })
+  draftRating.value = 0
+  draftContent.value = ''
+}
+
+const deleteReview = (id) => {
+  if (!can('moderate')) return
+  removeReview(id)
+}
+
 const openModal = (loc) => {
   selectedLocation.value = loc
   noteText.value = ''
+  draftRating.value = 0
+  draftContent.value = ''
   document.body.style.overflow = 'hidden'
 }
 
 const closeModal = () => {
   selectedLocation.value = null
   noteText.value = ''
+  draftRating.value = 0
+  draftContent.value = ''
   document.body.style.overflow = ''
 }
+
+// 从地图页跳转过来时（/routes?loc=3）自动打开对应地点详情
+onMounted(() => {
+  const locId = route.query.loc
+  if (!locId) return
+  const target = locations.value.find(l => l.id === Number(locId))
+  if (!target) return
+  openModal(target)
+  // 清掉 query，避免刷新后重复弹出
+  router.replace({ path: '/routes' })
+})
 
 const doCheckin = () => {
   if (selectedLocation.value) {
@@ -591,28 +831,35 @@ const switchTab = (tab) => {
 // ==============================
 const presetQuestions = [
   {
-    emoji: '⏰',
+    icon: 'clock',
     label: '半天（3-4小时）能走完的精华路线',
+    hint: '时间紧凑，优先串联核心地标',
+    tag: '热门'
   },
   {
-    emoji: '👶',
+    icon: 'baby',
     label: '适合儿童的红十字精神启蒙路线',
+    hint: '互动体验与轻松安全的参观动线'
   },
   {
-    emoji: '📚',
+    icon: 'book',
     label: '以博物馆和历史地标为主的深度路线',
+    hint: '沿着历史脉络理解上海红十字运动'
   },
   {
-    emoji: '🌆',
+    icon: 'city',
     label: '一天内游览所有红十字地点的完整路线',
+    hint: '一次串联全城，适合深度探索'
   },
   {
-    emoji: '❤️',
+    icon: 'heart',
     label: '以医疗救助机构为主的感人路线',
+    hint: '从医疗救护现场感受人道温度'
   },
   {
-    emoji: '📷',
+    icon: 'camera',
     label: '适合拍照打卡的网红路线',
+    hint: '兼顾建筑、展陈与城市风景'
   },
 ]
 
@@ -1461,6 +1708,18 @@ const clearAnswer = () => {
   word-break: break-word;
   overflow-wrap: break-word;
   line-height: 1.55;
+}
+
+.pc-loc-rating {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ff9800;
+  background: rgba(255, 152, 0, 0.12);
+  padding: 1px 8px;
+  border-radius: 10px;
+  vertical-align: middle;
 }
 
 .pc-loc-desc {
@@ -2538,6 +2797,17 @@ const clearAnswer = () => {
   line-height: 1.4;
 }
 
+.mobile-loc-rating {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: clamp(9px, 2.5vw, 11px);
+  font-weight: 700;
+  color: #ff9800;
+  background: rgba(255, 152, 0, 0.12);
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
 .mobile-loc-desc {
   font-size: clamp(11px, 3vw, 13px);
   color: #6b7a90;
@@ -3371,6 +3641,310 @@ const clearAnswer = () => {
   transform: translateY(0);
 }
 
+/* ==============================
+   地点评价与打分
+   ============================== */
+.modal-reviews {
+  margin-bottom: 24px;
+  padding: 18px 20px;
+  background: #fafbfc;
+  border-radius: 14px;
+  border: 1.5px solid #eef1f5;
+}
+
+.reviews-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.reviews-head-left {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.reviews-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1a2332;
+}
+
+.reviews-count {
+  font-size: 12px;
+  color: #98a2b3;
+}
+
+.reviews-head-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reviews-avg {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ff9800;
+}
+
+/* 各星级分布 */
+.reviews-dist {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed #e5e9ef;
+}
+
+.dist-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dist-star {
+  flex-shrink: 0;
+  width: 26px;
+  font-size: 11px;
+  color: #98a2b3;
+  text-align: right;
+}
+
+.dist-track {
+  flex: 1;
+  height: 6px;
+  background: #eef1f5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dist-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ffb400, #ff9800);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.dist-num {
+  flex-shrink: 0;
+  width: 20px;
+  font-size: 11px;
+  color: #98a2b3;
+  text-align: right;
+}
+
+/* 写评价表单 */
+.review-form {
+  padding: 14px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1.5px solid #ffe0e0;
+  margin-bottom: 16px;
+}
+
+.review-form-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.review-form-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #5a6478;
+}
+
+.review-form-score {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ff9800;
+}
+
+.review-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid #e8ecf2;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #1a2332;
+  line-height: 1.65;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 10px;
+}
+
+.review-textarea:focus {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.08);
+}
+
+.review-submit {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, #d32f2f, #c62828);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.review-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c62828, #a61b1b);
+}
+
+.review-submit:disabled {
+  background: #e0e0e0;
+  color: #9e9e9e;
+  cursor: not-allowed;
+}
+
+/* 已评价 / 游客提示 */
+.review-mine-tip,
+.review-guest-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  margin-bottom: 16px;
+}
+
+.review-mine-tip {
+  background: rgba(76, 175, 80, 0.08);
+  border: 1.5px solid rgba(76, 175, 80, 0.2);
+  color: #2e7d32;
+}
+
+.review-mine-tip strong {
+  color: #1b5e20;
+}
+
+.mine-avatar {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.review-guest-tip {
+  background: rgba(120, 144, 156, 0.08);
+  border: 1.5px dashed rgba(120, 144, 156, 0.3);
+  color: #607d8b;
+}
+
+/* 评论列表 */
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-item {
+  padding-top: 12px;
+  border-top: 1px solid #f0f2f5;
+}
+
+.review-item:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.review-item-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.review-avatar {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.review-user {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1a2332;
+}
+
+.review-star-tag {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #b7791f;
+  background: rgba(249, 168, 37, 0.16);
+  padding: 1px 5px;
+  border-radius: 7px;
+}
+
+.review-time {
+  font-size: 11px;
+  color: #a0aab8;
+  margin-left: auto;
+}
+
+.review-del {
+  border: none;
+  background: none;
+  color: #d32f2f;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-family: inherit;
+  transition: background 0.2s ease;
+}
+
+.review-del:hover {
+  background: rgba(211, 47, 47, 0.08);
+}
+
+.review-content {
+  font-size: 12.5px;
+  color: #5a6478;
+  line-height: 1.7;
+  margin: 0;
+  word-break: break-word;
+}
+
+.review-empty {
+  padding: 18px 0;
+  text-align: center;
+  font-size: 12.5px;
+  color: #a0aab8;
+}
+
 .modal-note-box {
   background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
   padding: 20px;
@@ -3574,6 +4148,77 @@ const clearAnswer = () => {
     margin-bottom: 18px;
   }
 
+  /* 评价区 - 移动端 */
+  .modal-reviews {
+    padding: 14px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+  }
+
+  .reviews-head {
+    margin-bottom: 12px;
+  }
+
+  .reviews-title {
+    font-size: clamp(12px, 3.5vw, 14px);
+  }
+
+  .reviews-count {
+    font-size: clamp(10px, 2.8vw, 12px);
+  }
+
+  .reviews-avg {
+    font-size: clamp(14px, 4vw, 16px);
+  }
+
+  .dist-star,
+  .dist-num {
+    font-size: clamp(9px, 2.6vw, 11px);
+  }
+
+  .review-form {
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+
+  .review-form-label {
+    font-size: clamp(11px, 3vw, 12.5px);
+  }
+
+  .review-textarea {
+    font-size: clamp(12px, 3.5vw, 13px);
+    padding: 9px 11px;
+  }
+
+  .review-submit {
+    padding: 11px;
+    font-size: clamp(12px, 3.5vw, 13px);
+  }
+
+  .review-mine-tip,
+  .review-guest-tip {
+    font-size: clamp(11px, 3vw, 12.5px);
+    padding: 10px 12px;
+    margin-bottom: 14px;
+  }
+
+  .review-user {
+    font-size: clamp(11px, 3.2vw, 13px);
+  }
+
+  .review-time {
+    font-size: clamp(9px, 2.6vw, 11px);
+  }
+
+  .review-content {
+    font-size: clamp(11px, 3.2vw, 13px);
+  }
+
+  .review-empty {
+    font-size: clamp(11px, 3vw, 12.5px);
+    padding: 14px 0;
+  }
+
   .highlights-label {
     font-size: clamp(11px, 3vw, 13px);
     margin-bottom: 10px;
@@ -3665,6 +4310,232 @@ const clearAnswer = () => {
   .modal-note-box,
   .modal-note-input {
     padding: 12px 14px;
+  }
+}
+
+/* 统一视觉语言 */
+.pc-page-header,
+.mobile-page-header {
+  position: relative;
+  overflow: hidden;
+  padding: 30px 24px;
+  border: 1px solid rgba(150, 47, 63, 0.09);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 90% 8%, rgba(255, 255, 255, 0.9) 0 8%, transparent 8.3%),
+    radial-gradient(circle at 88% 25%, rgba(197, 34, 55, 0.07), transparent 22%),
+    linear-gradient(135deg, #fffaf7 0%, #fff0ed 54%, #f8dde2 100%);
+  box-shadow: 0 16px 42px rgba(101, 35, 48, 0.07);
+}
+
+.pc-page-header::after,
+.mobile-page-header::after {
+  content: '';
+  position: absolute;
+  right: -38px;
+  bottom: -62px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid rgba(197, 34, 55, 0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.pc-page-badge,
+.mobile-page-header .mobile-page-badge {
+  position: relative;
+  z-index: 1;
+  padding: 7px 16px;
+  border: 1px solid rgba(197, 34, 55, 0.12);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 5px 14px rgba(102, 35, 48, 0.06);
+  animation: none;
+}
+
+.pc-page-title,
+.mobile-page-title {
+  position: relative;
+  z-index: 1;
+  color: #202331;
+  letter-spacing: -0.8px;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  animation: none;
+}
+
+.pc-page-subtitle,
+.mobile-page-subtitle {
+  position: relative;
+  z-index: 1;
+  color: #77717a;
+}
+
+.pc-tabs,
+.mobile-tabs {
+  border: 1px solid rgba(135, 62, 75, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 9px 26px rgba(49, 34, 39, 0.07);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.pc-tab-btn.active,
+.mobile-tab-btn.active {
+  background: linear-gradient(135deg, #c52237, #941629);
+  box-shadow: 0 7px 18px rgba(151, 25, 44, 0.22);
+}
+
+.mobile-tabs-wrap {
+  top: calc(62px + env(safe-area-inset-top, 0px));
+  margin-inline: -5px;
+  padding: 9px 5px;
+  background: linear-gradient(180deg, rgba(247, 245, 243, 0.97), rgba(247, 245, 243, 0.84));
+}
+
+.pc-loc-card,
+.mobile-loc-card,
+.pc-ai-card,
+.mobile-ai-card,
+.mobile-route-info {
+  border-color: rgba(140, 64, 77, 0.1);
+  box-shadow: 0 10px 30px rgba(45, 32, 37, 0.055);
+}
+
+.pc-loc-card {
+  border-width: 1px;
+  border-radius: 22px;
+}
+
+.pc-loc-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(197, 34, 55, 0.28);
+  box-shadow: 0 16px 38px rgba(112, 34, 49, 0.1);
+}
+
+.mobile-loc-card {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.mobile-loc-number,
+.mobile-step-number {
+  background: linear-gradient(145deg, #cb2a40, #95172a);
+}
+
+.mobile-loc-tag,
+.pc-loc-tag {
+  border: 1px solid rgba(197, 34, 55, 0.08);
+}
+
+.pc-ai-card,
+.mobile-ai-card {
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.pc-preset-item,
+.mobile-preset-item,
+.pc-custom-ask,
+.mobile-custom-ask {
+  border-color: rgba(131, 105, 111, 0.09);
+  background: linear-gradient(145deg, #fffdfb, #fbf7f6);
+}
+
+.pc-preset-item.selected,
+.mobile-preset-item.selected {
+  border-color: rgba(197, 34, 55, 0.2);
+  background: #fff2f2;
+}
+
+.pc-btn-ask-submit,
+.mobile-btn-ask-submit,
+.btn-checkin {
+  background: linear-gradient(135deg, #c52237, #901528);
+}
+
+.modal-card {
+  border-radius: 24px;
+  border: 1px solid rgba(130, 64, 75, 0.09);
+}
+
+@media (max-width: 768px) {
+  .routes-page {
+    gap: 20px;
+    padding-top: 16px;
+  }
+
+  .mobile-page-header {
+    padding: 24px 17px;
+    border-radius: 24px;
+    text-align: left;
+  }
+
+  .mobile-page-badge {
+    margin-bottom: 11px;
+  }
+
+  .mobile-page-title {
+    font-size: clamp(21px, 6vw, 27px);
+    line-height: 1.28;
+  }
+
+  .mobile-page-subtitle {
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  .mobile-tabs {
+    border-radius: 17px;
+  }
+
+  .mobile-tab-btn {
+    border-radius: 12px;
+  }
+}
+
+/* 地点详情的进入与退出动画 */
+.modal-card {
+  animation: none;
+}
+
+.route-detail-enter-active,
+.route-detail-leave-active {
+  transition: opacity 0.24s ease;
+}
+
+.route-detail-enter-active .modal-card {
+  transition:
+    transform 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.24s ease;
+}
+
+.route-detail-leave-active .modal-card {
+  transition:
+    transform 0.24s cubic-bezier(0.4, 0, 1, 1),
+    opacity 0.18s ease;
+}
+
+.route-detail-enter-from,
+.route-detail-leave-to {
+  opacity: 0;
+}
+
+.route-detail-enter-from .modal-card {
+  opacity: 0;
+  transform: translateY(24px) scale(0.965);
+}
+
+.route-detail-leave-to .modal-card {
+  opacity: 0;
+  transform: translateY(18px) scale(0.975);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-detail-enter-active,
+  .route-detail-leave-active,
+  .route-detail-enter-active .modal-card,
+  .route-detail-leave-active .modal-card {
+    transition-duration: 0.01ms;
   }
 }
 </style>

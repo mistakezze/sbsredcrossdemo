@@ -1,6 +1,5 @@
 <template>
   <div class="app-container" :class="{ mobile: isMobile, desktop: !isMobile }">
-
     <!-- ====== 桌面端：顶部 Logo + 导航栏 ====== -->
     <header v-if="!isMobile" class="pc-header">
       <div class="pc-header-inner">
@@ -14,18 +13,56 @@
             <p>Red Cross Cultural Journey</p>
           </div>
         </div>
-        <nav class="pc-nav">
-          <router-link to="/" class="pc-nav-item" :class="{ active: $route.path === '/' }">
-            🏠 首页
-          </router-link>
-          <router-link to="/routes" class="pc-nav-item" :class="{ active: $route.path === '/routes' }">
-            🗺️ 路线推荐
-          </router-link>
-          <router-link to="/checkins" class="pc-nav-item" :class="{ active: $route.path.startsWith('/checkins') }">
-            📋 个人打卡
-            <span v-if="checkinCount > 0" class="pc-badge">{{ checkinCount }}</span>
-          </router-link>
-        </nav>
+        <div class="pc-header-right">
+          <nav class="pc-nav">
+            <router-link to="/" class="pc-nav-item" :class="{ active: $route.path === '/' }">
+              <AppIcon name="home" size="16" /> 首页
+            </router-link>
+            <router-link to="/map" class="pc-nav-item" :class="{ active: $route.path === '/map' }">
+              <AppIcon name="map" size="16" /> 地图
+            </router-link>
+            <router-link to="/routes" class="pc-nav-item" :class="{ active: $route.path === '/routes' }">
+              <AppIcon name="route" size="16" /> 路线推荐
+            </router-link>
+            <router-link to="/activities" class="pc-nav-item" :class="{ active: $route.path === '/activities' }">
+              <AppIcon name="calendar" size="16" /> 活动
+            </router-link>
+            <router-link
+              v-if="canManagePlaces"
+              to="/places"
+              class="pc-nav-item"
+              :class="{ active: $route.path === '/places' }"
+            >
+              <AppIcon name="building" size="16" /> 地点管理
+            </router-link>
+            <router-link to="/checkins" class="pc-nav-item" :class="{ active: $route.path.startsWith('/checkins') }">
+              <AppIcon name="clipboard" size="16" /> 个人打卡
+              <span v-if="checkinCount > 0" class="pc-badge">{{ checkinCount }}</span>
+            </router-link>
+          </nav>
+          <button
+            class="theme-toggle"
+            :class="{ 'is-dark': isDark }"
+            role="switch"
+            :aria-label="`切换到${isDark ? '浅色' : '深色'}模式`"
+            :aria-checked="isDark"
+            @click="toggleTheme"
+          >
+            <span class="theme-switch">
+              <span class="theme-switch-symbol is-sun">
+                <AppIcon name="sun" size="10" />
+              </span>
+              <span class="theme-switch-symbol is-moon">
+                <AppIcon name="moon" size="10" />
+              </span>
+              <span class="theme-switch-thumb">
+                <AppIcon :name="isDark ? 'moon' : 'sun'" size="13" />
+              </span>
+            </span>
+            <span class="theme-toggle-label">{{ themeLabel }}</span>
+          </button>
+          <RoleSwitcher />
+        </div>
       </div>
     </header>
 
@@ -41,12 +78,39 @@
             <span>红十字会文化之旅</span>
           </div>
         </div>
+        <div class="mobile-topbar-actions">
+          <button
+            class="theme-toggle is-mobile"
+            :class="{ 'is-dark': isDark }"
+            role="switch"
+            :aria-label="`切换到${isDark ? '浅色' : '深色'}模式`"
+            :aria-checked="isDark"
+            @click="toggleTheme"
+          >
+            <span class="theme-switch">
+              <span class="theme-switch-symbol is-sun">
+                <AppIcon name="sun" size="9" />
+              </span>
+              <span class="theme-switch-symbol is-moon">
+                <AppIcon name="moon" size="9" />
+              </span>
+              <span class="theme-switch-thumb">
+                <AppIcon :name="isDark ? 'moon' : 'sun'" size="12" />
+              </span>
+            </span>
+          </button>
+          <RoleSwitcher />
+        </div>
       </div>
     </header>
 
     <!-- ====== 内容区 ====== -->
     <main class="main-content" :class="{ 'pc-main': !isMobile, 'mobile-main': isMobile }">
-      <router-view></router-view>
+      <router-view v-slot="{ Component }">
+        <transition name="page-shift" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
 
     <!-- ====== 桌面端：页脚 ====== -->
@@ -60,30 +124,82 @@
     <!-- ====== 移动端：底部 Tab 栏 ====== -->
     <nav v-if="isMobile" class="mobile-tabbar">
       <router-link to="/" class="mobile-tabbar-item" :class="{ active: $route.path === '/' }">
-        <span class="mobile-tabbar-icon">🏠</span>
+        <svg class="mobile-tabbar-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3.5 11.5 12 4l8.5 7.5M5.5 10.5V20h13v-9.5M9.5 20v-5h5v5" />
+        </svg>
         <span class="mobile-tabbar-label">首页</span>
       </router-link>
+      <router-link to="/map" class="mobile-tabbar-item" :class="{ active: $route.path === '/map' }">
+        <svg class="mobile-tabbar-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 10c0 5.4-8 11-8 11S4 15.4 4 10a8 8 0 1 1 16 0Z" />
+          <circle cx="12" cy="10" r="2.7" />
+        </svg>
+        <span class="mobile-tabbar-label">地图</span>
+      </router-link>
+      <router-link
+        v-if="canManagePlaces"
+        to="/places"
+        class="mobile-tabbar-item"
+        :class="{ active: $route.path === '/places' }"
+      >
+        <svg class="mobile-tabbar-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 20V8.5L12 4l8 4.5V20M9 20v-5.5h6V20" />
+          <path d="M8 10h2M14 10h2" />
+        </svg>
+        <span class="mobile-tabbar-label">地点</span>
+      </router-link>
       <router-link to="/routes" class="mobile-tabbar-item" :class="{ active: $route.path === '/routes' }">
-        <span class="mobile-tabbar-icon">🗺️</span>
+        <svg class="mobile-tabbar-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="5" cy="18" r="2" />
+          <circle cx="19" cy="6" r="2" />
+          <path d="M7 18h3.5a3 3 0 0 0 3-3v-6a3 3 0 0 1 3-3H17" />
+        </svg>
         <span class="mobile-tabbar-label">路线</span>
       </router-link>
+      <router-link to="/activities" class="mobile-tabbar-item" :class="{ active: $route.path === '/activities' }">
+        <svg class="mobile-tabbar-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3.5" y="5.5" width="17" height="15" rx="3" />
+          <path d="M7.5 3.5v4M16.5 3.5v4M3.5 10h17M8 14h3M13 14h3M8 17.5h3" />
+        </svg>
+        <span class="mobile-tabbar-label">活动</span>
+      </router-link>
       <router-link to="/checkins" class="mobile-tabbar-item" :class="{ active: $route.path.startsWith('/checkins') }">
-        <span class="mobile-tabbar-icon">📋</span>
+        <svg class="mobile-tabbar-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="4.5" width="14" height="16.5" rx="3" />
+          <path d="M9 4.5V3h6v1.5M9 12l2 2 4-4M9 18h6" />
+        </svg>
         <span class="mobile-tabbar-label">打卡</span>
         <span v-if="checkinCount > 0" class="mobile-tabbar-badge">{{ checkinCount }}</span>
       </router-link>
     </nav>
+
   </div>
 </template>
 
 <script setup>
+import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCheckinStore } from './stores/checkinStore'
+import { useUserStore } from './stores/userStore'
+import { useThemeStore } from './stores/themeStore'
 import { useViewport } from './composables/useViewport'
+import RoleSwitcher from './components/RoleSwitcher.vue'
 
 const router = useRouter()
 const { checkinCount } = useCheckinStore()
 const { isMobile } = useViewport()
+const { currentRoleKey, can } = useUserStore()
+const { isDark, themeLabel, toggleTheme } = useThemeStore()
+
+// 地点管理只对管理员和企业/地点用户开放
+const canManagePlaces = computed(() => can('uploadLocation'))
+
+// 在 /places 页面切换成无权限角色时，直接退回地图页
+watch(currentRoleKey, () => {
+  if (router.currentRoute.value.path === '/places' && !canManagePlaces.value) {
+    router.replace('/map')
+  }
+})
 </script>
 
 <style scoped>
@@ -170,6 +286,13 @@ const { isMobile } = useViewport()
   margin: 2px 0 0 0;
   opacity: 0.85;
   letter-spacing: 1px;
+}
+
+.pc-header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
 }
 
 .pc-nav {
@@ -278,6 +401,174 @@ const { isMobile } = useViewport()
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+/* 注意：此处不能用 transform 垂直居中，
+   否则会为 RoleSwitcher 内 position: fixed 的弹层创建包含块，导致弹层尺寸塌陷 */
+.mobile-role-slot {
+  position: absolute;
+  right: 16px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.mobile-topbar-actions {
+  position: absolute;
+  right: 13px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.88);
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 4px 14px rgba(48, 7, 17, 0.12);
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.theme-toggle:hover {
+  border-color: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.24);
+  outline-offset: 2px;
+}
+
+.theme-switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  display: block;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(255, 207, 108, 0.46), rgba(255, 255, 255, 0.16));
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.18) inset,
+    0 1px 3px rgba(49, 8, 18, 0.12) inset;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.theme-switch-symbol {
+  position: absolute;
+  top: 50%;
+  z-index: 0;
+  display: inline-flex;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.66);
+  transition: opacity 0.22s ease, color 0.22s ease;
+}
+
+.theme-switch-symbol.is-sun {
+  left: 6px;
+}
+
+.theme-switch-symbol.is-moon {
+  right: 6px;
+}
+
+.theme-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #ae1b32;
+  box-shadow:
+    0 1px 1px rgba(255, 255, 255, 0.7) inset,
+    0 3px 8px rgba(48, 8, 18, 0.24);
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+    color 0.2s ease,
+    background 0.25s ease;
+}
+
+.theme-toggle.is-dark .theme-switch {
+  background:
+    linear-gradient(90deg, rgba(39, 39, 43, 0.72), rgba(86, 75, 130, 0.48));
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+    0 1px 3px rgba(0, 0, 0, 0.24) inset;
+}
+
+.theme-toggle.is-dark .theme-switch-symbol.is-sun {
+  color: rgba(255, 214, 135, 0.45);
+}
+
+.theme-toggle.is-dark .theme-switch-symbol.is-moon {
+  color: rgba(224, 221, 255, 0.9);
+}
+
+.theme-toggle.is-dark .theme-switch-thumb {
+  transform: translateX(16px);
+  color: #6862d9;
+  background: #f7f7fa;
+}
+
+.theme-toggle-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.theme-toggle.is-mobile {
+  width: 46px;
+  height: 34px;
+  justify-content: center;
+  padding: 3px;
+  border-radius: 999px;
+}
+
+.theme-toggle.is-mobile .theme-switch {
+  width: 36px;
+  height: 22px;
+}
+
+.theme-toggle.is-mobile .theme-switch-thumb {
+  top: 2px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+}
+
+.theme-toggle.is-mobile.is-dark .theme-switch-thumb {
+  transform: translateX(12px);
+}
+
+.theme-toggle.is-mobile .theme-switch-symbol.is-sun {
+  left: 5px;
+}
+
+.theme-toggle.is-mobile .theme-switch-symbol.is-moon {
+  right: 5px;
 }
 
 .mobile-topbar-logo {
@@ -337,7 +628,7 @@ const { isMobile } = useViewport()
 
 .mobile-main {
   flex: 1;
-  padding: 20px 16px 90px 16px; /* 底部留位给 tabbar */
+  padding: 20px 16px 108px 16px; /* 底部留位给悬浮 tabbar */
   width: 100%;
   max-width: 100%;
 }
@@ -446,5 +737,173 @@ const { isMobile } = useViewport()
 @keyframes badgePop {
   from { transform: scale(0); }
   to { transform: scale(1); }
+}
+
+/* ==============================
+   ======= 移动端视觉升级 =======
+   ============================== */
+.mobile-topbar {
+  background:
+    radial-gradient(circle at 82% -45%, rgba(255, 255, 255, 0.2), transparent 42%),
+    linear-gradient(125deg, #8e1022 0%, #bc1c33 58%, #d43d4d 100%);
+  box-shadow: 0 10px 28px rgba(105, 13, 29, 0.18);
+}
+
+.mobile-topbar::before {
+  content: '';
+  position: absolute;
+  top: -44px;
+  left: -28px;
+  width: 112px;
+  height: 112px;
+  border: 22px solid rgba(255, 255, 255, 0.035);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.mobile-topbar::after {
+  bottom: -11px;
+  height: 12px;
+  background: linear-gradient(to bottom, rgba(110, 12, 29, 0.08), transparent);
+}
+
+.mobile-topbar-inner {
+  padding: 13px 18px;
+  padding-top: calc(13px + env(safe-area-inset-top, 0px));
+}
+
+.mobile-topbar-logo {
+  gap: 11px;
+}
+
+.mobile-topbar-icon {
+  width: 37px;
+  height: 37px;
+  border-radius: 12px;
+  box-shadow: 0 7px 16px rgba(74, 5, 17, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+.mobile-topbar-text span {
+  font-size: 16px;
+  letter-spacing: 0.45px;
+  text-shadow: 0 1px 5px rgba(79, 5, 18, 0.18);
+}
+
+.mobile-role-slot {
+  right: 15px;
+}
+
+.mobile-tabbar {
+  left: 12px;
+  right: 12px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  gap: 2px;
+  padding: 7px 6px;
+  border: 1px solid rgba(119, 49, 60, 0.09);
+  border-radius: 23px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 38px rgba(43, 30, 35, 0.16);
+  backdrop-filter: saturate(170%) blur(22px);
+  -webkit-backdrop-filter: saturate(170%) blur(22px);
+}
+
+.mobile-tabbar::before {
+  display: none;
+}
+
+.mobile-tabbar-item {
+  min-width: 0;
+  min-height: 53px;
+  padding-inline: 2px;
+  gap: 2px;
+  border-radius: 17px;
+  color: #a2a0a8;
+  z-index: 1;
+}
+
+.mobile-tabbar-icon {
+  width: 21px;
+  height: 21px;
+  opacity: 0.58;
+  filter: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mobile-tabbar-label {
+  font-size: 9.5px;
+  font-weight: 650;
+  letter-spacing: 0.15px;
+}
+
+.mobile-tabbar-item.active {
+  background: linear-gradient(135deg, #fff0f1, #fff8f5);
+  color: #bd1e35;
+}
+
+.mobile-tabbar-item.active::before {
+  display: none;
+}
+
+.mobile-tabbar-item.active .mobile-tabbar-icon {
+  opacity: 1;
+  transform: translateY(-1px) scale(1.08);
+}
+
+.mobile-tabbar-item.active .mobile-tabbar-label {
+  font-weight: 800;
+}
+
+.mobile-tabbar-badge {
+  top: 3px;
+  right: calc(50% - 22px);
+  background: #bd1e35;
+  box-shadow: 0 4px 10px rgba(160, 20, 43, 0.25);
+}
+
+@media (max-width: 360px) {
+  .mobile-tabbar {
+    left: 8px;
+    right: 8px;
+    padding-inline: 4px;
+  }
+
+  .mobile-tabbar-label {
+    font-size: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-topbar *,
+  .mobile-tabbar * {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 页面切换 */
+.page-shift-enter-active,
+.page-shift-leave-active {
+  transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.page-shift-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-shift-leave-to {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-shift-enter-active,
+  .page-shift-leave-active {
+    transition-duration: 0.01ms;
+  }
 }
 </style>

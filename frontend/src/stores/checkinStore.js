@@ -53,7 +53,8 @@ export const useCheckinStore = () => {
       note: note || '',
       checkinTime: dateStr,
       timestamp: timestamp,
-      category: location.category
+      category: location.category,
+      era: location.era
     }
 
     if (existingIndex >= 0) {

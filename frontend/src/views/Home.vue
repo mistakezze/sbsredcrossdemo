@@ -62,11 +62,11 @@
           <div class="hero-actions">
             <router-link to="/routes" class="btn btn-primary">
               <span>开启旅程</span>
-              <span class="btn-arrow">→</span>
+              <span class="btn-arrow"><AppIcon name="arrowRight" /></span>
             </router-link>
             <router-link to="/checkins" class="btn btn-secondary">
               <span>我的打卡</span>
-              <span class="btn-arrow">→</span>
+              <span class="btn-arrow"><AppIcon name="arrowRight" /></span>
             </router-link>
           </div>
         </div>
@@ -87,7 +87,7 @@
             @click="figureIndex > 0 && figureIndex--"
             aria-label="上一个"
           >
-            <span>‹</span>
+            <AppIcon name="arrowLeft" size="20" />
           </button>
 
           <div class="carousel-viewport">
@@ -113,7 +113,9 @@
                   <p class="figure-en large">{{ figures[figureIndex]?.enName }}</p>
                   <p class="pc-figure-title-line large">{{ figures[figureIndex]?.title }}</p>
                   <p class="pc-figure-desc large">{{ figures[figureIndex]?.description }}</p>
-                  <div class="pc-figure-achievement large">🏆 {{ figures[figureIndex]?.achievement }}</div>
+                  <div class="pc-figure-achievement large">
+                    <AppIcon name="trophy" size="15" /> {{ figures[figureIndex]?.achievement }}
+                  </div>
                   <blockquote v-if="figures[figureIndex]?.quote" class="figure-quote large">「{{ figures[figureIndex]?.quote }}」</blockquote>
                 </div>
               </div>
@@ -126,7 +128,7 @@
             @click="figureIndex < figures.length - 1 && figureIndex++"
             aria-label="下一个"
           >
-            <span>›</span>
+            <AppIcon name="chevronRight" size="20" />
           </button>
 
           <div class="carousel-dots">
@@ -156,7 +158,7 @@
             @click="locationIndex > 0 && locationIndex--"
             aria-label="上一个"
           >
-            <span>‹</span>
+            <AppIcon name="arrowLeft" size="20" />
           </button>
 
           <div class="carousel-viewport">
@@ -177,13 +179,15 @@
                   </template>
                   <div class="location-category large">{{ locations[locationIndex]?.category }}</div>
                   <div v-if="locations[locationIndex] && hasCheckedIn(locations[locationIndex]?.id)" class="location-checked large">
-                    <span class="check-icon">✓</span>
+                    <span class="check-icon"><AppIcon name="check" size="13" /></span>
                     <span>已打卡</span>
                   </div>
                 </div>
                 <div class="pc-location-body large">
                   <h3 class="pc-location-name large">{{ locations[locationIndex]?.name }}</h3>
-                  <div class="location-place large">📍 {{ locations[locationIndex]?.location }}</div>
+                  <div class="location-place large">
+                    <AppIcon name="pin" size="14" /> {{ locations[locationIndex]?.location }}
+                  </div>
                   <p class="pc-location-desc large">{{ locations[locationIndex]?.description }}</p>
                   <div class="location-highlights large">
                     <span v-for="(h, i) in (locations[locationIndex]?.highlights || []).slice(0, 3)" :key="i" class="highlight-tag">{{ h }}</span>
@@ -200,7 +204,7 @@
             @click="locationIndex < locations.length - 1 && locationIndex++"
             aria-label="下一个"
           >
-            <span>›</span>
+            <AppIcon name="chevronRight" size="20" />
           </button>
 
           <div class="carousel-dots">
@@ -266,7 +270,9 @@
       <!-- ===================== 小知识详情弹窗 ===================== -->
       <div v-if="selectedFact" class="fact-modal-overlay" @click.self="closeFactModal">
         <div class="fact-modal-card" :style="{ '--accent-color': selectedFact.color }">
-          <button class="fact-modal-close" @click="closeFactModal">×</button>
+          <button class="fact-modal-close" aria-label="关闭知识详情" @click="closeFactModal">
+            <AppIcon name="x" size="18" />
+          </button>
           
           <div class="fact-modal-header">
             <div class="fact-modal-icon">{{ selectedFact.icon }}</div>
@@ -294,7 +300,7 @@
         </div>
 
         <div class="mobile-hero-content">
-          <div class="mobile-hero-badge">🚩 上海 · 红十字发源地</div>
+          <div class="mobile-hero-badge"><AppIcon name="flag" size="13" /> 上海 · 红十字发源地</div>
           <h1 class="mobile-hero-title">红十字文化之旅</h1>
           <p class="mobile-hero-desc">
             探访人道精神地标，跟随先驱的足迹
@@ -319,8 +325,8 @@
         </div>
 
         <div class="mobile-hero-actions">
-          <router-link to="/routes" class="mobile-btn-primary">🗺️ 开启旅程</router-link>
-          <router-link to="/checkins" class="mobile-btn-secondary">📋 我的打卡</router-link>
+          <router-link to="/routes" class="mobile-btn-primary"><AppIcon name="route" size="15" /> 开启旅程</router-link>
+          <router-link to="/checkins" class="mobile-btn-secondary"><AppIcon name="clipboard" size="15" /> 我的打卡</router-link>
         </div>
       </section>
 
@@ -328,7 +334,7 @@
       <section class="mobile-section">
         <div class="mobile-section-header">
           <div class="mobile-section-title-wrap">
-            <span class="mobile-section-emoji">👥</span>
+            <span class="mobile-section-emoji"><AppIcon name="users" size="18" /></span>
             <h2 class="mobile-section-title">杰出人物</h2>
           </div>
           <span class="mobile-section-count">{{ figures.length }} 位</span>
@@ -354,7 +360,7 @@
                 <p class="mobile-figure-title">{{ figure.title }}</p>
                 <p class="mobile-figure-desc">{{ figure.description }}</p>
                 <div class="mobile-figure-tags">
-                  <span class="mobile-tag achievement">🏆 {{ figure.achievement }}</span>
+                  <span class="mobile-tag achievement"><AppIcon name="trophy" size="12" /> {{ figure.achievement }}</span>
                 </div>
                 <blockquote v-if="figure.quote" class="mobile-figure-quote">「{{ figure.quote }}」</blockquote>
               </div>
@@ -367,7 +373,7 @@
       <section class="mobile-section">
         <div class="mobile-section-header">
           <div class="mobile-section-title-wrap">
-            <span class="mobile-section-emoji">📍</span>
+            <span class="mobile-section-emoji"><AppIcon name="pin" size="18" /></span>
             <h2 class="mobile-section-title">文化地标</h2>
           </div>
           <span class="mobile-section-count">{{ locations.length }} 处</span>
@@ -389,11 +395,11 @@
                   <span class="mobile-loc-icon-v"></span>
                 </template>
                 <div class="mobile-location-cat">{{ loc.category }}</div>
-                <div v-if="hasCheckedIn(loc.id)" class="mobile-location-checked">✓</div>
+                <div v-if="hasCheckedIn(loc.id)" class="mobile-location-checked"><AppIcon name="check" size="12" /></div>
               </div>
               <div class="mobile-location-info">
                 <h3 class="mobile-location-name">{{ loc.name }}</h3>
-                <div class="mobile-location-place">📍 {{ loc.location }}</div>
+                <div class="mobile-location-place"><AppIcon name="pin" size="13" /> {{ loc.location }}</div>
                 <p class="mobile-location-desc">{{ loc.description }}</p>
                 <div class="mobile-location-tags">
                   <span v-for="(h, i) in loc.highlights.slice(0, 3)" :key="i" class="mobile-tag">{{ h }}</span>
@@ -408,7 +414,7 @@
       <section class="mobile-section">
         <div class="mobile-section-header">
           <div class="mobile-section-title-wrap">
-            <span class="mobile-section-emoji">💡</span>
+            <span class="mobile-section-emoji"><AppIcon name="lightbulb" size="18" /></span>
             <h2 class="mobile-section-title">小知识</h2>
           </div>
           <span class="mobile-section-count">{{ redCrossFacts.length }} 条</span>
@@ -422,12 +428,12 @@
             :style="{ '--accent-color': fact.color }"
             @click="openFactModal(fact)"
           >
-            <div class="mobile-fact-icon">{{ fact.icon }}</div>
+            <div class="mobile-fact-icon"><AppIcon :name="fact.icon" size="21" /></div>
             <div class="mobile-fact-info">
               <h4 class="mobile-fact-title">{{ fact.title }}</h4>
               <p class="mobile-fact-desc">{{ fact.desc }}</p>
             </div>
-            <span class="mobile-fact-arrow">›</span>
+            <span class="mobile-fact-arrow"><AppIcon name="chevronRight" size="18" /></span>
           </div>
         </div>
       </section>
@@ -435,20 +441,22 @@
       <!-- 移动端底部引导 -->
       <section class="mobile-section mobile-footer-guide">
         <div class="mobile-guide-card">
-          <div class="mobile-guide-emoji">🌟</div>
+          <div class="mobile-guide-emoji"><AppIcon name="sparkles" size="34" /></div>
           <h3 class="mobile-guide-title">开始您的探索</h3>
           <p class="mobile-guide-desc">浏览路线推荐，记录您的打卡足迹</p>
-          <router-link to="/routes" class="mobile-btn-primary full-width">🚀 立即开始</router-link>
+          <router-link to="/routes" class="mobile-btn-primary full-width"><AppIcon name="arrowRight" size="15" /> 立即开始</router-link>
         </div>
       </section>
 
       <!-- 移动端 小知识详情弹窗 -->
       <div v-if="selectedFact" class="fact-modal-overlay" @click.self="closeFactModal">
         <div class="fact-modal-card" :style="{ '--accent-color': selectedFact.color }">
-          <button class="fact-modal-close" @click="closeFactModal">×</button>
+          <button class="fact-modal-close" aria-label="关闭知识详情" @click="closeFactModal">
+            <AppIcon name="x" size="18" />
+          </button>
           
           <div class="fact-modal-header">
-            <div class="fact-modal-icon">{{ selectedFact.icon }}</div>
+            <div class="fact-modal-icon"><AppIcon :name="selectedFact.icon" size="28" /></div>
             <h2 class="fact-modal-title">{{ selectedFact.title }}</h2>
           </div>
           
@@ -533,45 +541,45 @@ const timelineEvents = [
 
 const redCrossFacts = [
   {
-    icon: '🏥',
+    icon: 'firstAid',
     title: '红十字的起源',
     desc: '红十字运动起源于1863年，由亨利·杜南发起，旨在为战争中的伤员提供中立的人道救助。',
     detail: '1859年，瑞士商人亨利·杜南在意大利索尔费里诺战场上目睹了战争的残酷。四万多名伤病士兵被遗弃在战场上，无人救治。深受触动的杜南撰写了《索尔费里诺回忆录》，呼吁制定国际公约，为战地伤员和医护人员提供中立保护。\n\n1863年，在杜南的倡议下，16个国家的代表在日内瓦召开会议，决定成立红十字国际委员会。1864年，《日内瓦公约》正式签署，红十字运动由此诞生。\n\n红十字标志是将瑞士国旗的颜色翻转而来——红底白十字变为白底红十字，以向红十字运动的发源地瑞士致敬。',
     color: '#d32f2f'
   },
   {
-    icon: '🕊️',
+    icon: 'heart',
     title: '七项基本原则',
     desc: '人道、公正、中立、独立、志愿服务、统一、普遍，是红十字运动的核心价值观。',
-    detail: '红十字与红新月运动的七项基本原则于1965年正式通过，是运动所有成员必须遵守的行为准则：\n\n📌 人道：保护人的生命和健康，保障人类的尊严\n📌 公正：不歧视任何人，仅根据需要提供帮助\n📌 中立：不在争议中选边站队，不参与政治、种族、宗教等纷争\n📌 独立：保持自主性，不受任何政府或势力控制\n📌 志愿服务：以志愿服务为基础，不求回报\n📌 统一：每个国家只有一个红十字会，对所有人开放\n📌 普遍：运动遍及全球，人人地位平等',
+    detail: '红十字与红新月运动的七项基本原则于1965年正式通过，是运动所有成员必须遵守的行为准则：\n\n人道：保护人的生命和健康，保障人类的尊严\n公正：不歧视任何人，仅根据需要提供帮助\n中立：不在争议中选边站队，不参与政治、种族、宗教等纷争\n独立：保持自主性，不受任何政府或势力控制\n志愿服务：以志愿服务为基础，不求回报\n统一：每个国家只有一个红十字会，对所有人开放\n普遍：运动遍及全球，人人地位平等',
     color: '#e53935'
   },
   {
-    icon: '🌍',
+    icon: 'globe',
     title: '全球最大人道网络',
     desc: '红十字与红新月运动是全球最大的人道网络，在192个国家拥有约1400万志愿者。',
-    detail: '红十字与红新月运动是世界上最大的人道网络，由三大部分组成：\n\n🏛️ 红十字国际委员会（ICRC）：负责在武装冲突中保护战争受害者\n🏛️ 红十字会与红新月会国际联合会（IFRC）：协调各国红会开展灾害应对等工作\n🏛️ 各国红十字会与红新月会：在各自国家开展人道服务\n\n运动在全球192个国家拥有成员协会，约1400万名志愿者和数十万工作人员，每年为数亿人提供帮助。无论是自然灾害、武装冲突还是公共卫生危机，哪里有人道需求，哪里就有红十字与红新月的身影。',
+    detail: '红十字与红新月运动是世界上最大的人道网络，由三大部分组成：\n\n红十字国际委员会（ICRC）：负责在武装冲突中保护战争受害者\n红十字会与红新月会国际联合会（IFRC）：协调各国红会开展灾害应对等工作\n各国红十字会与红新月会：在各自国家开展人道服务\n\n运动在全球192个国家拥有成员协会，约1400万名志愿者和数十万工作人员，每年为数亿人提供帮助。无论是自然灾害、武装冲突还是公共卫生危机，哪里有人道需求，哪里就有红十字与红新月的身影。',
     color: '#f44336'
   },
   {
-    icon: '❤️',
+    icon: 'heart',
     title: '中国红十字会',
     desc: '中国红十字会成立于1904年，是国际红十字运动的重要成员，以保护人的生命和健康为宗旨。',
-    detail: '中国红十字会成立于1904年3月10日，是中国近代史上第一个民间人道救助团体，也是国际红十字运动的重要成员。\n\n🔹 1904年：上海万国红十字会成立（中国红十字会前身）\n🔹 1912年：正式加入红十字国际委员会\n🔹 1949年：新中国成立后改组为中国红十字会\n🔹 1993年：《中华人民共和国红十字会法》颁布实施\n\n中国红十字会始终秉承"人道、博爱、奉献"的红十字精神，在应急救援、应急救护、人道救助、无偿献血、造血干细胞捐献、遗体和人体器官捐献、国际人道援助等领域发挥着重要作用。',
+    detail: '中国红十字会成立于1904年3月10日，是中国近代史上第一个民间人道救助团体，也是国际红十字运动的重要成员。\n\n1904年：上海万国红十字会成立（中国红十字会前身）\n1912年：正式加入红十字国际委员会\n1949年：新中国成立后改组为中国红十字会\n1993年：《中华人民共和国红十字会法》颁布实施\n\n中国红十字会始终秉承"人道、博爱、奉献"的红十字精神，在应急救援、应急救护、人道救助、无偿献血、造血干细胞捐献、遗体和人体器官捐献、国际人道援助等领域发挥着重要作用。',
     color: '#ff5722'
   },
   {
-    icon: '🩸',
+    icon: 'blood',
     title: '三救三献',
     desc: '应急救援、应急救护、人道救助；献血液、献造血干细胞、献遗体器官，是红十字会的核心业务。',
-    detail: '"三救三献"是中国红十字会的核心业务：\n\n🚑 三救：\n  • 应急救援：参与自然灾害、事故灾难等突发事件救援\n  • 应急救护：开展应急救护培训，普及急救知识技能\n  • 人道救助：帮扶困难群体，开展助学、助医、助老等\n\n💝 三献：\n  • 献血液：推动无偿献血工作，保障临床用血需求\n  • 献造血干细胞：建设中华骨髓库，为白血病患者寻找供者\n  • 献遗体器官：推动遗体和人体器官捐献，延续生命希望\n\n截至目前，中华骨髓库已登记入库志愿者超300万人，累计捐献造血干细胞超1.5万例；全国累计实现人体器官捐献超4万例，挽救了数万濒危患者的生命。',
+    detail: '"三救三献"是中国红十字会的核心业务：\n\n三救：\n  应急救援：参与自然灾害、事故灾难等突发事件救援\n  应急救护：开展应急救护培训，普及急救知识技能\n  人道救助：帮扶困难群体，开展助学、助医、助老等\n\n三献：\n  献血液：推动无偿献血工作，保障临床用血需求\n  献造血干细胞：建设中华骨髓库，为白血病患者寻找供者\n  献遗体器官：推动遗体和人体器官捐献，延续生命希望\n\n截至目前，中华骨髓库已登记入库志愿者超300万人，累计捐献造血干细胞超1.5万例；全国累计实现人体器官捐献超4万例，挽救了数万濒危患者的生命。',
     color: '#ff9800'
   },
   {
-    icon: '👶',
+    icon: 'homeHeart',
     title: '人道救助',
     desc: '红十字会开展助学、助医、助老、助困等多种人道救助服务，惠及数百万困难群众。',
-    detail: '人道救助是红十字会的重要职责，围绕"改善最易受损害群体的境况"这一目标，开展了多种形式的救助服务：\n\n🎒 助学救助：资助家庭困难学生完成学业，援建博爱学校\n🏥 助医救助：开展大病救助，帮助贫困家庭患者获得治疗\n👴 助老服务：关爱空巢老人，建设博爱养老服务机构\n🏠 助困帮扶：慰问困难家庭，发放生活物资\n\n此外，还有"红十字博爱送万家"品牌项目，每年元旦春节期间走访慰问困难群众，把温暖送到千家万户。\n\n据统计，全国各级红十字会每年投入人道救助资金数十亿元，受益群众数百万，成为政府社会保障体系的重要补充。',
+    detail: '人道救助是红十字会的重要职责，围绕"改善最易受损害群体的境况"这一目标，开展了多种形式的救助服务：\n\n助学救助：资助家庭困难学生完成学业，援建博爱学校\n助医救助：开展大病救助，帮助贫困家庭患者获得治疗\n助老服务：关爱空巢老人，建设博爱养老服务机构\n助困帮扶：慰问困难家庭，发放生活物资\n\n此外，还有"红十字博爱送万家"品牌项目，每年元旦春节期间走访困难群众，把温暖送到千家万户。\n\n据统计，全国各级红十字会每年投入人道救助资金数十亿元，受益群众数百万，成为政府社会保障体系的重要补充。',
     color: '#ffc107'
   }
 ]
@@ -2410,7 +2418,13 @@ const closeFactModal = () => {
 }
 
 .mobile-fact-icon {
-  font-size: 34px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #c52237;
+  background: transparent;
   flex-shrink: 0;
 }
 
@@ -2490,5 +2504,84 @@ const closeFactModal = () => {
   margin: 0 0 18px 0;
   line-height: 1.6;
   word-break: break-word;
+}
+
+/* 统一视觉语言 */
+.home {
+  --home-red: var(--rc-red, #c52237);
+  --home-ink: var(--rc-ink, #202331);
+}
+
+.pc-hero,
+.mobile-hero {
+  border: 1px solid rgba(154, 48, 65, 0.08);
+  box-shadow: 0 22px 60px rgba(111, 35, 49, 0.08);
+}
+
+.pc-hero-title,
+.mobile-hero-title {
+  letter-spacing: -1.2px;
+}
+
+.hero-badge,
+.mobile-hero-badge {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(197, 34, 55, 0.1);
+  box-shadow: 0 6px 18px rgba(137, 35, 49, 0.07);
+}
+
+.mobile-hero-stats {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(197, 34, 55, 0.07);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(84, 31, 41, 0.07);
+}
+
+.btn-primary,
+.mobile-btn-primary {
+  background: linear-gradient(135deg, #c52237, #901528);
+  box-shadow: 0 10px 24px rgba(152, 26, 45, 0.24);
+}
+
+.btn-secondary,
+.mobile-btn-secondary {
+  border-color: rgba(197, 34, 55, 0.14);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.pc-figure-card,
+.pc-location-card,
+.pc-timeline-card,
+.pc-fact-card,
+.mobile-figure-card-snap,
+.mobile-location-card-snap,
+.mobile-fact-item,
+.mobile-guide-card {
+  border-color: rgba(139, 66, 79, 0.1);
+  box-shadow: 0 10px 30px rgba(48, 34, 39, 0.06);
+}
+
+.pc-figure-card,
+.pc-location-card,
+.mobile-figure-card-snap,
+.mobile-location-card-snap {
+  border-radius: 22px;
+}
+
+.mobile-section-title {
+  letter-spacing: -0.4px;
+}
+
+.mobile-figure-card-snap,
+.mobile-location-card-snap,
+.mobile-fact-item {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.mobile-location-name,
+.mobile-fact-title,
+.mobile-guide-title {
+  color: var(--home-ink);
 }
 </style>

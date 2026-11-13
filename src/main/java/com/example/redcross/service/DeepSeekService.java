@@ -325,4 +325,271 @@ public class DeepSeekService {
             new LocationItem("上海博爱园", "纪念公园", "上海市 · 闵行区", "以博爱为主题的红十字纪念公园，园内设有红十字纪念碑、博爱广场、志愿者雕塑群等。")
         );
     }
+
+    // ============ AI 地点推荐 ============
+
+    /**
+     * 根据用户画像推荐地点
+     * 未配置 API Key 或调用失败时降级为本地生成
+     */
+    public AiRecommendResponse recommendPlaces(AiRecommendRequest req) {
+        if (req == null) req = new AiRecommendRequest();
+
+        List<LocationItem> locations = req.getLocations();
+        if (locations == null || locations.isEmpty()) {
+            locations = defaultLocations();
+        }
+
+        if (apiKey == null || apiKey.trim().isEmpty() || apiKey.trim().equals("${DEEPSEEK_API_KEY:}")) {
+            logger.info("DeepSeek API Key 未配置，AI 地点推荐使用本地 mock");
+            AiRecommendResponse mock = buildMockRecommend(req, locations);
+            mock.setMocked(true);
+            return mock;
+        }
+
+        try {
+            String prompt = buildRecommendPrompt(req, locations);
+
+            DeepSeekRequest dsReq = new DeepSeekRequest();
+            dsReq.setModel(model);
+            dsReq.setTemperature(0.95);
+            dsReq.setFrequencyPenalty(0.5);
+            dsReq.setPresencePenalty(0.35);
+            dsReq.setMessages(List.of(
+                new DeepSeekRequest.Message("system",
+                    "你是一位熟悉上海红十字文化的资深策展人，擅长根据访客的兴趣与经历为其挑选最合适的地点。"
+                        + "推荐理由必须贴合访客的真实经历，不能空泛夸奖；每次回答都要换用不同的句式与切入角度，避免套话。"),
+                new DeepSeekRequest.Message("user", prompt)
+            ));
+            dsReq.setResponseFormat(Map.of("type", "json_object"));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Bearer " + apiKey.trim());
+
+            HttpEntity<DeepSeekRequest> entity = new HttpEntity<>(dsReq, headers);
+
+            logger.info("调用 DeepSeek API 进行地点推荐: {}", apiUrl);
+            ResponseEntity<DeepSeekResponse> resp = restTemplate.exchange(
+                apiUrl, HttpMethod.POST, entity, DeepSeekResponse.class);
+
+            DeepSeekResponse ds = resp.getBody();
+            String content = "";
+            if (ds != null && ds.getChoices() != null && !ds.getChoices().isEmpty()) {
+                content = ds.getChoices().get(0).getMessage().getContent();
+            }
+
+            AiRecommendResponse parsed = parseRecommendResponse(content);
+            if (parsed.getRecommendations() == null || parsed.getRecommendations().isEmpty()) {
+                throw new IllegalStateException("AI 未返回有效的推荐内容");
+            }
+            return parsed;
+
+        } catch (HttpClientErrorException e) {
+            logger.error("DeepSeek 推荐接口返回错误: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString());
+            AiRecommendResponse fallback = buildMockRecommend(req, locations);
+            fallback.setMocked(true);
+            fallback.setErrorMessage("调用 DeepSeek 失败（" + e.getStatusCode() + "），已降级为本地推荐");
+            return fallback;
+        } catch (Exception e) {
+            logger.error("AI 地点推荐异常: {}", e.getMessage(), e);
+            AiRecommendResponse fallback = buildMockRecommend(req, locations);
+            fallback.setMocked(true);
+            fallback.setErrorMessage("调用 DeepSeek 异常：" + e.getMessage());
+            return fallback;
+        }
+    }
+
+    private String buildRecommendPrompt(AiRecommendRequest req, List<LocationItem> locations) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("【候选地点】以下是系统中唯一可用的地点，推荐时必须从中选择，名称要与下面完全一致，不能编造。\n\n");
+        for (int i = 0; i < locations.size(); i++) {
+            LocationItem loc = locations.get(i);
+            sb.append("【地点").append(i + 1).append("】").append(loc.getName()).append("\n");
+            sb.append("  区域：").append(loc.getLocation()).append("\n");
+            sb.append("  类别：").append(loc.getCategory()).append("\n");
+            sb.append("  简介：").append(loc.getDescription()).append("\n\n");
+        }
+
+        sb.append("【访客画像】\n");
+        List<String> checkedNames = req.getCheckedNames();
+        sb.append("  已打卡过的地点：")
+          .append(checkedNames == null || checkedNames.isEmpty() ? "暂无（新访客）" : String.join("、", checkedNames))
+          .append("\n");
+
+        List<String> checkedCats = req.getCheckedCategories();
+        sb.append("  已到访过的类别：")
+          .append(checkedCats == null || checkedCats.isEmpty() ? "暂无" : String.join("、", checkedCats))
+          .append("\n");
+
+        List<String> likedCats = req.getLikedCategories();
+        sb.append("  给出高分评价的类别：")
+          .append(likedCats == null || likedCats.isEmpty() ? "暂无" : String.join("、", likedCats))
+          .append("\n");
+
+        if (req.getPreference() != null && !req.getPreference().isBlank()) {
+            sb.append("  访客当下的偏好：").append(req.getPreference().trim()).append("\n");
+        }
+        sb.append("\n");
+
+        sb.append("【输出要求】请严格按以下 JSON 格式返回，只返回 JSON，不要任何解释文字：\n");
+        sb.append("{\n");
+        sb.append("  \"summary\": \"一到两句，概括你这次为这位访客挑选地点的整体思路。\",\n");
+        sb.append("  \"recommendations\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"name\": \"地点全称（必须与候选地点完全一致）\",\n");
+        sb.append("      \"category\": \"该地点的类别\",\n");
+        sb.append("      \"reason\": \"2-3 句话。必须结合访客的打卡历史或高分偏好来说明为什么推荐这里，不要说放之四海而皆准的空话。\",\n");
+        sb.append("      \"highlight\": \"最值得做的一件具体的事（一个动作，不是泛泛的形容词）\",\n");
+        sb.append("      \"bestTime\": \"建议到访的时间段与理由\",\n");
+        sb.append("      \"tip\": \"一条实用提示（交通、预约、注意事项等）\"\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}\n\n");
+
+        sb.append("【硬性规则】\n");
+        sb.append("1. 推荐 3-4 个地点，全部必须来自候选地点，不得编造或改写名称。\n");
+        sb.append("2. 优先推荐访客还没打卡过的地点；若候选几乎都去过，可推荐重访，但要说明「这次可以看什么不一样的东西」。\n");
+        sb.append("3. reason 必须体现个性化：提到访客去过的地方、偏好过的类别，或直接回应用户的偏好描述。\n");
+        sb.append("4. 同一批推荐中，每个地点的推荐理由句式、切入角度要各不相同，禁止套用同一模板。\n");
+        sb.append("5. 不要使用「绝佳」「不可错过」「承载着」这类高频套话。\n");
+        sb.append("6. 只返回 JSON。\n");
+
+        return sb.toString();
+    }
+
+    private AiRecommendResponse parseRecommendResponse(String content) {
+        AiRecommendResponse response = new AiRecommendResponse();
+        List<PlaceRecommendation> list = new ArrayList<>();
+        response.setRecommendations(list);
+
+        String json = extractJson(content);
+        if (json == null) {
+            response.setErrorMessage("AI 返回内容为空");
+            return response;
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(json);
+            response.setSummary(textOrEmpty(root, "summary"));
+
+            JsonNode arr = root.get("recommendations");
+            if (arr != null && arr.isArray()) {
+                for (JsonNode n : arr) {
+                    PlaceRecommendation r = new PlaceRecommendation();
+                    r.setName(textOrEmpty(n, "name"));
+                    r.setCategory(textOrEmpty(n, "category"));
+                    r.setReason(textOrEmpty(n, "reason"));
+                    r.setHighlight(textOrEmpty(n, "highlight"));
+                    r.setBestTime(textOrEmpty(n, "bestTime"));
+                    r.setTip(textOrEmpty(n, "tip"));
+                    if (!r.getName().isEmpty()) list.add(r);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("解析 AI 推荐 JSON 失败: {}", e.getMessage());
+            response.setErrorMessage("解析 AI 返回内容失败");
+        }
+        return response;
+    }
+
+    /** 从可能带有 ```json 包裹的文本中提取 JSON 主体 */
+    private String extractJson(String content) {
+        if (content == null || content.isBlank()) return null;
+        String s = content.trim();
+
+        int fence = s.indexOf("```");
+        if (fence >= 0) {
+            int start = s.indexOf('\n', fence);
+            int end = s.indexOf("```", fence + 3);
+            if (start > 0 && end > start) {
+                s = s.substring(start + 1, end).trim();
+            }
+        }
+
+        int first = s.indexOf('{');
+        int last = s.lastIndexOf('}');
+        if (first >= 0 && last > first) {
+            s = s.substring(first, last + 1);
+        }
+        return s;
+    }
+
+    /** 本地生成的推荐（无 API Key 或调用失败时使用） */
+    private AiRecommendResponse buildMockRecommend(AiRecommendRequest req, List<LocationItem> locations) {
+        AiRecommendResponse response = new AiRecommendResponse();
+
+        List<String> checkedNames = req.getCheckedNames() == null ? List.of() : req.getCheckedNames();
+        List<String> likedCats = req.getLikedCategories() == null ? List.of() : req.getLikedCategories();
+        List<String> checkedCats = req.getCheckedCategories() == null ? List.of() : req.getCheckedCategories();
+
+        // 优先挑选尚未打卡的地点
+        List<LocationItem> pool = new ArrayList<>();
+        for (LocationItem loc : locations) {
+            if (!checkedNames.contains(loc.getName())) pool.add(loc);
+        }
+        boolean allVisited = pool.isEmpty();
+        if (allVisited) pool = new ArrayList<>(locations);
+
+        response.setSummary(allVisited
+            ? "大部分地点你都走过了，这次换个视角——重访那些容易被匆匆略过的地方。"
+            : "顺着你已经走过的足迹，这次挑了几个还没踏足、但和你口味对得上的地方。");
+
+        List<PlaceRecommendation> list = new ArrayList<>();
+        int take = Math.min(3, pool.size());
+        for (int i = 0; i < take; i++) {
+            LocationItem loc = pool.get(i);
+            PlaceRecommendation r = new PlaceRecommendation();
+            r.setName(loc.getName());
+            r.setCategory(loc.getCategory());
+            r.setReason(mockRecommendReason(i, loc, likedCats, checkedCats, allVisited));
+            r.setHighlight(mockRecommendHighlight(i));
+            r.setBestTime(mockRecommendBestTime(i));
+            r.setTip("出发前先确认开放时间，部分场馆需提前预约。");
+            list.add(r);
+        }
+        response.setRecommendations(list);
+        return response;
+    }
+
+    private String mockRecommendReason(int index, LocationItem loc, List<String> likedCats,
+                                       List<String> checkedCats, boolean allVisited) {
+        if (allVisited) {
+            switch (index % 3) {
+                case 0: return "你去过这里，但大概率漏掉了展厅角落里那些不起眼的细节，二刷只看一个主题收获反而更大。";
+                case 1: return "同一个地方换个时段来感受完全不同，尤其是人少的时候，整个空间的氛围都会变。";
+                default: return "既然已经走过一圈，这次带上一个没来过的朋友，讲解的过程也是重新理解的过程。";
+            }
+        }
+        if (likedCats.contains(loc.getCategory())) {
+            return "你在" + loc.getCategory() + "类地点给过高分，这里的调性和你的口味是一路的，"
+                + "而且还留着你没看过的那部分内容。";
+        }
+        if (checkedCats.contains(loc.getCategory())) {
+            return "你已经接触过" + loc.getCategory() + "类地点，这一处呈现的是另一个切面，"
+                + "补上它，你对这条线索的理解会完整很多。";
+        }
+        switch (index % 3) {
+            case 0: return "你走过的地点里还没有" + loc.getCategory() + "这一类，正好补上一块空白。";
+            case 1: return "从你过往的足迹看，这里是很自然的延伸——主题不重复，气质却接得上。";
+            default: return "这次给你换个方向，去一个和你已打卡地点完全不同类型的地方，对比着看会更有意思。";
+        }
+    }
+
+    private String mockRecommendHighlight(int index) {
+        switch (index % 3) {
+            case 0: return "在免费讲解开始前十分钟到，能占到最靠近展柜的位置。";
+            case 1: return "向服务台要一份纸质导览图，按编号走一遍，不会漏掉展项。";
+            default: return "离馆前在留言簿上写一句话，比拍照更容易记住当时的感觉。";
+        }
+    }
+
+    private String mockRecommendBestTime(int index) {
+        switch (index % 3) {
+            case 0: return "工作日上午 9:30-11:30，团队客还没到，展厅最安静。";
+            case 1: return "周末下午 14:00 之后，光线和人气都刚好。";
+            default: return "周三通常人最少，时间能调的话优先选这天。";
+        }
+    }
 }
