@@ -38,6 +38,28 @@ const routes = [
     path: '/checkins/:id',
     name: 'CheckinDetail',
     component: () => import('../views/CheckinDetail.vue')
+  },
+  {
+    path: '/admin',
+    redirect: '/admin/places'
+  },
+  {
+    path: '/admin/places',
+    name: 'AdminPlaces',
+    component: () => import('../views/Admin.vue'),
+    meta: { adminOnly: true, adminSection: 'places' }
+  },
+  {
+    path: '/admin/activities',
+    name: 'AdminActivities',
+    component: () => import('../views/Admin.vue'),
+    meta: { adminOnly: true, adminSection: 'activities' }
+  },
+  {
+    path: '/admin/reviews',
+    name: 'AdminReviews',
+    component: () => import('../views/Admin.vue'),
+    meta: { adminOnly: true, adminSection: 'reviews' }
   }
 ]
 
@@ -49,10 +71,20 @@ const router = createRouter({
   }
 })
 
-// 没有权限的角色直接访问 /places 时，退回地图页
+// 管理员使用独立工作台；普通角色不能进入管理路由。
 router.beforeEach((to) => {
-  if (!to.meta.roles) return true
   const { currentRoleKey } = useUserStore()
+
+  if (to.meta.adminOnly) {
+    if (currentRoleKey.value === 'admin') return true
+    return { path: '/', replace: true }
+  }
+
+  if (currentRoleKey.value === 'admin') {
+    return { path: '/admin/places', replace: true }
+  }
+
+  if (!to.meta.roles) return true
   if (to.meta.roles.includes(currentRoleKey.value)) return true
   return { path: '/map', replace: true }
 })

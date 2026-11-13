@@ -13,7 +13,7 @@ const locationsData = [
     history: '2005年开馆，位于中国红十字会发源地——上海徐汇区，是全国红十字系统首座专业博物馆。',
     highlights: ['百年红十字史展', '人道救援实物展', '沈敦和故居复原', '互动体验区'],
     image: '',
-    color: '#d32f2f',
+    color: '#ef5654',
     lat: 31.1889,
     lng: 121.437
   },
@@ -27,7 +27,7 @@ const locationsData = [
     history: '1911年成立上海红十字分会，1950年改组为上海市红十字会，是中国红十字事业的重要力量。',
     highlights: ['应急救护培训中心', '无偿献血组织', '志愿服务平台', '国际交流合作'],
     image: '',
-    color: '#c62828',
+    color: '#81021f',
     lat: 31.2265,
     lng: 121.4482
   },
@@ -41,7 +41,7 @@ const locationsData = [
     history: '2008年汶川地震后加速建设，2010年正式投入使用，已参与多次重大灾害救援行动。',
     highlights: ['应急物资储备库', '救灾指挥中心', '应急演练基地', '志愿者培训中心'],
     image: '',
-    color: '#ef5350',
+    color: '#ef5654',
     lat: 31.235,
     lng: 121.61
   },
@@ -55,7 +55,7 @@ const locationsData = [
     history: '前身为1920年代创立的教会医院，1980年代由红十字会冠名，发展为综合性医疗机构。',
     highlights: ['人道医疗救助', '24小时急诊服务', '社区健康义诊', '红十字义诊团'],
     image: '',
-    color: '#e57373',
+    color: '#f47a76',
     lat: 31.216,
     lng: 121.409
   },
@@ -69,7 +69,7 @@ const locationsData = [
     history: '1990年代在上海设立代表处，是ICRC在东亚地区的核心协调枢纽。',
     highlights: ['国际人道法推广', '地区援助协调', '人道外交', '学术交流合作'],
     image: '',
-    color: '#ff7043',
+    color: '#81021f',
     lat: 31.232,
     lng: 121.475
   },
@@ -83,7 +83,7 @@ const locationsData = [
     history: '2000年初创立，是全国第一家红十字青少年专项活动中心，已培训数十万青少年。',
     highlights: ['急救技能训练营', '人道精神课堂', '志愿服务项目', '红十字少年团'],
     image: '',
-    color: '#ff8a65',
+    color: '#ef5654',
     lat: 31.27,
     lng: 121.518
   },
@@ -97,7 +97,7 @@ const locationsData = [
     history: '1992年启动，已登记志愿捐献者超过10万人，已成功帮助数千名患者找到配型。',
     highlights: ['造血干细胞登记', 'HLA配型检索', '捐献者关怀', '科普宣传教育'],
     image: '',
-    color: '#ffb74d',
+    color: '#81021f',
     lat: 31.234,
     lng: 121.453
   },
@@ -111,7 +111,7 @@ const locationsData = [
     history: '2014年建成开放，是全国第一个以红十字为主题的城市公园，占地约100亩。',
     highlights: ['红十字纪念碑', '博爱主题雕塑', '志愿者纪念馆', '文化宣传长廊'],
     image: '',
-    color: '#ffcc80',
+    color: '#f47a76',
     lat: 31.112,
     lng: 121.388
   }
@@ -119,8 +119,8 @@ const locationsData = [
 
 // 时代分类元信息
 export const ERAS = {
-  history: { key: 'history', label: '红十字历史地点', short: '历史地点', icon: 'historic', color: '#b8860b' },
-  modern: { key: 'modern', label: '现代红十字地点', short: '现代地点', icon: 'city', color: '#d32f2f' }
+  history: { key: 'history', label: '红十字历史地点', short: '历史地点', icon: 'historic', color: '#ef5654' },
+  modern: { key: 'modern', label: '现代红十字地点', short: '现代地点', icon: 'city', color: '#81021f' }
 }
 
 const baseLocationsRef = ref(locationsData)

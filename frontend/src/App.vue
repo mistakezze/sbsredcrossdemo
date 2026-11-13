@@ -3,18 +3,18 @@
     <!-- ====== 桌面端：顶部 Logo + 导航栏 ====== -->
     <header v-if="!isMobile" class="pc-header">
       <div class="pc-header-inner">
-        <div class="pc-logo" @click="router.push('/')">
+        <div class="pc-logo" @click="router.push(homePath)">
           <div class="pc-logo-icon">
             <span class="cross-h"></span>
             <span class="cross-v"></span>
           </div>
           <div class="pc-logo-text">
-            <h1>红十字会文化之旅</h1>
-            <p>Red Cross Cultural Journey</p>
+            <h1>{{ isAdmin ? '红十字管理台' : '红十字会文化之旅' }}</h1>
+            <p>{{ isAdmin ? 'Administration Console' : 'Red Cross Cultural Journey' }}</p>
           </div>
         </div>
         <div class="pc-header-right">
-          <nav class="pc-nav">
+          <nav v-if="!isAdmin" class="pc-nav">
             <router-link to="/" class="pc-nav-item" :class="{ active: $route.path === '/' }">
               <AppIcon name="home" size="16" /> 首页
             </router-link>
@@ -38,6 +38,19 @@
             <router-link to="/checkins" class="pc-nav-item" :class="{ active: $route.path.startsWith('/checkins') }">
               <AppIcon name="clipboard" size="16" /> 个人打卡
               <span v-if="checkinCount > 0" class="pc-badge">{{ checkinCount }}</span>
+            </router-link>
+          </nav>
+          <nav v-else class="pc-nav admin-pc-nav" aria-label="管理员导航">
+            <router-link
+              v-for="item in adminNavItems"
+              :key="item.key"
+              :to="item.path"
+              class="pc-nav-item"
+              :class="{ active: $route.meta.adminSection === item.key }"
+            >
+              <AppIcon :name="item.icon" size="16" />
+              {{ item.label }}
+              <span v-if="item.count > 0" class="pc-badge">{{ item.count }}</span>
             </router-link>
           </nav>
           <button
@@ -69,13 +82,13 @@
     <!-- ====== 移动端：顶栏 + 底部 Tab ====== -->
     <header v-if="isMobile" class="mobile-topbar">
       <div class="mobile-topbar-inner">
-        <div class="mobile-topbar-logo" @click="router.push('/')">
+        <div class="mobile-topbar-logo" @click="router.push(homePath)">
           <div class="mobile-topbar-icon">
             <span class="cross-h"></span>
             <span class="cross-v"></span>
           </div>
           <div class="mobile-topbar-text">
-            <span>红十字会文化之旅</span>
+            <span>{{ isAdmin ? '红十字管理台' : '红十字会文化之旅' }}</span>
           </div>
         </div>
         <div class="mobile-topbar-actions">
@@ -114,7 +127,7 @@
     </main>
 
     <!-- ====== 桌面端：页脚 ====== -->
-    <footer v-if="!isMobile" class="pc-footer">
+    <footer v-if="!isMobile && !isAdmin" class="pc-footer">
       <div class="pc-footer-inner">
         <p>© 2026 红十字会文化之旅 | 人道主义精神传承</p>
         <p class="pc-footer-sub">以人为本 · 博爱奉献 · 共建和平</p>
@@ -122,7 +135,21 @@
     </footer>
 
     <!-- ====== 移动端：底部 Tab 栏 ====== -->
-    <nav v-if="isMobile" class="mobile-tabbar">
+    <nav v-if="isMobile" class="mobile-tabbar" :class="{ 'is-admin': isAdmin }">
+      <template v-if="isAdmin">
+        <router-link
+          v-for="item in adminNavItems"
+          :key="item.key"
+          :to="item.path"
+          class="mobile-tabbar-item"
+          :class="{ active: $route.meta.adminSection === item.key }"
+        >
+          <AppIcon :name="item.icon" size="21" class="mobile-tabbar-icon" />
+          <span class="mobile-tabbar-label">{{ item.shortLabel }}</span>
+          <span v-if="item.count > 0" class="mobile-tabbar-badge">{{ item.count }}</span>
+        </router-link>
+      </template>
+      <template v-else>
       <router-link to="/" class="mobile-tabbar-item" :class="{ active: $route.path === '/' }">
         <svg class="mobile-tabbar-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M3.5 11.5 12 4l8.5 7.5M5.5 10.5V20h13v-9.5M9.5 20v-5h5v5" />
@@ -171,6 +198,7 @@
         <span class="mobile-tabbar-label">打卡</span>
         <span v-if="checkinCount > 0" class="mobile-tabbar-badge">{{ checkinCount }}</span>
       </router-link>
+      </template>
     </nav>
 
   </div>
@@ -182,21 +210,49 @@ import { useRouter } from 'vue-router'
 import { useCheckinStore } from './stores/checkinStore'
 import { useUserStore } from './stores/userStore'
 import { useThemeStore } from './stores/themeStore'
+import { usePlaceSubmitStore } from './stores/locationSubmitStore'
+import { useActivityStore } from './stores/activityStore'
+import { useReviewStore } from './stores/reviewStore'
 import { useViewport } from './composables/useViewport'
 import RoleSwitcher from './components/RoleSwitcher.vue'
+import { ADMIN_DEFAULT_PATH, ADMIN_SECTIONS } from './config/adminSections'
 
 const router = useRouter()
 const { checkinCount } = useCheckinStore()
 const { isMobile } = useViewport()
 const { currentRoleKey, can } = useUserStore()
 const { isDark, themeLabel, toggleTheme } = useThemeStore()
+const { stats: placeStats } = usePlaceSubmitStore()
+const { activityReviewStats, reviews: activityReviews } = useActivityStore()
+const { reviews: locationReviews } = useReviewStore()
 
 // 地点管理只对管理员和企业/地点用户开放
 const canManagePlaces = computed(() => can('uploadLocation'))
+const isAdmin = computed(() => currentRoleKey.value === 'admin')
+const homePath = computed(() => isAdmin.value ? ADMIN_DEFAULT_PATH : '/')
+const adminNavItems = computed(() =>
+  ADMIN_SECTIONS.map(section => ({
+    ...section,
+    count:
+      section.key === 'places'
+        ? placeStats.value.pending
+        : section.key === 'activities'
+          ? activityReviewStats.value.pending
+          : activityReviews.value.length + locationReviews.value.length
+  }))
+)
 
-// 在 /places 页面切换成无权限角色时，直接退回地图页
-watch(currentRoleKey, () => {
-  if (router.currentRoute.value.path === '/places' && !canManagePlaces.value) {
+watch(currentRoleKey, (role) => {
+  const currentRoute = router.currentRoute.value
+
+  if (role === 'admin') {
+    if (!currentRoute.meta.adminOnly) router.replace(ADMIN_DEFAULT_PATH)
+    return
+  }
+
+  if (currentRoute.meta.adminOnly) {
+    router.replace('/')
+  } else if (currentRoute.path === '/places' && !canManagePlaces.value) {
     router.replace('/map')
   }
 })
@@ -207,14 +263,14 @@ watch(currentRoleKey, () => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f7f9fc;
+  background: var(--apple-bg);
 }
 
 /* ============ 桌面端样式 ============ */
 .pc-header {
-  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+  background: linear-gradient(118deg, #43000f 0%, var(--palette-burgundy) 68%, #9c1932 100%);
   color: white;
-  box-shadow: 0 4px 20px rgba(211, 47, 47, 0.25);
+  box-shadow: 0 12px 34px rgba(65, 0, 15, 0.2);
   position: fixed;
   top: 0;
   left: 0;
@@ -260,7 +316,7 @@ watch(currentRoleKey, () => {
 .pc-logo-icon .cross-h,
 .pc-logo-icon .cross-v {
   position: absolute;
-  background: #d32f2f;
+  background: var(--palette-silver-red);
 }
 
 .pc-logo-icon .cross-h {
@@ -323,15 +379,15 @@ watch(currentRoleKey, () => {
 }
 
 .pc-nav-item.active {
-  background: white;
-  color: #d32f2f;
+  background: var(--palette-lotus-white);
+  color: var(--palette-burgundy);
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .pc-badge {
   background: #ffeb3b;
-  color: #d32f2f;
+  color: var(--palette-burgundy-deep);
   font-size: 11px;
   font-weight: 700;
   padding: 2px 8px;
@@ -349,8 +405,8 @@ watch(currentRoleKey, () => {
 }
 
 .pc-footer {
-  background: #1a2332;
-  color: #a0aec0;
+  background: linear-gradient(120deg, #39000e, var(--palette-burgundy));
+  color: rgba(254, 238, 225, 0.62);
   padding: 28px 32px;
   margin-top: auto;
 }
@@ -375,7 +431,7 @@ watch(currentRoleKey, () => {
 
 /* ============ 移动端样式 ============ */
 .mobile-topbar {
-  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+  background: linear-gradient(120deg, #40000e 0%, var(--palette-burgundy) 74%, #96142f 100%);
   color: white;
   position: sticky;
   top: 0;
@@ -391,7 +447,7 @@ watch(currentRoleKey, () => {
   left: 0;
   right: 0;
   height: 16px;
-  background: linear-gradient(to bottom, rgba(183, 28, 28, 0.12), transparent);
+  background: linear-gradient(to bottom, rgba(129, 2, 31, 0.12), transparent);
   pointer-events: none;
 }
 
@@ -464,7 +520,7 @@ watch(currentRoleKey, () => {
   flex-shrink: 0;
   border-radius: 999px;
   background:
-    linear-gradient(90deg, rgba(255, 207, 108, 0.46), rgba(255, 255, 255, 0.16));
+    linear-gradient(90deg, rgba(239, 86, 84, 0.52), rgba(254, 238, 225, 0.22));
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.18) inset,
     0 1px 3px rgba(49, 8, 18, 0.12) inset;
@@ -500,7 +556,7 @@ watch(currentRoleKey, () => {
   place-items: center;
   border-radius: 50%;
   background: #fff;
-  color: #ae1b32;
+  color: var(--palette-burgundy);
   box-shadow:
     0 1px 1px rgba(255, 255, 255, 0.7) inset,
     0 3px 8px rgba(48, 8, 18, 0.24);
@@ -512,7 +568,7 @@ watch(currentRoleKey, () => {
 
 .theme-toggle.is-dark .theme-switch {
   background:
-    linear-gradient(90deg, rgba(39, 39, 43, 0.72), rgba(86, 75, 130, 0.48));
+    linear-gradient(90deg, rgba(49, 8, 19, 0.85), rgba(129, 2, 31, 0.58));
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.14) inset,
     0 1px 3px rgba(0, 0, 0, 0.24) inset;
@@ -528,7 +584,7 @@ watch(currentRoleKey, () => {
 
 .theme-toggle.is-dark .theme-switch-thumb {
   transform: translateX(16px);
-  color: #6862d9;
+  color: var(--palette-burgundy);
   background: #f7f7fa;
 }
 
@@ -601,7 +657,7 @@ watch(currentRoleKey, () => {
   position: absolute;
   width: 16px;
   height: 4px;
-  background: #d32f2f;
+  background: var(--palette-silver-red);
   border-radius: 2px;
 }
 
@@ -609,7 +665,7 @@ watch(currentRoleKey, () => {
   position: absolute;
   width: 4px;
   height: 16px;
-  background: #d32f2f;
+  background: var(--palette-silver-red);
   border-radius: 2px;
 }
 
@@ -639,10 +695,10 @@ watch(currentRoleKey, () => {
   left: 0;
   right: 0;
   display: flex;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 249, 242, 0.86);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-top: 0.5px solid rgba(211, 47, 47, 0.08);
+  border-top: 0.5px solid rgba(129, 2, 31, 0.1);
   z-index: 100;
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -665,7 +721,7 @@ watch(currentRoleKey, () => {
   align-items: center;
   justify-content: center;
   padding: 10px 4px 8px;
-  color: #a0aab8;
+  color: #927b80;
   text-decoration: none;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
@@ -689,7 +745,7 @@ watch(currentRoleKey, () => {
 }
 
 .mobile-tabbar-item.active {
-  color: #d32f2f;
+  color: var(--palette-burgundy);
 }
 
 .mobile-tabbar-item.active .mobile-tabbar-icon {
@@ -714,7 +770,7 @@ watch(currentRoleKey, () => {
   transform: translateX(-50%);
   width: 24px;
   height: 3px;
-  background: linear-gradient(90deg, #d32f2f, #ff5252);
+  background: linear-gradient(90deg, var(--palette-silver-red), #f78b84);
   border-radius: 0 0 3px 3px;
 }
 
@@ -722,15 +778,15 @@ watch(currentRoleKey, () => {
   position: absolute;
   top: 4px;
   right: calc(50% - 24px);
-  background: linear-gradient(135deg, #ff5252, #d32f2f);
-  color: white;
+  background: linear-gradient(135deg, #f78b84, var(--palette-silver-red));
+  color: var(--palette-burgundy-deep);
   font-size: 10px;
   font-weight: 700;
   padding: 1px 6px;
   border-radius: 10px;
   min-width: 16px;
   line-height: 1.4;
-  box-shadow: 0 2px 6px rgba(211, 47, 47, 0.35);
+  box-shadow: 0 2px 6px rgba(129, 2, 31, 0.25);
   animation: badgePop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -744,9 +800,9 @@ watch(currentRoleKey, () => {
    ============================== */
 .mobile-topbar {
   background:
-    radial-gradient(circle at 82% -45%, rgba(255, 255, 255, 0.2), transparent 42%),
-    linear-gradient(125deg, #8e1022 0%, #bc1c33 58%, #d43d4d 100%);
-  box-shadow: 0 10px 28px rgba(105, 13, 29, 0.18);
+    radial-gradient(circle at 82% -45%, rgba(239, 86, 84, 0.4), transparent 43%),
+    linear-gradient(120deg, #40000e 0%, var(--palette-burgundy) 72%, #96142f 100%);
+  box-shadow: 0 10px 28px rgba(65, 0, 15, 0.22);
 }
 
 .mobile-topbar::before {
@@ -764,7 +820,7 @@ watch(currentRoleKey, () => {
 .mobile-topbar::after {
   bottom: -11px;
   height: 12px;
-  background: linear-gradient(to bottom, rgba(110, 12, 29, 0.08), transparent);
+  background: linear-gradient(to bottom, rgba(65, 0, 15, 0.1), transparent);
 }
 
 .mobile-topbar-inner {
@@ -799,9 +855,9 @@ watch(currentRoleKey, () => {
   bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   gap: 2px;
   padding: 7px 6px;
-  border: 1px solid rgba(119, 49, 60, 0.09);
+  border: 1px solid rgba(129, 2, 31, 0.12);
   border-radius: 23px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 249, 242, 0.92);
   box-shadow: 0 14px 38px rgba(43, 30, 35, 0.16);
   backdrop-filter: saturate(170%) blur(22px);
   -webkit-backdrop-filter: saturate(170%) blur(22px);
@@ -817,7 +873,7 @@ watch(currentRoleKey, () => {
   padding-inline: 2px;
   gap: 2px;
   border-radius: 17px;
-  color: #a2a0a8;
+  color: #927b80;
   z-index: 1;
 }
 
@@ -840,8 +896,8 @@ watch(currentRoleKey, () => {
 }
 
 .mobile-tabbar-item.active {
-  background: linear-gradient(135deg, #fff0f1, #fff8f5);
-  color: #bd1e35;
+  background: linear-gradient(135deg, #fbe7dc, #fff8ef);
+  color: var(--palette-burgundy);
 }
 
 .mobile-tabbar-item.active::before {
@@ -860,8 +916,8 @@ watch(currentRoleKey, () => {
 .mobile-tabbar-badge {
   top: 3px;
   right: calc(50% - 22px);
-  background: #bd1e35;
-  box-shadow: 0 4px 10px rgba(160, 20, 43, 0.25);
+  background: var(--palette-silver-red);
+  box-shadow: 0 4px 10px rgba(129, 2, 31, 0.25);
 }
 
 @media (max-width: 360px) {

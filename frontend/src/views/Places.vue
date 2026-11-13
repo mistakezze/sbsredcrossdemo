@@ -139,7 +139,7 @@
     <transition name="fade">
       <div v-if="detailItem" class="pl-overlay" @click.self="closeDetail">
         <div class="pl-modal" :class="{ 'is-mobile': isMobile }">
-          <div class="pl-banner" :style="{ background: `linear-gradient(135deg, ${detailItem.color}, #b71c1c)` }">
+          <div class="pl-banner" :style="{ background: `linear-gradient(135deg, ${detailItem.color}, #81021f)` }">
             <div class="banner-top">
               <span class="banner-status">
                 <AppIcon :name="SUBMIT_STATUS[detailItem.status].icon" size="11" />
@@ -502,7 +502,7 @@ const fromMapPoint = (p) => {
 
 const pickerMarkerMarkup = `
   <svg viewBox="0 0 24 24" width="30" height="30" fill="none"
-       stroke="#c52237" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+       stroke="#ef5654" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
     <path d="M20 10c0 5.4-8 11-8 11S4 15.4 4 10a8 8 0 1 1 16 0Z"/>
     <circle cx="12" cy="10" r="2.5"/>
   </svg>
@@ -650,7 +650,7 @@ const submitUpload = () => {
   justify-content: space-between;
   gap: 30px;
   flex-wrap: wrap;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+  background: linear-gradient(135deg, #feeee1 0%, #fbe7dc 100%);
   border-radius: 24px;
   padding: 30px 34px;
 }
@@ -661,8 +661,8 @@ const submitUpload = () => {
   display: inline-block;
   padding: 7px 18px;
   background: #fff;
-  border: 2px solid #d32f2f;
-  color: #d32f2f;
+  border: 2px solid #ef5654;
+  color: #ef5654;
   border-radius: 50px;
   font-size: 12px;
   font-weight: 700;
@@ -672,7 +672,7 @@ const submitUpload = () => {
 
 .pc-header-title {
   font-size: clamp(20px, 2.4vw, 30px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 10px 0;
   font-weight: 800;
   line-height: 1.3;
@@ -680,7 +680,7 @@ const submitUpload = () => {
 
 .pc-header-desc {
   font-size: 14px;
-  color: #7a8599;
+  color: #79636a;
   margin: 0;
   line-height: 1.7;
   max-width: 560px;
@@ -709,24 +709,24 @@ const submitUpload = () => {
   font-size: 24px;
   font-weight: 800;
   line-height: 1;
-  color: #d32f2f;
+  color: #ef5654;
 }
 
 .pc-stat-num.pending { color: #f9a825; }
 .pc-stat-num.approved { color: #2e7d32; }
-.pc-stat-num.rejected { color: #c62828; }
+.pc-stat-num.rejected { color: #81021f; }
 
 .pc-stat-label {
   display: block;
   font-size: 11.5px;
-  color: #7a8599;
+  color: #79636a;
   margin-top: 6px;
   font-weight: 600;
 }
 
 .pc-btn-upload {
   padding: 13px 24px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: #fff;
   border: none;
   border-radius: 13px;
@@ -745,7 +745,7 @@ const submitUpload = () => {
 }
 
 .m-places-header {
-  background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 60%, #fff0f3 100%);
+  background: linear-gradient(160deg, #feeee1 0%, #fbe7dc 60%, #fbe9df 100%);
   border-radius: 18px;
   padding: 18px 16px;
   display: flex;
@@ -759,7 +759,7 @@ const submitUpload = () => {
   padding: 5px 13px;
   background: rgba(255, 255, 255, 0.9);
   border: 1.5px solid rgba(211, 47, 47, 0.15);
-  color: #d32f2f;
+  color: #ef5654;
   border-radius: 50px;
   font-size: clamp(10px, 2.5vw, 12px);
   font-weight: 700;
@@ -767,7 +767,7 @@ const submitUpload = () => {
 
 .m-header-title {
   font-size: clamp(18px, 5vw, 23px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   font-weight: 800;
   line-height: 1.25;
@@ -776,7 +776,7 @@ const submitUpload = () => {
 
 .m-header-desc {
   font-size: clamp(11px, 3vw, 13px);
-  color: #8a95a8;
+  color: #9a858a;
   margin: 0;
   line-height: 1.6;
 }
@@ -797,17 +797,17 @@ const submitUpload = () => {
   font-size: clamp(16px, 4.4vw, 20px);
   font-weight: 800;
   line-height: 1.1;
-  color: #d32f2f;
+  color: #ef5654;
 }
 
 .m-stat-num.pending { color: #f9a825; }
 .m-stat-num.approved { color: #2e7d32; }
-.m-stat-num.rejected { color: #c62828; }
+.m-stat-num.rejected { color: #81021f; }
 
 .m-stat-label {
   display: block;
   font-size: clamp(9px, 2.4vw, 11px);
-  color: #8a95a8;
+  color: #9a858a;
   margin-top: 3px;
   font-weight: 600;
 }
@@ -815,7 +815,7 @@ const submitUpload = () => {
 .m-btn-upload {
   margin-top: 4px;
   padding: 11px;
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: #fff;
   border: none;
   border-radius: 11px;
@@ -862,9 +862,9 @@ const submitUpload = () => {
   gap: 6px;
   padding: 8px 16px;
   background: #fff;
-  border: 1.5px solid #eef1f5;
+  border: 1.5px solid #f4ece4;
   border-radius: 11px;
-  color: #7a8599;
+  color: #79636a;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -878,10 +878,10 @@ const submitUpload = () => {
   font-size: 12px;
 }
 
-.filter-chip:hover { border-color: #ffcdd2; color: #d32f2f; }
+.filter-chip:hover { border-color: #f6c7bd; color: #ef5654; }
 
 .filter-chip.active {
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   border-color: transparent;
   color: #fff;
   box-shadow: 0 4px 12px rgba(211, 47, 47, 0.24);
@@ -915,7 +915,7 @@ const submitUpload = () => {
 .place-card {
   display: flex;
   background: #fff;
-  border: 1.5px solid #eef1f5;
+  border: 1.5px solid #f4ece4;
   border-radius: 18px;
   overflow: hidden;
   transition: all 0.22s ease;
@@ -924,7 +924,7 @@ const submitUpload = () => {
 
 .place-card:hover {
   transform: translateY(-3px);
-  border-color: #ffcdd2;
+  border-color: #f6c7bd;
   box-shadow: 0 12px 30px rgba(211, 47, 47, 0.1);
 }
 
@@ -962,18 +962,18 @@ const submitUpload = () => {
 
 .place-era.era-modern {
   background: rgba(211, 47, 47, 0.1);
-  color: #c62828;
+  color: #81021f;
 }
 
 .place-category {
-  background: #f4f6f9;
-  color: #7a8599;
+  background: #f8f0e7;
+  color: #79636a;
 }
 
 .place-name {
   font-size: 15.5px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   line-height: 1.4;
   word-break: break-word;
@@ -984,13 +984,13 @@ const submitUpload = () => {
   flex-wrap: wrap;
   gap: 10px;
   font-size: 11px;
-  color: #8a95a8;
+  color: #9a858a;
   word-break: break-word;
 }
 
 .place-desc {
   font-size: 12.5px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.65;
   margin: 0;
   word-break: break-word;
@@ -1014,8 +1014,8 @@ const submitUpload = () => {
 
 .place-note.rejected {
   background: rgba(198, 40, 40, 0.06);
-  border-left-color: #c62828;
-  color: #b71c1c;
+  border-left-color: #81021f;
+  color: #81021f;
 }
 
 .note-label {
@@ -1028,7 +1028,7 @@ const submitUpload = () => {
   gap: 7px;
   flex-wrap: wrap;
   padding-top: 8px;
-  border-top: 1px solid #f2f5f9;
+  border-top: 1px solid #f7efe6;
   margin-top: 2px;
 }
 
@@ -1047,11 +1047,11 @@ const submitUpload = () => {
 }
 
 .btn-ghost {
-  background: #f4f6f9;
-  color: #5a6478;
+  background: #f8f0e7;
+  color: #635057;
 }
 
-.btn-ghost:hover { background: #e8ebef; }
+.btn-ghost:hover { background: #efe4da; }
 
 .btn-approve {
   background: linear-gradient(135deg, #4caf50, #2e7d32);
@@ -1063,19 +1063,19 @@ const submitUpload = () => {
 
 .btn-reject {
   background: #fff;
-  border-color: #ffcdd2;
-  color: #d32f2f;
+  border-color: #f6c7bd;
+  color: #ef5654;
 }
 
-.btn-reject:hover { background: #fff5f5; }
+.btn-reject:hover { background: #feeee1; }
 
 .btn-remove {
   background: transparent;
-  color: #b0bac7;
+  color: #b6a6a9;
   margin-left: auto;
 }
 
-.btn-remove:hover { color: #d32f2f; }
+.btn-remove:hover { color: #ef5654; }
 
 .places-empty {
   grid-column: 1 / -1;
@@ -1089,7 +1089,7 @@ const submitUpload = () => {
 }
 
 .empty-emoji { font-size: 34px; opacity: 0.5; }
-.empty-text { font-size: 13px; color: #a0aab8; }
+.empty-text { font-size: 13px; color: #9a858a; }
 
 /* ==============================
    弹窗通用
@@ -1186,11 +1186,11 @@ const submitUpload = () => {
 .banner-close:hover { background: rgba(255, 255, 255, 0.42); }
 
 .banner-close.dark {
-  background: #f4f6f9;
-  color: #7a8599;
+  background: #f8f0e7;
+  color: #79636a;
 }
 
-.banner-close.dark:hover { background: #e8ebef; color: #1a2332; }
+.banner-close.dark:hover { background: #efe4da; color: #32181f; }
 
 .banner-title {
   font-size: 20px;
@@ -1218,7 +1218,7 @@ const submitUpload = () => {
 
 .pl-desc {
   font-size: 13px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.75;
   margin: 0 0 14px 0;
   word-break: break-word;
@@ -1256,7 +1256,7 @@ const submitUpload = () => {
 
 .pl-highlight {
   font-size: 11.5px;
-  color: #d32f2f;
+  color: #ef5654;
   background: rgba(211, 47, 47, 0.08);
   padding: 5px 12px;
   border-radius: 16px;
@@ -1265,7 +1265,7 @@ const submitUpload = () => {
 }
 
 .pl-info {
-  background: #fafbfc;
+  background: #fbf4eb;
   border-radius: 12px;
   padding: 13px 15px;
   display: flex;
@@ -1282,7 +1282,7 @@ const submitUpload = () => {
   font-size: 12px;
 }
 
-.pl-info-label { color: #a0aab8; font-weight: 700; flex-shrink: 0; }
+.pl-info-label { color: #9a858a; font-weight: 700; flex-shrink: 0; }
 .pl-info-value { color: #33415c; font-weight: 600; text-align: right; word-break: break-word; }
 
 .pl-note {
@@ -1298,8 +1298,8 @@ const submitUpload = () => {
 
 .pl-note.rejected {
   background: rgba(198, 40, 40, 0.06);
-  border-left-color: #c62828;
-  color: #b71c1c;
+  border-left-color: #81021f;
+  color: #81021f;
 }
 
 .pl-footer,
@@ -1308,7 +1308,7 @@ const submitUpload = () => {
   display: flex;
   gap: 9px;
   padding: 14px 22px calc(18px + env(safe-area-inset-bottom, 0px));
-  border-top: 1.5px solid #f2f5f9;
+  border-top: 1.5px solid #f7efe6;
   flex-shrink: 0;
 }
 
@@ -1326,7 +1326,7 @@ const submitUpload = () => {
   align-items: center;
   justify-content: space-between;
   padding: 17px 21px;
-  border-bottom: 1.5px solid #f2f5f9;
+  border-bottom: 1.5px solid #f7efe6;
   flex-shrink: 0;
 }
 
@@ -1334,7 +1334,7 @@ const submitUpload = () => {
 .upload-title {
   font-size: 16px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
 }
 
 .review-body,
@@ -1348,7 +1348,7 @@ const submitUpload = () => {
 }
 
 .review-target {
-  background: #fafbfc;
+  background: #fbf4eb;
   border-radius: 12px;
   padding: 12px 14px;
 }
@@ -1356,14 +1356,14 @@ const submitUpload = () => {
 .review-target-name {
   font-size: 14px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
   margin-bottom: 4px;
   word-break: break-word;
 }
 
 .review-target-meta {
   font-size: 11.5px;
-  color: #8a95a8;
+  color: #9a858a;
   word-break: break-word;
 }
 
@@ -1383,12 +1383,12 @@ const submitUpload = () => {
 .field-label {
   font-size: 11.5px;
   font-weight: 700;
-  color: #7a8599;
+  color: #79636a;
 }
 
 .field-hint {
   font-weight: 600;
-  color: #b0bac7;
+  color: #b6a6a9;
   font-size: 10.5px;
 }
 
@@ -1401,7 +1401,7 @@ const submitUpload = () => {
   padding: 10px 12px;
   font-size: 13px;
   font-family: inherit;
-  color: #1a2332;
+  color: #32181f;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   background: #fff;
@@ -1409,7 +1409,7 @@ const submitUpload = () => {
 
 .field-input:focus,
 .field-textarea:focus {
-  border-color: #d32f2f;
+  border-color: #ef5654;
   box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.08);
 }
 
@@ -1420,10 +1420,10 @@ const submitUpload = () => {
 .era-option {
   flex: 1;
   padding: 10px;
-  background: #fafbfc;
-  border: 1.5px solid #eef1f5;
+  background: #fbf4eb;
+  border: 1.5px solid #f4ece4;
   border-radius: 10px;
-  color: #7a8599;
+  color: #79636a;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -1432,7 +1432,7 @@ const submitUpload = () => {
 }
 
 .era-option.active {
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   border-color: transparent;
   color: #fff;
 }
@@ -1441,7 +1441,7 @@ const submitUpload = () => {
   height: 200px;
   border-radius: 12px;
   overflow: hidden;
-  border: 1.5px solid #eef1f5;
+  border: 1.5px solid #f4ece4;
 }
 
 :deep(.picker-marker-host) { background: transparent; border: none; }
@@ -1449,14 +1449,14 @@ const submitUpload = () => {
 :deep(.picker-marker) {
   width: 30px;
   height: 30px;
-  color: #c52237;
+  color: #ef5654;
   line-height: 0;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .picker-coord {
   font-size: 11.5px;
-  color: #8a95a8;
+  color: #9a858a;
   font-weight: 600;
   margin-top: 6px;
 }
@@ -1474,17 +1474,17 @@ const submitUpload = () => {
 .btn-cancel {
   flex: 1;
   padding: 12px;
-  background: #f4f6f9;
+  background: #f8f0e7;
   border: none;
   border-radius: 11px;
-  color: #7a8599;
+  color: #79636a;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
 }
 
-.btn-cancel:hover { background: #e8ebef; }
+.btn-cancel:hover { background: #efe4da; }
 
 .btn-confirm {
   flex: 1;
@@ -1501,7 +1501,7 @@ const submitUpload = () => {
 }
 
 .btn-confirm.reject {
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   box-shadow: 0 5px 16px rgba(211, 47, 47, 0.3);
 }
 
@@ -1539,7 +1539,7 @@ const submitUpload = () => {
   background:
     radial-gradient(circle at 92% 10%, rgba(255, 255, 255, 0.9) 0 7%, transparent 7.3%),
     radial-gradient(circle at 80% 20%, rgba(197, 34, 55, 0.08), transparent 25%),
-    linear-gradient(135deg, #fffaf7 0%, #fff0ed 55%, #f8dde2 100%);
+    linear-gradient(135deg, #fef5ea 0%, #fcefe5 55%, #f1d4c8 100%);
   box-shadow: 0 16px 42px rgba(101, 35, 48, 0.07);
 }
 
@@ -1562,7 +1562,7 @@ const submitUpload = () => {
 
 .pc-header-desc,
 .m-header-desc {
-  color: #77717a;
+  color: #746469;
 }
 
 .pc-stat,
@@ -1575,7 +1575,7 @@ const submitUpload = () => {
 .pc-btn-upload,
 .m-btn-upload {
   border-radius: 14px;
-  background: linear-gradient(135deg, #c52237, #901528);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   box-shadow: 0 9px 22px rgba(147, 25, 44, 0.22);
 }
 
@@ -1586,7 +1586,7 @@ const submitUpload = () => {
 }
 
 .filter-chip.active {
-  background: linear-gradient(135deg, #c52237, #941629);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   box-shadow: 0 6px 18px rgba(145, 25, 44, 0.2);
 }
 

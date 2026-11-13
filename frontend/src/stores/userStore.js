@@ -1,4 +1,9 @@
 import { ref, computed } from 'vue'
+import {
+  SIMULATED_REGISTERED_USERS,
+  SIMULATED_USER_BY_ID,
+  pickRandomRegisteredUsers
+} from '../data/demoUsers'
 
 const STORAGE_KEY = 'redcross_current_role'
 
@@ -35,7 +40,7 @@ export const ROLES = [
     key: 'member',
     name: '注册用户',
     icon: 'userHeart',
-    color: '#d32f2f',
+    color: '#ef5654',
     desc: '核心用户，可打卡、评价与打分',
     starred: false,
     starLevel: 0
@@ -76,17 +81,33 @@ export const PERMISSIONS = {
 }
 
 const DEFAULT_ROLE = 'member'
+const VALID_ROLE_KEYS = new Set([
+  ...ROLES.map(role => role.key),
+  ...SIMULATED_REGISTERED_USERS.map(user => user.id)
+])
+const registeredAccountSample = ref(pickRandomRegisteredUsers(5))
 
 const loadRole = () => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
-    return ROLES.some(r => r.key === saved) ? saved : DEFAULT_ROLE
+    return VALID_ROLE_KEYS.has(saved) ? saved : DEFAULT_ROLE
   } catch {
     return DEFAULT_ROLE
   }
 }
 
 const currentRoleKey = ref(loadRole())
+
+const includeCurrentRegisteredUser = (users) => {
+  const current = SIMULATED_USER_BY_ID.get(currentRoleKey.value)
+  if (!current || users.some(user => user.id === current.id)) return users
+  return [...users.slice(0, users.length - 1), current]
+}
+
+const refreshRegisteredAccounts = () => {
+  registeredAccountSample.value = includeCurrentRegisteredUser(pickRandomRegisteredUsers(5))
+  return registeredAccountSample.value
+}
 
 const saveRole = () => {
   try {
@@ -98,11 +119,14 @@ const saveRole = () => {
 
 export const useUserStore = () => {
   const currentUser = computed(
-    () => ROLES.find(r => r.key === currentRoleKey.value) || ROLES[3]
+    () =>
+      SIMULATED_USER_BY_ID.get(currentRoleKey.value) ||
+      ROLES.find(r => r.key === currentRoleKey.value) ||
+      ROLES[3]
   )
 
   const setRole = (key) => {
-    if (!ROLES.some(r => r.key === key)) return false
+    if (!VALID_ROLE_KEYS.has(key)) return false
     currentRoleKey.value = key
     saveRole()
     return true
@@ -110,16 +134,21 @@ export const useUserStore = () => {
 
   // 权限判断：can('review') / can('moderate') / can('checkin') / can('uploadLocation')
   const can = (action) => {
-    const perm = PERMISSIONS[currentRoleKey.value]
+    const permissionRole = currentUser.value.permissionRole || currentRoleKey.value
+    const perm = PERMISSIONS[permissionRole]
     return !!(perm && perm[action])
   }
 
-  const getRole = (key) => ROLES.find(r => r.key === key)
+  const getRole = (key) =>
+    SIMULATED_USER_BY_ID.get(key) || ROLES.find(r => r.key === key)
 
   return {
     ROLES,
     currentRoleKey,
     currentUser,
+    registeredAccountSample,
+    refreshRegisteredAccounts,
+    registeredUserCount: SIMULATED_REGISTERED_USERS.length,
     setRole,
     can,
     getRole

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RUNNING</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0d0a0b;
+        color: #f5e9e4;
+      }
+
+      body {
+        margin: 0;
+        padding: 32px;
+        background:
+          radial-gradient(circle at 90% 0, rgba(239, 86, 84, 0.16), transparent 32rem),
+          #0d0a0b;
+      }
+
+      main {
+        width: min(960px, 100%);
+        margin: 0 auto;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+
+      p {
+        margin: 0 0 20px;
+        color: #b8a8ab;
+      }
+
+      pre {
+        overflow: auto;
+        padding: 20px;
+        border: 1px solid rgba(254, 238, 225, 0.1);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.045);
+        color: #e9dcd7;
+        font: 12px/1.65 "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+        white-space: pre-wrap;
+      }
+
+      .status {
+        display: inline-flex;
+        margin-bottom: 16px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: rgba(249, 168, 37, 0.14);
+        color: #ffd166;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      html[data-status="pass"] .status {
+        background: rgba(76, 175, 80, 0.14);
+        color: #8ce6a2;
+      }
+
+      html[data-status="fail"] .status {
+        background: rgba(239, 86, 84, 0.14);
+        color: #ffaaa7;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>推荐算法自动验证</h1>
+      <p>直接调用项目中的真实推荐模块，使用固定测试数据检查模型与排序结果。</p>
+      <span class="status">正在运行</span>
+      <pre id="result">Running...</pre>
+    </main>
+
+    <script type="module">
+      import { fitUserCF } from '/src/utils/userCF.js'
+      import { fitLowRankPreference } from '/src/utils/lowRankModel.js'
+      import { buildCollaborativeSignal } from '/src/utils/cfBlend.js'
+      import {
+        recommendPlaces,
+        RECO_WEIGHTS
+      } from '/src/utils/placeRecommend.js'
+      import {
+        useActivityStore,
+        ACTIVITY_RECO_WEIGHTS,
+        ACTIVITY_COLD_START_WEIGHTS,
+        reviewStatusOf,
+        activityStatus
+      } from '/src/stores/activityStore.js'
+      import { useLocationStore } from '/src/stores/locationStore.js'
+      import { useReviewStore } from '/src/stores/reviewStore.js'
+      import { useCheckinStore } from '/src/stores/checkinStore.js'
+      import { useUserStore, ROLES } from '/src/stores/userStore.js'
+      import {
+        SIMULATED_REGISTERED_USERS,
+        SIMULATED_LOCATION_REVIEWS,
+        simulatedLocationCheckinsFor,
+        pickRandomRegisteredUsers
+      } from '/src/data/demoUsers.js'
+
+      const resultEl = document.querySelector('#result')
+      const statusEl = document.querySelector('.status')
+      const assertions = []
+
+      const assert = (name, pass, detail) => {
+        assertions.push({ name, pass: Boolean(pass), detail })
+      }
+
+      const weightSum = (weights) =>
+        Number(Object.values(weights).reduce((sum, value) => sum + value, 0).toFixed(6))
+
+      try {
+        const locations = [
+          { id: 1, name: 'L1', category: '博物馆', lat: 31.20, lng: 121.44 },
+          { id: 2, name: 'L2', category: '机构', lat: 31.21, lng: 121.45 },
+          { id: 3, name: 'L3', category: '医院', lat: 31.22, lng: 121.46 },
+          { id: 4, name: 'L4', category: '公园', lat: 31.23, lng: 121.47 },
+          { id: 5, name: 'L5', category: '学校', lat: 31.24, lng: 121.48 },
+          { id: 6, name: 'L6', category: '机构', lat: 31.25, lng: 121.49 }
+        ]
+        const reviews = [
+          { roleKey: 'member', locationId: 1, rating: 5, timestamp: 101 },
+          { roleKey: 'member', locationId: 2, rating: 4, timestamp: 102 },
+          { roleKey: 'member', locationId: 3, rating: 2, timestamp: 103 },
+          { roleKey: 'volunteer', locationId: 1, rating: 5, timestamp: 104 },
+          { roleKey: 'volunteer', locationId: 2, rating: 4, timestamp: 105 },
+          { roleKey: 'volunteer', locationId: 4, rating: 5, timestamp: 106 },
+          { roleKey: 'guest', locationId: 2, rating: 2, timestamp: 107 },
+          { roleKey: 'guest', locationId: 5, rating: 1, timestamp: 108 }
+        ]
+        const checkins = [
+          { roleKey: 'member', locationId: 1, timestamp: 109 }
+        ]
+        const roleNameOf = (key) =>
+          ({ member: '注册用户', volunteer: '志愿者', guest: '游客用户' }[key] || key)
+        const baseOptions = {
+          locations,
+          reviews,
+          checkins,
+          currentRoleKey: 'member',
+          roleNameOf
+        }
+
+        const userCF = fitUserCF(baseOptions)
+        const lowRank = fitLowRankPreference(baseOptions)
+        const blended = buildCollaborativeSignal({
+          userCF,
+          latent: lowRank,
+          itemIds: locations.map(location => location.id)
+        })
+
+        assert('UserCF 可用', userCF.available, userCF)
+        assert(
+          'UserCF 找到相似邻居并预测高分地点',
+          userCF.available && userCF.neighborCount > 0 && userCF.predict(4) >= 4.5,
+          { neighbors: userCF.neighbors, prediction: userCF.predict(4), explanation: userCF.explain(4) }
+        )
+        assert(
+          '低秩模型可训练且秩受约束',
+          lowRank.available && lowRank.rank >= 1 && lowRank.rank <= 3,
+          { rank: lowRank.rank, rmse: lowRank.rmse, users: lowRank.userCount }
+        )
+        assert('协同过滤融合信号可用', blended.signals.cf, blended.signals)
+
+        const runSyntheticPlaces = () => recommendPlaces({
+          ...baseOptions,
+          userLocation: { lat: 31.205, lng: 121.445 },
+          userCFModel: userCF,
+          latentModel: lowRank,
+          limit: 4
+        })
+        const placesA = runSyntheticPlaces()
+        const placesB = runSyntheticPlaces()
+        const signature = (result) =>
+          result.items.map(item => `${item.location.id}:${item.score}`).join('|')
+
+        assert(
+          '地点推荐返回 4 个有序结果',
+          placesA.items.length === 4 &&
+            placesA.items.every((item, index, list) =>
+              index === 0 || list[index - 1].score >= item.score
+            ),
+          placesA.items.map(item => ({ id: item.location.id, score: item.score }))
+        )
+        assert(
+          '每条地点推荐都有解释理由',
+          placesA.items.every(item => item.reasons.length > 0),
+          placesA.items.map(item => item.reasons)
+        )
+        assert('地点推荐结果稳定可复现', signature(placesA) === signature(placesB), signature(placesA))
+        assert('地点综合权重总和为 1', weightSum(RECO_WEIGHTS) === 1, RECO_WEIGHTS)
+
+        const activityStore = useActivityStore()
+        const cold = activityStore.recommend('guest', 4)
+        const personal = activityStore.recommend('volunteer', 4)
+        const simulatedUser = SIMULATED_REGISTERED_USERS[0]
+        const simulatedPersonal = activityStore.recommend(simulatedUser.id, 4)
+
+        assert(
+          '活动冷启动进入默认策略',
+          cold.mode === 'cold' && cold.items.length > 0 && cold.items.length <= 4,
+          { mode: cold.mode, ids: cold.items.map(item => item.activity.id), signals: cold.signals }
+        )
+        assert(
+          '活动个性化推荐可用',
+          personal.mode === 'personal' && personal.items.length > 0 && personal.items.length <= 4,
+          { mode: personal.mode, ids: personal.items.map(item => item.activity.id), signals: personal.signals }
+        )
+        assert(
+          '活动候选均为已通过且未结束',
+          personal.items.every(({ activity }) =>
+            reviewStatusOf(activity) === 'approved' && activityStatus(activity) !== 'ended'
+          ),
+          personal.items.map(({ activity }) => ({
+            id: activity.id,
+            reviewStatus: reviewStatusOf(activity),
+            status: activityStatus(activity)
+          }))
+        )
+        assert('活动综合权重总和为 1', weightSum(ACTIVITY_RECO_WEIGHTS) === 1, ACTIVITY_RECO_WEIGHTS)
+        assert(
+          '活动冷启动权重总和为 1',
+          weightSum(ACTIVITY_COLD_START_WEIGHTS) === 1,
+          ACTIVITY_COLD_START_WEIGHTS
+        )
+        assert(
+          '模拟注册用户库包含 100 名唯一用户',
+          SIMULATED_REGISTERED_USERS.length === 100 &&
+            new Set(SIMULATED_REGISTERED_USERS.map(user => user.id)).size === 100 &&
+            new Set(SIMULATED_REGISTERED_USERS.map(user => user.name)).size === 100,
+          {
+            count: SIMULATED_REGISTERED_USERS.length,
+            first: SIMULATED_REGISTERED_USERS.slice(0, 3)
+          }
+        )
+
+        const sampledUsers = pickRandomRegisteredUsers(5)
+        assert(
+          '随机账号抽取返回 5 名不同用户',
+          sampledUsers.length === 5 &&
+            new Set(sampledUsers.map(user => user.id)).size === 5 &&
+            sampledUsers.every(user => user.permissionRole === 'member'),
+          sampledUsers.map(user => user.name)
+        )
+
+        const simulatedLocationOptions = {
+          locations,
+          reviews: [...SIMULATED_LOCATION_REVIEWS, ...reviews],
+          checkins: simulatedLocationCheckinsFor(simulatedUser.id),
+          currentRoleKey: simulatedUser.id,
+          roleNameOf: key => SIMULATED_REGISTERED_USERS.find(user => user.id === key)?.name || key
+        }
+        const simulatedUserCF = fitUserCF(simulatedLocationOptions)
+        const simulatedLowRank = fitLowRankPreference(simulatedLocationOptions)
+        assert(
+          '100 人偏好数据可驱动 UserCF',
+          simulatedUserCF.available && simulatedUserCF.neighborCount > 0,
+          {
+            user: simulatedUser.name,
+            neighbors: simulatedUserCF.neighbors
+          }
+        )
+        assert(
+          '100 人偏好数据可训练低秩模型',
+          simulatedLowRank.available && simulatedLowRank.userCount >= 50,
+          {
+            userCount: simulatedLowRank.userCount,
+            observedCount: simulatedLowRank.observedCount,
+            rank: simulatedLowRank.rank,
+            rmse: simulatedLowRank.rmse
+          }
+        )
+        assert(
+          '模拟账号可生成个性化活动推荐',
+          simulatedPersonal.mode === 'personal' && simulatedPersonal.items.length > 0,
+          {
+            mode: simulatedPersonal.mode,
+            neighbors: simulatedPersonal.models.userCF.neighborCount,
+            latentUsers: simulatedPersonal.models.latent.userCount
+          }
+        )
+
+        const { currentRoleKey } = useUserStore()
+        const { locations: realLocations, getLocationById } = useLocationStore()
+        const { reviews: realReviews } = useReviewStore()
+        const { checkins: realCheckins } = useCheckinStore()
+        const currentRole = currentRoleKey.value
+        const realPlaces = recommendPlaces({
+          locations: realLocations.value,
+          reviews: [...realReviews.value, ...SIMULATED_LOCATION_REVIEWS],
+          checkins: [
+            ...realCheckins.value,
+            ...simulatedLocationCheckinsFor(currentRole)
+          ],
+          currentRoleKey: currentRole,
+          roleNameOf: key => ROLES.find(role => role.key === key)?.name || key,
+          limit: 4
+        })
+
+        assert(
+          '当前业务数据可生成地点推荐',
+          realPlaces.items.length > 0 &&
+            realPlaces.items.every(item => getLocationById(item.location.id)),
+          realPlaces.items.map(item => ({
+            name: item.location.name,
+            score: item.score,
+            reasons: item.reasons
+          }))
+        )
+
+        const passed = assertions.every(item => item.pass)
+        const report = {
+          passed,
+          summary: `${assertions.filter(item => item.pass).length}/${assertions.length} checks passed`,
+          role: currentRole,
+          assertions
+        }
+        resultEl.textContent = JSON.stringify(report, null, 2)
+        statusEl.textContent = passed ? 'PASS' : 'FAIL'
+        document.documentElement.dataset.status = passed ? 'pass' : 'fail'
+        document.title = passed ? 'PASS' : 'FAIL'
+      } catch (error) {
+        resultEl.textContent = `${error?.stack || error}`
+        statusEl.textContent = 'ERROR'
+        document.documentElement.dataset.status = 'fail'
+        document.title = 'ERROR'
+      }
+    </script>
+  </body>
+</html>

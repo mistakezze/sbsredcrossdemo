@@ -493,49 +493,49 @@ const timelineEvents = [
     year: '1904',
     title: '上海万国红十字会成立',
     desc: '日俄战争爆发，沈敦和等人发起成立上海万国红十字会，成为中国红十字运动的起点。',
-    color: '#d32f2f'
+    color: '#ef5654'
   },
   {
     year: '1911',
     title: '辛亥革命战地救护',
     desc: '辛亥革命爆发后，红十字会组建多支医疗队奔赴前线，救治伤兵数万人。',
-    color: '#e53935'
+    color: '#81021f'
   },
   {
     year: '1937',
     title: '淞沪抗战救护行动',
     desc: '淞沪会战期间，上海红十字会组织大规模战地救护，建立多所临时医院。',
-    color: '#f44336'
+    color: '#ef5654'
   },
   {
     year: '1949',
     title: '新中国红十字事业新生',
     desc: '上海解放后，红十字会改组，成为新中国卫生事业和人道救助的重要力量。',
-    color: '#ff5722'
+    color: '#81021f'
   },
   {
     year: '1978',
     title: '改革开放后恢复发展',
     desc: '改革开放后，上海红十字会恢复各项工作，在救灾、救护、救助等领域持续发力。',
-    color: '#ff9800'
+    color: '#f47a76'
   },
   {
     year: '2008',
     title: '汶川地震救援',
     desc: '汶川特大地震发生后，上海红十字会迅速行动，募集大量善款物资并派出救援队。',
-    color: '#ffc107'
+    color: '#81021f'
   },
   {
     year: '2020',
     title: '新冠疫情防控',
     desc: '新冠疫情期间，上海红十字会全力参与疫情防控，动员社会力量支援抗疫一线。',
-    color: '#8bc34a'
+    color: '#ef5654'
   },
   {
     year: '2024',
     title: '新时代新征程',
     desc: '进入新时代，上海红十字事业持续高质量发展，谱写人道事业新篇章。',
-    color: '#4caf50'
+    color: '#81021f'
   }
 ]
 
@@ -545,42 +545,42 @@ const redCrossFacts = [
     title: '红十字的起源',
     desc: '红十字运动起源于1863年，由亨利·杜南发起，旨在为战争中的伤员提供中立的人道救助。',
     detail: '1859年，瑞士商人亨利·杜南在意大利索尔费里诺战场上目睹了战争的残酷。四万多名伤病士兵被遗弃在战场上，无人救治。深受触动的杜南撰写了《索尔费里诺回忆录》，呼吁制定国际公约，为战地伤员和医护人员提供中立保护。\n\n1863年，在杜南的倡议下，16个国家的代表在日内瓦召开会议，决定成立红十字国际委员会。1864年，《日内瓦公约》正式签署，红十字运动由此诞生。\n\n红十字标志是将瑞士国旗的颜色翻转而来——红底白十字变为白底红十字，以向红十字运动的发源地瑞士致敬。',
-    color: '#d32f2f'
+    color: '#ef5654'
   },
   {
     icon: 'heart',
     title: '七项基本原则',
     desc: '人道、公正、中立、独立、志愿服务、统一、普遍，是红十字运动的核心价值观。',
     detail: '红十字与红新月运动的七项基本原则于1965年正式通过，是运动所有成员必须遵守的行为准则：\n\n人道：保护人的生命和健康，保障人类的尊严\n公正：不歧视任何人，仅根据需要提供帮助\n中立：不在争议中选边站队，不参与政治、种族、宗教等纷争\n独立：保持自主性，不受任何政府或势力控制\n志愿服务：以志愿服务为基础，不求回报\n统一：每个国家只有一个红十字会，对所有人开放\n普遍：运动遍及全球，人人地位平等',
-    color: '#e53935'
+    color: '#81021f'
   },
   {
     icon: 'globe',
     title: '全球最大人道网络',
     desc: '红十字与红新月运动是全球最大的人道网络，在192个国家拥有约1400万志愿者。',
     detail: '红十字与红新月运动是世界上最大的人道网络，由三大部分组成：\n\n红十字国际委员会（ICRC）：负责在武装冲突中保护战争受害者\n红十字会与红新月会国际联合会（IFRC）：协调各国红会开展灾害应对等工作\n各国红十字会与红新月会：在各自国家开展人道服务\n\n运动在全球192个国家拥有成员协会，约1400万名志愿者和数十万工作人员，每年为数亿人提供帮助。无论是自然灾害、武装冲突还是公共卫生危机，哪里有人道需求，哪里就有红十字与红新月的身影。',
-    color: '#f44336'
+    color: '#ef5654'
   },
   {
     icon: 'heart',
     title: '中国红十字会',
     desc: '中国红十字会成立于1904年，是国际红十字运动的重要成员，以保护人的生命和健康为宗旨。',
     detail: '中国红十字会成立于1904年3月10日，是中国近代史上第一个民间人道救助团体，也是国际红十字运动的重要成员。\n\n1904年：上海万国红十字会成立（中国红十字会前身）\n1912年：正式加入红十字国际委员会\n1949年：新中国成立后改组为中国红十字会\n1993年：《中华人民共和国红十字会法》颁布实施\n\n中国红十字会始终秉承"人道、博爱、奉献"的红十字精神，在应急救援、应急救护、人道救助、无偿献血、造血干细胞捐献、遗体和人体器官捐献、国际人道援助等领域发挥着重要作用。',
-    color: '#ff5722'
+    color: '#81021f'
   },
   {
     icon: 'blood',
     title: '三救三献',
     desc: '应急救援、应急救护、人道救助；献血液、献造血干细胞、献遗体器官，是红十字会的核心业务。',
     detail: '"三救三献"是中国红十字会的核心业务：\n\n三救：\n  应急救援：参与自然灾害、事故灾难等突发事件救援\n  应急救护：开展应急救护培训，普及急救知识技能\n  人道救助：帮扶困难群体，开展助学、助医、助老等\n\n三献：\n  献血液：推动无偿献血工作，保障临床用血需求\n  献造血干细胞：建设中华骨髓库，为白血病患者寻找供者\n  献遗体器官：推动遗体和人体器官捐献，延续生命希望\n\n截至目前，中华骨髓库已登记入库志愿者超300万人，累计捐献造血干细胞超1.5万例；全国累计实现人体器官捐献超4万例，挽救了数万濒危患者的生命。',
-    color: '#ff9800'
+    color: '#f47a76'
   },
   {
     icon: 'homeHeart',
     title: '人道救助',
     desc: '红十字会开展助学、助医、助老、助困等多种人道救助服务，惠及数百万困难群众。',
     detail: '人道救助是红十字会的重要职责，围绕"改善最易受损害群体的境况"这一目标，开展了多种形式的救助服务：\n\n助学救助：资助家庭困难学生完成学业，援建博爱学校\n助医救助：开展大病救助，帮助贫困家庭患者获得治疗\n助老服务：关爱空巢老人，建设博爱养老服务机构\n助困帮扶：慰问困难家庭，发放生活物资\n\n此外，还有"红十字博爱送万家"品牌项目，每年元旦春节期间走访困难群众，把温暖送到千家万户。\n\n据统计，全国各级红十字会每年投入人道救助资金数十亿元，受益群众数百万，成为政府社会保障体系的重要补充。',
-    color: '#ffc107'
+    color: '#81021f'
   }
 ]
 
@@ -613,7 +613,7 @@ const closeFactModal = () => {
 /* Hero */
 .pc-hero {
   position: relative;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 50%, #ffffff 100%);
+  background: linear-gradient(135deg, #feeee1 0%, #fbe7dc 50%, #fffaf3 100%);
   padding: 80px 48px 100px;
   border-radius: 24px;
   overflow: hidden;
@@ -629,8 +629,8 @@ const closeFactModal = () => {
   display: inline-block;
   padding: 10px 24px;
   background: white;
-  border: 2px solid #d32f2f;
-  color: #d32f2f;
+  border: 2px solid #ef5654;
+  color: #ef5654;
   border-radius: 50px;
   font-size: 13px;
   font-weight: 700;
@@ -643,7 +643,7 @@ const closeFactModal = () => {
   font-size: clamp(40px, 5vw, 64px);
   line-height: 1.15;
   margin: 0 0 24px 0;
-  color: #1a2332;
+  color: #32181f;
   font-weight: 800;
   display: flex;
   flex-direction: column;
@@ -652,7 +652,7 @@ const closeFactModal = () => {
 }
 
 .title-main {
-  background: linear-gradient(135deg, #1a2332, #d32f2f, #1a2332);
+  background: linear-gradient(135deg, #32181f, #ef5654, #32181f);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -660,7 +660,7 @@ const closeFactModal = () => {
 }
 
 .pc-hero-subtitle {
-  color: #d32f2f;
+  color: #ef5654;
   font-size: clamp(28px, 3.5vw, 42px);
   position: relative;
   display: inline-block;
@@ -668,7 +668,7 @@ const closeFactModal = () => {
 
 .pc-hero-desc {
   font-size: 17px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.9;
   margin: 0 0 36px 0;
   word-break: break-word;
@@ -697,14 +697,14 @@ const closeFactModal = () => {
 .stat-number {
   font-size: 36px;
   font-weight: 800;
-  color: #d32f2f;
+  color: #ef5654;
   position: relative;
   text-shadow: 0 2px 8px rgba(211, 47, 47, 0.2);
 }
 
 .stat-label {
   font-size: 13px;
-  color: #7a8599;
+  color: #79636a;
   margin-top: 6px;
   font-weight: 500;
 }
@@ -712,7 +712,7 @@ const closeFactModal = () => {
 .stat-divider {
   width: 1px;
   height: 40px;
-  background: linear-gradient(180deg, transparent, #e5e9ef, transparent);
+  background: linear-gradient(180deg, transparent, #eadfd6, transparent);
 }
 
 .hero-actions {
@@ -738,7 +738,7 @@ const closeFactModal = () => {
 .btn:hover .btn-arrow { transform: translateX(5px); }
 
 .btn-primary {
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   box-shadow: 0 4px 20px rgba(211, 47, 47, 0.35);
 }
@@ -749,11 +749,11 @@ const closeFactModal = () => {
 
 .btn-secondary {
   background: white;
-  color: #d32f2f;
-  border: 2px solid #d32f2f;
+  color: #ef5654;
+  border: 2px solid #ef5654;
 }
 .btn-secondary:hover {
-  background: #d32f2f;
+  background: #ef5654;
   color: white;
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(211, 47, 47, 0.35);
@@ -953,7 +953,7 @@ const closeFactModal = () => {
 }
 
 .pc-section-alt {
-  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  background: linear-gradient(180deg, #fcf5ec 0%, #fffaf3 100%);
   border-radius: 24px;
   position: relative;
   overflow: hidden;
@@ -969,7 +969,7 @@ const closeFactModal = () => {
   display: inline-block;
   padding: 8px 20px;
   background: rgba(211, 47, 47, 0.1);
-  color: #d32f2f;
+  color: #ef5654;
   border-radius: 50px;
   font-size: 13px;
   font-weight: 600;
@@ -979,14 +979,14 @@ const closeFactModal = () => {
 
 .pc-section-title {
   font-size: clamp(32px, 4vw, 48px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 14px 0;
   font-weight: 800;
 }
 
 .pc-section-subtitle {
   font-size: 16px;
-  color: #7a8599;
+  color: #79636a;
   margin: 0;
   word-break: break-word;
   line-height: 1.6;
@@ -1054,8 +1054,8 @@ const closeFactModal = () => {
   height: 52px;
   border-radius: 50%;
   background: white;
-  border: 2px solid #e5e9ef;
-  color: #1a2332;
+  border: 2px solid #eadfd6;
+  color: #32181f;
   font-size: 28px;
   font-weight: 300;
   cursor: pointer;
@@ -1071,8 +1071,8 @@ const closeFactModal = () => {
 
 .carousel-arrow:hover:not(.disabled) {
   transform: translateY(-50%) scale(1.12);
-  border-color: #d32f2f;
-  color: #d32f2f;
+  border-color: #ef5654;
+  color: #ef5654;
   box-shadow: 0 6px 24px rgba(211, 47, 47, 0.25);
 }
 
@@ -1114,12 +1114,12 @@ const closeFactModal = () => {
 }
 
 .dot:hover {
-  background: #d32f2f;
+  background: #ef5654;
   transform: scale(1.2);
 }
 
 .dot.active {
-  background: #d32f2f;
+  background: #ef5654;
   width: 28px;
   border-radius: 5px;
 }
@@ -1242,7 +1242,7 @@ const closeFactModal = () => {
 
 .figure-years {
   background: rgba(26, 35, 50, 0.06);
-  color: #5a6478;
+  color: #635057;
   padding: 3px 10px;
   border-radius: 6px;
   font-size: 12px;
@@ -1251,7 +1251,7 @@ const closeFactModal = () => {
 
 .pc-figure-name.large {
   font-size: clamp(24px, 2.5vw, 30px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 6px 0;
   font-weight: 700;
   word-break: break-word;
@@ -1274,7 +1274,7 @@ const closeFactModal = () => {
 
 .pc-figure-desc.large {
   font-size: 15px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.85;
   margin: 0 0 18px 0;
   word-break: break-word;
@@ -1362,7 +1362,7 @@ const closeFactModal = () => {
   width: 140px;
   height: 140px;
   border-radius: 18px;
-  background: linear-gradient(135deg, #fff5f5, #ffe0e0);
+  background: linear-gradient(135deg, #feeee1, #f5d8cd);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -1414,7 +1414,7 @@ const closeFactModal = () => {
   bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, var(--accent-color), #b71c1c);
+  background: linear-gradient(135deg, var(--accent-color), #81021f);
   color: white;
   padding: 4px 10px;
   border-radius: 12px;
@@ -1452,7 +1452,7 @@ const closeFactModal = () => {
 
 .pc-location-name.large {
   font-size: clamp(20px, 2vw, 24px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 12px 0;
   font-weight: 700;
   line-height: 1.4;
@@ -1464,14 +1464,14 @@ const closeFactModal = () => {
 
 .location-place.large {
   font-size: 14px;
-  color: #7a8599;
+  color: #79636a;
   margin-bottom: 16px;
   word-break: break-word;
 }
 
 .pc-location-desc.large {
   font-size: 15px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.8;
   margin: 0 0 20px 0;
   word-break: break-word;
@@ -1493,8 +1493,8 @@ const closeFactModal = () => {
 }
 
 .highlight-tag.more {
-  background: #f0f2f5;
-  color: #7a8599;
+  background: #f3e8de;
+  color: #79636a;
 }
 
 /* ===== PC 时间线/小知识区背景装饰 ===== */
@@ -1535,7 +1535,7 @@ const closeFactModal = () => {
 
 /* ===== PC 时间线（最初版本：横向排列，卡片在上方） ===== */
 .pc-timeline-section {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(180deg, #fffaf3 0%, #fcf5ec 100%);
   border-radius: 24px;
   position: relative;
   overflow: hidden;
@@ -1558,7 +1558,7 @@ const closeFactModal = () => {
   left: 80px;
   right: 80px;
   height: 4px;
-  background: linear-gradient(90deg, #d32f2f, #ff9800, #ffc107, #8bc34a, #4caf50);
+  background: linear-gradient(90deg, #ef5654, #ff9800, #ffc107, #8bc34a, #4caf50);
   border-radius: 2px;
   transform: translateY(-50%);
 }
@@ -1598,7 +1598,7 @@ const closeFactModal = () => {
 
 .pc-timeline-title {
   font-size: 13px;
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 6px 0;
   font-weight: 700;
   line-height: 1.4;
@@ -1607,7 +1607,7 @@ const closeFactModal = () => {
 
 .pc-timeline-desc {
   font-size: 11px;
-  color: #7a8599;
+  color: #79636a;
   line-height: 1.6;
   margin: 0;
   word-break: break-word;
@@ -1652,7 +1652,7 @@ const closeFactModal = () => {
 
 /* ===== PC 红十字小知识 ===== */
 .pc-facts-section {
-  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  background: linear-gradient(180deg, #fcf5ec 0%, #fffaf3 100%);
   border-radius: 24px;
   position: relative;
   overflow: hidden;
@@ -1672,7 +1672,7 @@ const closeFactModal = () => {
   border-radius: 20px;
   padding: 32px 28px;
   box-shadow: 0 4px 20px rgba(26, 35, 50, 0.06);
-  border: 2px solid #f0f2f5;
+  border: 2px solid #f3e8de;
   transition: all 0.3s ease;
   cursor: pointer;
 }
@@ -1691,7 +1691,7 @@ const closeFactModal = () => {
 
 .pc-fact-title {
   font-size: 18px;
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 10px 0;
   font-weight: 700;
   word-break: break-word;
@@ -1699,7 +1699,7 @@ const closeFactModal = () => {
 
 .pc-fact-desc {
   font-size: 14px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.8;
   margin: 0;
   word-break: break-word;
@@ -1760,8 +1760,8 @@ const closeFactModal = () => {
   height: 36px;
   border-radius: 50%;
   border: none;
-  background: #f0f2f5;
-  color: #5a6478;
+  background: #f3e8de;
+  color: #635057;
   font-size: 24px;
   line-height: 1;
   cursor: pointer;
@@ -1773,8 +1773,8 @@ const closeFactModal = () => {
 }
 
 .fact-modal-close:hover {
-  background: #e5e9ef;
-  color: #1a2332;
+  background: #eadfd6;
+  color: #32181f;
   transform: rotate(90deg);
 }
 
@@ -1792,7 +1792,7 @@ const closeFactModal = () => {
 
 .fact-modal-title {
   font-size: clamp(22px, 3vw, 28px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   font-weight: 800;
   word-break: break-word;
@@ -1804,7 +1804,7 @@ const closeFactModal = () => {
 
 .fact-modal-para {
   font-size: 15px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.9;
   margin: 0 0 16px 0;
   word-break: break-word;
@@ -1877,7 +1877,7 @@ const closeFactModal = () => {
 /* Mobile Hero */
 .mobile-hero {
   position: relative;
-  background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 40%, #fff0f3 70%, #ffffff 100%);
+  background: linear-gradient(160deg, #feeee1 0%, #fbe7dc 40%, #fbe9df 70%, #fffaf3 100%);
   padding: 28px 20px 22px;
   border-radius: 20px;
   overflow: hidden;
@@ -1905,7 +1905,7 @@ const closeFactModal = () => {
   position: absolute;
   top: 50%;
   left: 50%;
-  background: #d32f2f;
+  background: #ef5654;
   border-radius: 4px;
 }
 .m-cross-h { width: 100px; height: 24px; transform: translate(-50%, -50%); }
@@ -1938,7 +1938,7 @@ const closeFactModal = () => {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: #d32f2f;
+  color: #ef5654;
   border-radius: 50px;
   font-size: 11px;
   font-weight: 700;
@@ -1951,10 +1951,10 @@ const closeFactModal = () => {
   font-size: clamp(26px, 7.5vw, 34px);
   line-height: 1.2;
   margin: 0 0 10px 0;
-  color: #1a2332;
+  color: #32181f;
   font-weight: 800;
   word-break: break-word;
-  background: linear-gradient(135deg, #1a2332 30%, #d32f2f 70%, #c62828);
+  background: linear-gradient(135deg, #32181f 30%, #ef5654 70%, #81021f);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1962,7 +1962,7 @@ const closeFactModal = () => {
 
 .mobile-hero-desc {
   font-size: clamp(13px, 3.5vw, 15px);
-  color: #6b7a90;
+  color: #7b676c;
   line-height: 1.65;
   margin: 0 0 18px 0;
   word-break: break-word;
@@ -1998,13 +1998,13 @@ const closeFactModal = () => {
 .mobile-stat-num {
   font-size: clamp(22px, 6vw, 30px);
   font-weight: 800;
-  color: #d32f2f;
+  color: #ef5654;
   line-height: 1.2;
 }
 
 .mobile-stat-label {
   font-size: 11px;
-  color: #8a95a8;
+  color: #9a858a;
   margin-top: 4px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -2026,7 +2026,7 @@ const closeFactModal = () => {
 .mobile-btn-primary {
   flex: 1;
   padding: 15px 16px;
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   border-radius: 14px;
   font-size: 14px;
@@ -2056,7 +2056,7 @@ const closeFactModal = () => {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: #d32f2f;
+  color: #ef5654;
   border: 1.5px solid rgba(211, 47, 47, 0.2);
   border-radius: 14px;
   font-size: 14px;
@@ -2069,7 +2069,7 @@ const closeFactModal = () => {
 
 .mobile-btn-secondary:active {
   transform: scale(0.96);
-  background: #fff5f5;
+  background: #feeee1;
   border-color: rgba(211, 47, 47, 0.35);
 }
 
@@ -2098,7 +2098,7 @@ const closeFactModal = () => {
 
 .mobile-section-title {
   font-size: clamp(18px, 5vw, 22px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   font-weight: 800;
   word-break: break-word;
@@ -2107,7 +2107,7 @@ const closeFactModal = () => {
 
 .mobile-section-count {
   font-size: 12px;
-  color: #8a95a8;
+  color: #9a858a;
   font-weight: 600;
   background: rgba(211, 47, 47, 0.06);
   padding: 5px 12px;
@@ -2205,14 +2205,14 @@ const closeFactModal = () => {
 
 .mobile-figure-name {
   font-size: clamp(15px, 4vw, 17px);
-  color: #1a2332;
+  color: #32181f;
   font-weight: 700;
   word-break: break-word;
 }
 
 .mobile-figure-years {
   font-size: 11px;
-  color: #8a95a8;
+  color: #9a858a;
   font-weight: 500;
   flex-shrink: 0;
 }
@@ -2227,7 +2227,7 @@ const closeFactModal = () => {
 
 .mobile-figure-desc {
   font-size: clamp(12px, 3vw, 13px);
-  color: #6b7a90;
+  color: #7b676c;
   line-height: 1.7;
   margin: 0 0 10px 0;
   word-break: break-word;
@@ -2295,7 +2295,7 @@ const closeFactModal = () => {
 .mobile-location-image {
   position: relative;
   aspect-ratio: 16 / 10;
-  background: linear-gradient(135deg, #fff5f5, #ffe0e0);
+  background: linear-gradient(135deg, #feeee1, #f5d8cd);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2322,7 +2322,7 @@ const closeFactModal = () => {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: linear-gradient(135deg, var(--accent-color), #b71c1c);
+  background: linear-gradient(135deg, var(--accent-color), #81021f);
   color: white;
   padding: 5px 12px;
   border-radius: 20px;
@@ -2358,7 +2358,7 @@ const closeFactModal = () => {
 
 .mobile-location-name {
   font-size: clamp(16px, 4.3vw, 18px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 6px 0;
   font-weight: 700;
   line-height: 1.3;
@@ -2367,7 +2367,7 @@ const closeFactModal = () => {
 
 .mobile-location-place {
   font-size: clamp(11px, 3vw, 12px);
-  color: #7a8599;
+  color: #79636a;
   margin-bottom: 8px;
   word-break: break-word;
   line-height: 1.4;
@@ -2375,7 +2375,7 @@ const closeFactModal = () => {
 
 .mobile-location-desc {
   font-size: clamp(12px, 3vw, 13px);
-  color: #5a6478;
+  color: #635057;
   line-height: 1.65;
   margin: 0 0 10px 0;
   word-break: break-word;
@@ -2414,7 +2414,7 @@ const closeFactModal = () => {
 .mobile-fact-item:active {
   transform: scale(0.98);
   box-shadow: 0 1px 8px rgba(211, 47, 47, 0.1);
-  background: linear-gradient(135deg, #fff8f8 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #fff7ed 0%, #fffaf3 100%);
 }
 
 .mobile-fact-icon {
@@ -2423,7 +2423,7 @@ const closeFactModal = () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #c52237;
+  color: #ef5654;
   background: transparent;
   flex-shrink: 0;
 }
@@ -2435,7 +2435,7 @@ const closeFactModal = () => {
 
 .mobile-fact-title {
   font-size: clamp(14px, 3.8vw, 16px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 5px 0;
   font-weight: 700;
   word-break: break-word;
@@ -2443,7 +2443,7 @@ const closeFactModal = () => {
 
 .mobile-fact-desc {
   font-size: clamp(11px, 3vw, 13px);
-  color: #8a95a8;
+  color: #9a858a;
   line-height: 1.55;
   margin: 0;
   word-break: break-word;
@@ -2471,7 +2471,7 @@ const closeFactModal = () => {
 }
 
 .mobile-guide-card {
-  background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 50%, #fff0f3 100%);
+  background: linear-gradient(160deg, #feeee1 0%, #fbe7dc 50%, #fbe9df 100%);
   border-radius: 20px;
   padding: 28px 22px;
   text-align: center;
@@ -2493,14 +2493,14 @@ const closeFactModal = () => {
 
 .mobile-guide-title {
   font-size: clamp(17px, 4.5vw, 19px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 8px 0;
   font-weight: 700;
 }
 
 .mobile-guide-desc {
   font-size: clamp(12px, 3.2vw, 14px);
-  color: #6b7a90;
+  color: #7b676c;
   margin: 0 0 18px 0;
   line-height: 1.6;
   word-break: break-word;
@@ -2508,8 +2508,8 @@ const closeFactModal = () => {
 
 /* 统一视觉语言 */
 .home {
-  --home-red: var(--rc-red, #c52237);
-  --home-ink: var(--rc-ink, #202331);
+  --home-red: var(--rc-red, #ef5654);
+  --home-ink: var(--rc-ink, #32181f);
 }
 
 .pc-hero,
@@ -2539,7 +2539,7 @@ const closeFactModal = () => {
 
 .btn-primary,
 .mobile-btn-primary {
-  background: linear-gradient(135deg, #c52237, #901528);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   box-shadow: 0 10px 24px rgba(152, 26, 45, 0.24);
 }
 

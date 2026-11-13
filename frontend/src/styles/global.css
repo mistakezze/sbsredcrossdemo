@@ -3,20 +3,27 @@
    ================================ */
 
 :root {
-  --rc-red: #c52237;
-  --rc-red-deep: #8f1427;
-  --rc-red-soft: #fff0f1;
-  --rc-ink: #202331;
-  --rc-muted: #7d7b84;
-  --rc-cream: #fffaf7;
-  --rc-surface: #ffffff;
-  --rc-canvas: #f7f5f3;
-  --rc-line: rgba(119, 53, 65, 0.1);
+  /* Reference palette: silver red, lotus white, burgundy red. */
+  --palette-silver-red: #ef5654;
+  --palette-lotus-white: #feeee1;
+  --palette-burgundy: #81021f;
+  --palette-silver-soft: #fbe7dc;
+  --palette-silver-mist: #fff3e9;
+  --palette-burgundy-deep: #39000e;
+  --rc-red: var(--palette-silver-red);
+  --rc-red-deep: var(--palette-burgundy);
+  --rc-red-soft: #fbe7dc;
+  --rc-ink: #32181f;
+  --rc-muted: #79636a;
+  --rc-cream: var(--palette-lotus-white);
+  --rc-surface: #fff9f2;
+  --rc-canvas: var(--palette-lotus-white);
+  --rc-line: rgba(129, 2, 31, 0.1);
   --rc-radius-sm: 12px;
   --rc-radius-md: 18px;
   --rc-radius-lg: 26px;
-  --rc-shadow-sm: 0 6px 20px rgba(41, 34, 40, 0.055);
-  --rc-shadow-md: 0 16px 42px rgba(53, 37, 43, 0.09);
+  --rc-shadow-sm: 0 6px 20px rgba(87, 27, 37, 0.06);
+  --rc-shadow-md: 0 16px 42px rgba(87, 27, 37, 0.1);
 }
 
 * {
@@ -48,8 +55,8 @@ body {
   line-height: 1.6;
   color: var(--rc-ink);
   background:
-    radial-gradient(circle at 8% 3%, rgba(198, 47, 64, 0.045), transparent 25rem),
-    radial-gradient(circle at 92% 9%, rgba(221, 170, 115, 0.055), transparent 24rem),
+    radial-gradient(circle at 8% 3%, rgba(239, 86, 84, 0.11), transparent 26rem),
+    radial-gradient(circle at 92% 9%, rgba(129, 2, 31, 0.055), transparent 25rem),
     var(--rc-canvas);
   min-height: 100vh;
   /* 移动端文字不挤压的关键：正常断词，中文按字 break */
@@ -60,7 +67,9 @@ body {
 /* ===== 移动端全局美化 ===== */
 @media (max-width: 768px) {
   body {
-    background: linear-gradient(180deg, #f8f0f0 0%, #f7f9fc 120px, #f7f9fc 100%);
+    background:
+      radial-gradient(circle at 12% 0%, rgba(239, 86, 84, 0.12), transparent 20rem),
+      linear-gradient(180deg, var(--palette-lotus-white) 0%, #fff8ef 42%, #fff8ef 100%);
   }
 
   /* 移动端所有页面入场动画 */
@@ -110,13 +119,13 @@ p {
 }
 
 a {
-  color: #d32f2f;
+  color: var(--palette-burgundy);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: #b71c1c;
+  color: var(--palette-silver-red);
 }
 
 ul, ol {
@@ -138,14 +147,14 @@ a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 3px solid rgba(197, 34, 55, 0.22);
+  outline: 3px solid rgba(239, 86, 84, 0.27);
   outline-offset: 3px;
 }
 
 /* 选中文字颜色 */
 ::selection {
-  background: rgba(211, 47, 47, 0.2);
-  color: #1a2332;
+  background: rgba(239, 86, 84, 0.22);
+  color: var(--palette-burgundy-deep);
 }
 
 /* 滚动条样式 */
@@ -166,7 +175,7 @@ select:focus-visible {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(150, 49, 65, 0.42);
+  background: rgba(129, 2, 31, 0.34);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
@@ -174,7 +183,7 @@ select:focus-visible {
 /* Firefox 滚动条 */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(134, 94, 102, 0.28) transparent;
+  scrollbar-color: rgba(129, 2, 31, 0.22) transparent;
 }
 
 /* 禁用某些元素的默认样式 */
@@ -286,7 +295,7 @@ select {
 #app .confirm-box,
 #app .role-panel {
   border: 1px solid rgba(255, 255, 255, 0.42);
-  background: #fffdfb;
+  background: #fff8f0;
   box-shadow: 0 30px 90px rgba(28, 13, 19, 0.28);
   overscroll-behavior: contain;
 }
@@ -400,7 +409,7 @@ select {
 #app .panel-close:hover,
 #app .fact-modal-close:hover,
 #app .modal-close:hover {
-  background: #fff0f1;
+  background: #fbe9e2;
   color: var(--rc-red);
 }
 
@@ -413,7 +422,7 @@ select {
 #app .review-body,
 #app .upload-body,
 #app .fact-modal-body {
-  background: #fffdfb;
+  background: #fff8f0;
   overscroll-behavior: contain;
 }
 
@@ -424,7 +433,7 @@ select {
   aspect-ratio: auto;
   background-image:
     radial-gradient(circle at 76% 18%, rgba(255, 255, 255, 0.22), transparent 32%),
-    linear-gradient(135deg, var(--accent-color, #c52237), #8f1427);
+    linear-gradient(135deg, var(--accent-color, #ef5654), #81021f);
 }
 
 #app .modal-image::after {
@@ -525,8 +534,8 @@ select {
   padding: 6px 11px;
   border: 1px solid rgba(197, 34, 55, 0.08);
   border-radius: 999px;
-  background: #fff4f3;
-  color: #b22337;
+  background: #fcefe5;
+  color: #81021f;
   font-size: 11px;
   font-weight: 700;
 }
@@ -578,7 +587,7 @@ select {
   align-items: center;
   justify-content: center;
   border-radius: 9px;
-  background: #fff0f1;
+  background: #fbe9e2;
   font-size: 14px;
 }
 
@@ -638,7 +647,7 @@ select {
 #app .m-note-input {
   border: 1px solid rgba(119, 73, 83, 0.14);
   border-radius: 11px;
-  background: #fffdfb;
+  background: #fff8f0;
   color: #343038;
   box-shadow: inset 0 1px 2px rgba(52, 34, 39, 0.025);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -704,7 +713,7 @@ select {
   border-bottom: 1px solid rgba(124, 77, 87, 0.09);
   background:
     radial-gradient(circle at 92% 20%, rgba(197, 34, 55, 0.07), transparent 30%),
-    linear-gradient(135deg, #fffaf7, #fff3f0);
+    linear-gradient(135deg, #fef5ea, #fff3f0);
 }
 
 #app .create-head::before,
@@ -841,8 +850,8 @@ select {
 #app .btn-del-act,
 #app .review-del {
   border-color: rgba(197, 34, 55, 0.15);
-  color: #b22337;
-  background: #fff4f3;
+  color: #81021f;
+  background: #fcefe5;
 }
 
 /* 知识卡、角色面板与确认框 */
@@ -890,7 +899,7 @@ select {
 
 #app .role-item.active {
   border-color: rgba(197, 34, 55, 0.45);
-  background: linear-gradient(135deg, #fff2f2, #fff9f6);
+  background: linear-gradient(135deg, #fae9df, #fff7ed);
   box-shadow: 0 7px 20px rgba(142, 29, 46, 0.08);
 }
 
@@ -961,7 +970,7 @@ select {
 
 #overlay-root .role-item.active {
   border-color: rgba(197, 34, 55, 0.45);
-  background: linear-gradient(135deg, #fff2f2, #fff9f6);
+  background: linear-gradient(135deg, #fae9df, #fff7ed);
   box-shadow: 0 7px 20px rgba(142, 29, 46, 0.08);
 }
 
@@ -1020,7 +1029,7 @@ select {
   #app .role-panel.is-mobile {
     border-radius: 27px 27px 0 0;
     max-height: 92vh;
-    background: #fffdfb;
+    background: #fff8f0;
   }
 
   #app .loc-modal-mobile::before,
@@ -1122,23 +1131,23 @@ select {
    ========================================================= */
 
 :root {
-  --apple-bg: #f5f5f7;
-  --apple-surface: rgba(255, 255, 255, 0.88);
-  --apple-surface-solid: #ffffff;
-  --apple-material: rgba(250, 250, 252, 0.82);
-  --apple-ink: #1d1d1f;
-  --apple-secondary: #6e6e73;
-  --apple-tertiary: #86868b;
-  --apple-separator: rgba(60, 60, 67, 0.12);
-  --apple-fill: rgba(118, 118, 128, 0.09);
-  --apple-red: #c52237;
-  --apple-red-deep: #9d172b;
+  --apple-bg: var(--palette-lotus-white);
+  --apple-surface: rgba(255, 250, 243, 0.9);
+  --apple-surface-solid: #fffaf3;
+  --apple-material: rgba(254, 238, 225, 0.86);
+  --apple-ink: var(--palette-burgundy-deep);
+  --apple-secondary: #755e64;
+  --apple-tertiary: #927b80;
+  --apple-separator: rgba(129, 2, 31, 0.11);
+  --apple-fill: rgba(129, 2, 31, 0.065);
+  --apple-red: var(--palette-silver-red);
+  --apple-red-deep: var(--palette-burgundy);
   --apple-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.035),
-    0 10px 32px rgba(0, 0, 0, 0.055);
+    0 1px 2px rgba(74, 2, 20, 0.035),
+    0 12px 34px rgba(74, 2, 20, 0.07);
   --apple-shadow-strong:
-    0 2px 8px rgba(0, 0, 0, 0.05),
-    0 24px 70px rgba(0, 0, 0, 0.12);
+    0 2px 8px rgba(74, 2, 20, 0.055),
+    0 26px 74px rgba(74, 2, 20, 0.16);
 }
 
 #app {
@@ -1175,10 +1184,10 @@ select {
 #app .pc-header {
   color: white;
   background:
-    radial-gradient(circle at 84% -50%, rgba(255, 255, 255, 0.18), transparent 42%),
-    linear-gradient(125deg, rgba(128, 12, 31, 0.96), rgba(183, 22, 44, 0.94));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 10px 30px rgba(105, 13, 29, 0.14);
+    radial-gradient(circle at 84% -50%, rgba(239, 86, 84, 0.35), transparent 44%),
+    linear-gradient(118deg, #43000f 0%, var(--palette-burgundy) 68%, #9c1932 100%);
+  border-bottom: 1px solid rgba(254, 238, 225, 0.16);
+  box-shadow: 0 12px 34px rgba(65, 0, 15, 0.2);
   backdrop-filter: saturate(180%) blur(24px);
   -webkit-backdrop-filter: saturate(180%) blur(24px);
 }
@@ -1215,7 +1224,8 @@ select {
   gap: 3px;
   padding: 3px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(58, 0, 14, 0.28);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
 }
 
 #app .pc-nav-item {
@@ -1228,27 +1238,27 @@ select {
 }
 
 #app .pc-nav-item:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(254, 238, 225, 0.12);
   color: white;
 }
 
 #app .pc-nav-item.active {
-  color: #9c1428;
-  background: rgba(255, 255, 255, 0.94);
+  color: var(--palette-burgundy);
+  background: var(--palette-lotus-white);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.06),
     0 3px 10px rgba(0, 0, 0, 0.035);
 }
 
 #app .pc-nav-item.active .app-icon {
-  color: #b0172d;
+  color: var(--palette-silver-red);
 }
 
 #app .pc-badge {
   min-width: 18px;
   padding: 1px 6px;
-  background: var(--apple-red);
-  color: white;
+  background: var(--palette-silver-red);
+  color: var(--palette-burgundy-deep);
   font-size: 9px;
 }
 
@@ -1281,10 +1291,10 @@ select {
 #app .mobile-topbar {
   color: white;
   background:
-    radial-gradient(circle at 86% -55%, rgba(255, 255, 255, 0.2), transparent 45%),
-    linear-gradient(125deg, rgba(130, 12, 31, 0.97), rgba(191, 25, 47, 0.95));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 8px 24px rgba(110, 12, 29, 0.16);
+    radial-gradient(circle at 86% -55%, rgba(239, 86, 84, 0.4), transparent 46%),
+    linear-gradient(120deg, #40000e 0%, var(--palette-burgundy) 74%, #96142f 100%);
+  border-bottom: 1px solid rgba(254, 238, 225, 0.16);
+  box-shadow: 0 10px 28px rgba(65, 0, 15, 0.22);
   backdrop-filter: saturate(180%) blur(24px);
   -webkit-backdrop-filter: saturate(180%) blur(24px);
 }
@@ -1338,9 +1348,9 @@ select {
   bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   gap: 1px;
   padding: 6px 5px;
-  border: 1px solid rgba(60, 60, 67, 0.1);
+  border: 1px solid rgba(129, 2, 31, 0.13);
   border-radius: 24px;
-  background: rgba(250, 250, 252, 0.82);
+  background: rgba(255, 249, 242, 0.86);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.8) inset,
     0 12px 38px rgba(0, 0, 0, 0.13);
@@ -1368,8 +1378,8 @@ select {
 }
 
 #app .mobile-tabbar-item.active {
-  background: rgba(197, 34, 55, 0.075);
-  color: var(--apple-red);
+  background: rgba(239, 86, 84, 0.14);
+  color: var(--palette-burgundy);
 }
 
 #app .mobile-tabbar-item.active .mobile-tabbar-icon {
@@ -1381,8 +1391,9 @@ select {
 }
 
 #app .mobile-tabbar-badge {
-  background: var(--apple-red);
-  box-shadow: 0 2px 7px rgba(160, 20, 43, 0.2);
+  background: var(--palette-silver-red);
+  color: var(--palette-burgundy-deep);
+  box-shadow: 0 2px 7px rgba(129, 2, 31, 0.2);
 }
 
 /* Page headers */
@@ -1392,14 +1403,15 @@ select {
 #app .pc-page-header {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(160, 38, 58, 0.13);
+  border: 1px solid rgba(129, 2, 31, 0.12);
   border-radius: 28px;
   background:
-    radial-gradient(circle at 88% 16%, rgba(197, 34, 55, 0.17), transparent 34%),
-    linear-gradient(135deg, rgba(255, 252, 251, 0.98), rgba(255, 235, 237, 0.92));
+    radial-gradient(circle at 88% 16%, rgba(239, 86, 84, 0.2), transparent 35%),
+    radial-gradient(circle at 12% 105%, rgba(129, 2, 31, 0.055), transparent 32%),
+    linear-gradient(135deg, rgba(255, 249, 242, 0.98), rgba(254, 238, 225, 0.94));
   box-shadow:
-    0 1px 2px rgba(108, 27, 43, 0.035),
-    0 14px 36px rgba(117, 27, 43, 0.075);
+    0 1px 2px rgba(108, 2, 26, 0.035),
+    0 16px 40px rgba(108, 2, 26, 0.08);
 }
 
 #app .pc-map-header::after,
@@ -1415,11 +1427,11 @@ select {
 #app .mobile-page-header {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(160, 38, 58, 0.13);
+  border: 1px solid rgba(129, 2, 31, 0.12);
   border-radius: 24px;
   background:
-    radial-gradient(circle at 92% 10%, rgba(197, 34, 55, 0.16), transparent 34%),
-    linear-gradient(145deg, rgba(255, 253, 252, 0.96), rgba(255, 237, 239, 0.9));
+    radial-gradient(circle at 92% 10%, rgba(239, 86, 84, 0.2), transparent 35%),
+    linear-gradient(145deg, rgba(255, 250, 243, 0.97), rgba(254, 238, 225, 0.93));
   box-shadow: var(--apple-shadow);
   backdrop-filter: blur(18px) saturate(135%);
   -webkit-backdrop-filter: blur(18px) saturate(135%);
@@ -1440,8 +1452,8 @@ select {
   padding: 5px 10px;
   border: 0;
   border-radius: 9px;
-  background: rgba(255, 255, 255, 0.72);
-  color: #a51b31;
+  background: rgba(254, 238, 225, 0.84);
+  color: var(--palette-burgundy);
   box-shadow: none;
   font-size: 11px;
   font-weight: 600;
@@ -1483,7 +1495,7 @@ select {
 #app .m-header-stats {
   padding: 3px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.48);
+  background: rgba(254, 238, 225, 0.6);
 }
 
 #app .pc-stat,
@@ -1491,7 +1503,7 @@ select {
 #app .m-stat {
   border: 0;
   border-radius: 11px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 251, 245, 0.92);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.055),
     0 4px 12px rgba(0, 0, 0, 0.03);
@@ -1505,11 +1517,11 @@ select {
 
 /* Check-in hero retains a restrained brand accent. */
 #app .m-page-header {
-  border: 1px solid rgba(129, 20, 37, 0.22);
+  border: 1px solid rgba(254, 238, 225, 0.2);
   border-radius: 25px;
   background:
-    radial-gradient(circle at 90% 4%, rgba(255, 255, 255, 0.18), transparent 34%),
-    linear-gradient(145deg, #b5162e, #8f1225);
+    radial-gradient(circle at 90% 4%, rgba(239, 86, 84, 0.38), transparent 36%),
+    linear-gradient(145deg, #4a0011, var(--palette-burgundy));
   box-shadow:
     0 1px 1px rgba(255, 255, 255, 0.12) inset,
     0 14px 36px rgba(121, 17, 35, 0.19);
@@ -1531,14 +1543,15 @@ select {
 /* Home hero */
 #app .pc-hero,
 #app .mobile-hero {
-  border: 1px solid rgba(160, 38, 58, 0.12);
+  border: 1px solid rgba(129, 2, 31, 0.11);
   border-radius: 29px;
   background:
-    radial-gradient(circle at 86% 12%, rgba(197, 34, 55, 0.16), transparent 32%),
-    linear-gradient(150deg, rgba(255, 252, 251, 0.98), rgba(255, 235, 238, 0.9));
+    radial-gradient(circle at 86% 12%, rgba(239, 86, 84, 0.2), transparent 33%),
+    radial-gradient(circle at 8% 100%, rgba(129, 2, 31, 0.05), transparent 32%),
+    linear-gradient(150deg, rgba(255, 250, 243, 0.98), rgba(254, 238, 225, 0.94));
   box-shadow:
-    0 1px 2px rgba(108, 27, 43, 0.03),
-    0 14px 38px rgba(117, 27, 43, 0.07);
+    0 1px 2px rgba(108, 2, 26, 0.03),
+    0 16px 40px rgba(108, 2, 26, 0.075);
 }
 
 #app .mobile-hero-title,
@@ -1561,8 +1574,8 @@ select {
 #app .reco-cold-tag {
   border: 0;
   border-radius: 9px;
-  background: rgba(255, 255, 255, 0.74);
-  color: #a51b31;
+  background: rgba(254, 238, 225, 0.84);
+  color: var(--palette-burgundy);
   box-shadow: none;
   font-weight: 600;
 }
@@ -1571,7 +1584,7 @@ select {
 #app .pc-hero-stats {
   border: 0;
   border-radius: 17px;
-  background: rgba(255, 255, 255, 0.56);
+  background: rgba(254, 238, 225, 0.58);
   box-shadow: none;
 }
 
@@ -1599,7 +1612,7 @@ select {
 #app .note-btn.save,
 #app .m-note-btn.save {
   border-radius: 14px;
-  box-shadow: 0 7px 18px rgba(151, 26, 44, 0.16);
+  box-shadow: 0 8px 20px rgba(129, 2, 31, 0.16);
   transition:
     transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
     box-shadow 0.22s ease,
@@ -1623,7 +1636,9 @@ select {
 #app .nf-btn,
 #app .note-btn.save,
 #app .m-note-btn.save {
-  background: linear-gradient(180deg, #cb2940, #ad1c32);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, #f66c68, var(--palette-silver-red));
+  color: var(--palette-burgundy-deep);
 }
 
 #app .btn-approve {
@@ -1633,9 +1648,9 @@ select {
 }
 
 #app .btn-reject {
-  border-color: rgba(255, 59, 48, 0.14);
-  background: rgba(255, 59, 48, 0.07);
-  color: #d70015;
+  border-color: rgba(129, 2, 31, 0.15);
+  background: rgba(239, 86, 84, 0.1);
+  color: var(--palette-burgundy);
 }
 
 #app .btn-secondary,
@@ -1647,7 +1662,7 @@ select {
 #app .note-btn.cancel,
 #app .m-note-btn.cancel {
   border: 1px solid var(--apple-separator);
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 251, 245, 0.86);
   color: var(--apple-ink);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.035);
 }
@@ -1700,18 +1715,18 @@ select {
 #app .act-card:hover,
 #app .place-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(60, 60, 67, 0.16);
+  border-color: rgba(129, 2, 31, 0.17);
   box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.045),
-    0 18px 42px rgba(0, 0, 0, 0.075);
+    0 2px 5px rgba(73, 2, 19, 0.035),
+    0 20px 46px rgba(73, 2, 19, 0.09);
 }
 
 #app .reco-section {
-  border: 1px solid rgba(151, 47, 65, 0.11);
+  border: 1px solid rgba(129, 2, 31, 0.1);
   border-radius: 22px;
   background:
-    radial-gradient(circle at 92% 8%, rgba(255, 255, 255, 0.72), transparent 24%),
-    linear-gradient(145deg, rgba(255, 249, 249, 0.9), rgba(249, 242, 249, 0.86));
+    radial-gradient(circle at 92% 8%, rgba(239, 86, 84, 0.13), transparent 25%),
+    linear-gradient(145deg, rgba(255, 248, 240, 0.92), rgba(251, 232, 221, 0.86));
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.025);
 }
 
@@ -1759,39 +1774,40 @@ select {
 
 #app .filter-chip.active,
 #app .filter-btn.active {
-  border-color: transparent;
-  background: linear-gradient(180deg, #c9273e, #a9182e);
-  color: white;
+  border-color: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(180deg, #f66c68, var(--palette-silver-red));
+  color: var(--palette-burgundy-deep);
   box-shadow:
-    0 1px 2px rgba(112, 16, 34, 0.16),
-    0 5px 14px rgba(144, 24, 43, 0.16);
+    0 1px 2px rgba(90, 2, 23, 0.13),
+    0 6px 16px rgba(129, 2, 31, 0.15);
 }
 
 #app .reco-ai-btn {
   border-radius: 11px;
-  background: #5856d6;
-  box-shadow: 0 5px 14px rgba(88, 86, 214, 0.16);
+  background: linear-gradient(135deg, var(--palette-burgundy), #570015);
+  color: var(--palette-lotus-white);
+  box-shadow: 0 6px 16px rgba(90, 2, 23, 0.18);
 }
 
 #app .filter-chip.active .filter-count,
 #app .filter-btn.active .filter-count {
-  background: rgba(255, 255, 255, 0.19);
-  color: white;
+  background: rgba(57, 0, 14, 0.1);
+  color: var(--palette-burgundy-deep);
 }
 
 #app .action-btn:hover:not(:disabled),
 #app .filter-btn:hover,
 #app .filter-chip:hover {
   border-color: var(--apple-separator);
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 249, 242, 0.92);
   color: var(--apple-ink);
 }
 
 #app .pc-tabs,
 #app .mobile-tabs {
-  border: 1px solid rgba(145, 50, 67, 0.1);
+  border: 1px solid rgba(129, 2, 31, 0.1);
   border-radius: 15px;
-  background: rgba(118, 118, 128, 0.075);
+  background: rgba(129, 2, 31, 0.055);
   box-shadow: none;
 }
 
@@ -1804,20 +1820,20 @@ select {
 
 #app .pc-tab-btn.active,
 #app .mobile-tab-btn.active {
-  background: linear-gradient(180deg, #c9273e, #a9182e);
-  color: white;
+  background: linear-gradient(180deg, #f66c68, var(--palette-silver-red));
+  color: var(--palette-burgundy-deep);
   box-shadow:
-    0 1px 2px rgba(112, 16, 34, 0.16),
-    0 5px 14px rgba(144, 24, 43, 0.16);
+    0 1px 2px rgba(90, 2, 23, 0.13),
+    0 6px 16px rgba(129, 2, 31, 0.15);
 }
 
 #app .pc-tab-btn.active .app-icon {
-  color: white;
+  color: var(--palette-burgundy-deep);
 }
 
 #app .mobile-tabs-wrap {
   top: calc(56px + env(safe-area-inset-top, 0px));
-  background: linear-gradient(180deg, rgba(245, 245, 247, 0.98), rgba(245, 245, 247, 0.86));
+  background: linear-gradient(180deg, rgba(254, 238, 225, 0.98), rgba(255, 248, 239, 0.88));
 }
 
 /* Lists and form details */
@@ -1837,19 +1853,19 @@ select {
 #app .pc-side-item:hover,
 #app .pc-side-item.is-active {
   border-color: var(--apple-separator);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 249, 242, 0.9);
 }
 
 #app .detail-info-row,
 #app .pl-info-row {
   border-radius: 13px;
-  background: rgba(118, 118, 128, 0.055);
+  background: rgba(129, 2, 31, 0.045);
 }
 
 #app .detail-icon,
 #app .fact-modal-icon {
   color: var(--apple-red);
-  background: rgba(197, 34, 55, 0.075);
+  background: rgba(239, 86, 84, 0.12);
 }
 
 #app .modal-reviews,
@@ -1858,7 +1874,7 @@ select {
 #app .fact-modal-body {
   border-color: var(--apple-separator);
   border-radius: 16px;
-  background: rgba(118, 118, 128, 0.055);
+  background: rgba(129, 2, 31, 0.04);
 }
 
 #app .field-input,
@@ -1868,7 +1884,7 @@ select {
 #app .m-note-input {
   border-color: var(--apple-separator);
   border-radius: 12px;
-  background: rgba(118, 118, 128, 0.06);
+  background: rgba(129, 2, 31, 0.045);
   box-shadow: none;
 }
 
@@ -1877,9 +1893,9 @@ select {
 #app .review-textarea:focus,
 #app .note-input:focus,
 #app .m-note-input:focus {
-  border-color: rgba(197, 34, 55, 0.5);
-  background: white;
-  box-shadow: 0 0 0 4px rgba(197, 34, 55, 0.08);
+  border-color: rgba(239, 86, 84, 0.56);
+  background: #fffaf3;
+  box-shadow: 0 0 0 4px rgba(239, 86, 84, 0.11);
 }
 
 /* Sheets and dialogs */
@@ -1907,7 +1923,7 @@ select {
 #app .role-panel {
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 28px;
-  background: rgba(252, 252, 253, 0.94);
+  background: rgba(255, 249, 242, 0.95);
   box-shadow: var(--apple-shadow-strong);
   backdrop-filter: blur(28px) saturate(135%);
   -webkit-backdrop-filter: blur(28px) saturate(135%);
@@ -1921,16 +1937,16 @@ select {
 #app .review-footer,
 #app .upload-footer {
   border-top-color: var(--apple-separator);
-  background: rgba(252, 252, 253, 0.9);
+  background: rgba(255, 249, 242, 0.92);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
 }
 
 #app .pc-footer {
   margin-top: 48px;
-  border-top: 1px solid var(--apple-separator);
-  background: rgba(250, 250, 252, 0.84);
-  color: var(--apple-tertiary);
+  border-top: 1px solid rgba(254, 238, 225, 0.12);
+  background: linear-gradient(120deg, #39000e, var(--palette-burgundy));
+  color: rgba(254, 238, 225, 0.62);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -1969,7 +1985,7 @@ select {
   #app .fact-modal-card,
   #app .role-panel.is-mobile {
     border-radius: 28px 28px 0 0;
-    background: rgba(252, 252, 253, 0.96);
+    background: rgba(255, 249, 242, 0.97);
   }
 }
 
@@ -1995,13 +2011,13 @@ select {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 25px;
   background:
-    radial-gradient(circle at 90% 12%, rgba(214, 62, 82, 0.27), transparent 30%),
-    radial-gradient(circle at 18% 120%, rgba(197, 34, 55, 0.19), transparent 38%),
-    linear-gradient(140deg, #1c1c1e 0%, #2c2024 58%, #571725 100%);
-  color: white;
+    radial-gradient(circle at 90% 12%, rgba(239, 86, 84, 0.42), transparent 31%),
+    radial-gradient(circle at 18% 120%, rgba(129, 2, 31, 0.32), transparent 40%),
+    linear-gradient(140deg, #14090c 0%, #39000e 48%, var(--palette-burgundy) 100%);
+  color: var(--palette-lotus-white);
   box-shadow:
     0 1px 1px rgba(255, 255, 255, 0.1) inset,
-    0 18px 42px rgba(63, 15, 26, 0.18);
+    0 18px 44px rgba(76, 0, 19, 0.24);
 }
 
 #app .route-ai-hero::after {
@@ -2025,7 +2041,7 @@ select {
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.1);
-  color: #ffd7dc;
+  color: var(--palette-lotus-white);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -2084,9 +2100,9 @@ select {
   align-items: center;
   gap: 6px;
   padding: 7px 10px;
-  border: 1px solid rgba(119, 74, 84, 0.08);
+  border: 1px solid rgba(129, 2, 31, 0.08);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 249, 242, 0.82);
   color: var(--apple-secondary);
   font-size: 10.5px;
   font-weight: 600;
@@ -2146,9 +2162,9 @@ select {
   width: 100%;
   min-width: 0;
   padding: 14px;
-  border: 1px solid rgba(60, 60, 67, 0.09);
+  border: 1px solid rgba(129, 2, 31, 0.09);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 249, 242, 0.9);
   color: var(--apple-ink);
   text-align: left;
   box-shadow:
@@ -2164,8 +2180,8 @@ select {
 
 #app .route-ai-panel .pc-preset-item:hover,
 #app .route-ai-panel .mobile-preset-item:active {
-  border-color: rgba(197, 34, 55, 0.2);
-  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(239, 86, 84, 0.25);
+  background: rgba(255, 250, 244, 0.98);
   transform: translateY(-1px);
   box-shadow:
     0 2px 5px rgba(0, 0, 0, 0.04),
@@ -2174,11 +2190,11 @@ select {
 
 #app .route-ai-panel .pc-preset-item.selected,
 #app .route-ai-panel .mobile-preset-item.selected {
-  border-color: rgba(197, 34, 55, 0.28);
-  background: linear-gradient(145deg, #fff8f8, #fff0f2);
+  border-color: rgba(239, 86, 84, 0.32);
+  background: linear-gradient(145deg, #fff8ef, #fbe7dc);
   box-shadow:
-    0 0 0 3px rgba(197, 34, 55, 0.05),
-    0 8px 22px rgba(118, 29, 47, 0.07);
+    0 0 0 3px rgba(239, 86, 84, 0.08),
+    0 8px 22px rgba(129, 2, 31, 0.08);
 }
 
 #app .pc-preset-icon,
@@ -2189,7 +2205,7 @@ select {
   place-items: center;
   flex-shrink: 0;
   border-radius: 12px;
-  background: rgba(197, 34, 55, 0.075);
+  background: rgba(239, 86, 84, 0.12);
   color: var(--apple-red);
   transition: transform 0.22s ease, background 0.22s ease;
 }
@@ -2197,7 +2213,7 @@ select {
 #app .pc-preset-item:hover .pc-preset-icon,
 #app .mobile-preset-item:active .mobile-preset-icon {
   transform: scale(1.05);
-  background: rgba(197, 34, 55, 0.11);
+  background: rgba(239, 86, 84, 0.18);
 }
 
 #app .pc-preset-copy,
@@ -2229,8 +2245,8 @@ select {
   flex-shrink: 0;
   padding: 3px 7px;
   border-radius: 7px;
-  background: rgba(197, 34, 55, 0.08);
-  color: #ae1d33;
+  background: rgba(239, 86, 84, 0.12);
+  color: var(--palette-burgundy);
   font-size: 9px;
   font-weight: 650;
 }
@@ -2259,11 +2275,11 @@ select {
 #app .route-ai-composer {
   margin-top: 0;
   padding: 17px;
-  border: 1px solid rgba(60, 60, 67, 0.1);
+  border: 1px solid rgba(129, 2, 31, 0.1);
   border-radius: 19px;
   background:
-    radial-gradient(circle at 94% 4%, rgba(197, 34, 55, 0.065), transparent 28%),
-    rgba(255, 255, 255, 0.78);
+    radial-gradient(circle at 94% 4%, rgba(239, 86, 84, 0.12), transparent 29%),
+    rgba(255, 249, 242, 0.84);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.025);
 }
 
@@ -2284,7 +2300,7 @@ select {
   place-items: center;
   flex-shrink: 0;
   border-radius: 10px;
-  background: rgba(197, 34, 55, 0.075);
+  background: rgba(239, 86, 84, 0.12);
   color: var(--apple-red);
   font-size: 14px;
 }
@@ -2326,25 +2342,26 @@ select {
 
 #app .route-ai-composer .pc-ask-textarea,
 #app .route-ai-composer .mobile-ask-textarea {
-  border: 1px solid rgba(60, 60, 67, 0.12);
+  border: 1px solid rgba(129, 2, 31, 0.12);
   border-radius: 13px;
-  background: rgba(118, 118, 128, 0.055);
+  background: rgba(129, 2, 31, 0.04);
   color: var(--apple-ink);
   box-shadow: none;
 }
 
 #app .route-ai-composer .pc-ask-textarea:focus,
 #app .route-ai-composer .mobile-ask-textarea:focus {
-  border-color: rgba(197, 34, 55, 0.42);
-  background: white;
-  box-shadow: 0 0 0 4px rgba(197, 34, 55, 0.07);
+  border-color: rgba(239, 86, 84, 0.5);
+  background: #fffaf3;
+  box-shadow: 0 0 0 4px rgba(239, 86, 84, 0.1);
 }
 
 #app .route-ai-composer .pc-btn-ask-submit,
 #app .route-ai-composer .mobile-btn-ask-submit {
   border-radius: 12px;
-  background: linear-gradient(180deg, #ca2740, #a91930);
-  box-shadow: 0 6px 16px rgba(143, 24, 43, 0.14);
+  background: linear-gradient(180deg, #f66c68, var(--palette-silver-red));
+  color: var(--palette-burgundy-deep);
+  box-shadow: 0 6px 16px rgba(129, 2, 31, 0.15);
 }
 
 #app .route-ai-composer .pc-btn-ask-submit:disabled,
@@ -2458,28 +2475,28 @@ select {
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --rc-ink: #f5f5f7;
+  --rc-ink: #feeee1;
   --rc-muted: #a1a1a6;
-  --rc-cream: #1c1c1e;
-  --rc-surface: #1c1c1e;
+  --rc-cream: #1b1417;
+  --rc-surface: #1b1719;
   --rc-canvas: #0b0b0d;
-  --rc-line: rgba(255, 255, 255, 0.11);
-  --rc-red: #f0445b;
-  --rc-red-deep: #b91e36;
-  --rc-red-soft: rgba(240, 68, 91, 0.12);
+  --rc-line: rgba(254, 238, 225, 0.11);
+  --rc-red: var(--palette-silver-red);
+  --rc-red-deep: var(--palette-burgundy);
+  --rc-red-soft: rgba(239, 86, 84, 0.13);
   --rc-shadow-sm: 0 6px 22px rgba(0, 0, 0, 0.24);
   --rc-shadow-md: 0 20px 52px rgba(0, 0, 0, 0.34);
   --apple-bg: #0b0b0d;
-  --apple-surface: rgba(28, 28, 30, 0.9);
-  --apple-surface-solid: #1c1c1e;
-  --apple-material: rgba(22, 22, 24, 0.84);
-  --apple-ink: #f5f5f7;
-  --apple-secondary: #a1a1a6;
-  --apple-tertiary: #86868b;
-  --apple-separator: rgba(255, 255, 255, 0.11);
-  --apple-fill: rgba(118, 118, 128, 0.22);
-  --apple-red: #ef4057;
-  --apple-red-deep: #b81d35;
+  --apple-surface: rgba(29, 23, 26, 0.92);
+  --apple-surface-solid: #1d171a;
+  --apple-material: rgba(22, 18, 20, 0.86);
+  --apple-ink: #feeee1;
+  --apple-secondary: #b9aaae;
+  --apple-tertiary: #96888c;
+  --apple-separator: rgba(254, 238, 225, 0.11);
+  --apple-fill: rgba(239, 86, 84, 0.09);
+  --apple-red: var(--palette-silver-red);
+  --apple-red-deep: var(--palette-burgundy);
   --apple-shadow:
     0 1px 1px rgba(255, 255, 255, 0.025) inset,
     0 10px 30px rgba(0, 0, 0, 0.28);
@@ -2491,13 +2508,13 @@ select {
 :root[data-theme="dark"],
 :root[data-theme="dark"] body {
   background: #0b0b0d;
-  color: #f5f5f7;
+  color: #feeee1;
 }
 
 :root[data-theme="dark"] body {
   background:
-    radial-gradient(circle at 8% 2%, rgba(197, 34, 55, 0.13), transparent 28rem),
-    radial-gradient(circle at 92% 8%, rgba(120, 87, 145, 0.08), transparent 26rem),
+    radial-gradient(circle at 8% 2%, rgba(239, 86, 84, 0.12), transparent 29rem),
+    radial-gradient(circle at 92% 8%, rgba(129, 2, 31, 0.15), transparent 27rem),
     #0b0b0d;
 }
 
@@ -2516,14 +2533,14 @@ select {
 :root[data-theme="dark"] #app .mobile-page-title,
 :root[data-theme="dark"] #app .pc-section-title,
 :root[data-theme="dark"] #app .mobile-section-title {
-  color: #f5f5f7;
+  color: #feeee1;
   -webkit-text-fill-color: currentColor;
 }
 
 :root[data-theme="dark"] #app .pc-header {
   background:
-    radial-gradient(circle at 84% -50%, rgba(255, 255, 255, 0.12), transparent 42%),
-    linear-gradient(125deg, rgba(50, 7, 16, 0.97), rgba(111, 12, 31, 0.95));
+    radial-gradient(circle at 84% -50%, rgba(239, 86, 84, 0.28), transparent 44%),
+    linear-gradient(118deg, #26000a, #610018 72%, var(--palette-burgundy));
   border-bottom-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 10px 32px rgba(0, 0, 0, 0.28);
 }
@@ -2542,26 +2559,26 @@ select {
 }
 
 :root[data-theme="dark"] #app .pc-nav-item.active {
-  background: rgba(255, 255, 255, 0.13);
-  color: white;
+  background: var(--palette-lotus-white);
+  color: var(--palette-burgundy);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
 }
 
 :root[data-theme="dark"] #app .pc-nav-item.active .app-icon {
-  color: #ff7183;
+  color: var(--palette-silver-red);
 }
 
 :root[data-theme="dark"] #app .mobile-topbar {
   background:
-    radial-gradient(circle at 86% -55%, rgba(255, 255, 255, 0.12), transparent 45%),
-    linear-gradient(125deg, rgba(49, 7, 16, 0.98), rgba(112, 12, 31, 0.96));
+    radial-gradient(circle at 86% -55%, rgba(239, 86, 84, 0.3), transparent 46%),
+    linear-gradient(120deg, #250009, #5d0017 72%, var(--palette-burgundy));
   border-bottom-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.3);
 }
 
 :root[data-theme="dark"] #app .mobile-tabbar {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(23, 23, 25, 0.84);
+  border-color: rgba(254, 238, 225, 0.1);
+  background: rgba(24, 18, 21, 0.88);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 16px 42px rgba(0, 0, 0, 0.44);
@@ -2572,8 +2589,8 @@ select {
 }
 
 :root[data-theme="dark"] #app .mobile-tabbar-item.active {
-  background: rgba(239, 64, 87, 0.13);
-  color: #ff7183;
+  background: rgba(239, 86, 84, 0.14);
+  color: #ff8c89;
 }
 
 :root[data-theme="dark"] #app .theme-toggle {
@@ -2591,8 +2608,8 @@ select {
 :root[data-theme="dark"] #app .mobile-page-header {
   border-color: rgba(255, 255, 255, 0.08);
   background:
-    radial-gradient(circle at 90% 12%, rgba(197, 34, 55, 0.18), transparent 34%),
-    linear-gradient(145deg, rgba(31, 24, 27, 0.96), rgba(17, 17, 19, 0.96));
+    radial-gradient(circle at 90% 12%, rgba(239, 86, 84, 0.2), transparent 35%),
+    linear-gradient(145deg, rgba(35, 24, 28, 0.98), rgba(17, 14, 16, 0.98));
   box-shadow:
     0 1px 1px rgba(255, 255, 255, 0.035) inset,
     0 14px 38px rgba(0, 0, 0, 0.24);
@@ -2632,8 +2649,8 @@ select {
 :root[data-theme="dark"] #app .mobile-hero {
   border-color: rgba(255, 255, 255, 0.08);
   background:
-    radial-gradient(circle at 86% 12%, rgba(197, 34, 55, 0.18), transparent 32%),
-    linear-gradient(150deg, rgba(32, 24, 27, 0.97), rgba(17, 17, 19, 0.95));
+    radial-gradient(circle at 86% 12%, rgba(239, 86, 84, 0.2), transparent 33%),
+    linear-gradient(150deg, rgba(33, 24, 28, 0.98), rgba(16, 13, 15, 0.97));
   box-shadow:
     0 1px 1px rgba(255, 255, 255, 0.035) inset,
     0 16px 42px rgba(0, 0, 0, 0.28);
@@ -2642,20 +2659,20 @@ select {
 :root[data-theme="dark"] #app .mobile-hero-title,
 :root[data-theme="dark"] #app .title-main,
 :root[data-theme="dark"] #app .pc-hero-title {
-  color: #f5f5f7;
+  color: #feeee1;
   background: none;
   -webkit-text-fill-color: currentColor;
 }
 
 :root[data-theme="dark"] #app .pc-hero-subtitle {
-  color: #ff667a;
+  color: #ff8c89;
 }
 
 :root[data-theme="dark"] #app .m-page-header {
   border-color: rgba(255, 255, 255, 0.08);
   background:
-    radial-gradient(circle at 90% 4%, rgba(255, 255, 255, 0.11), transparent 34%),
-    linear-gradient(145deg, #6d0b1c, #34050d);
+    radial-gradient(circle at 90% 4%, rgba(239, 86, 84, 0.3), transparent 35%),
+    linear-gradient(145deg, #4a0011, var(--palette-burgundy));
 }
 
 :root[data-theme="dark"] #app .pc-figure-card,
@@ -2684,18 +2701,18 @@ select {
 :root[data-theme="dark"] #app .m-note-section,
 :root[data-theme="dark"] #app .info-section,
 :root[data-theme="dark"] #app .note-section {
-  border-color: rgba(255, 255, 255, 0.09);
-  background: rgba(28, 28, 30, 0.9);
+  border-color: rgba(254, 238, 225, 0.09);
+  background: rgba(29, 23, 26, 0.92);
   box-shadow:
     0 1px 1px rgba(255, 255, 255, 0.025) inset,
     0 12px 32px rgba(0, 0, 0, 0.26);
 }
 
 :root[data-theme="dark"] #app .reco-section {
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(254, 238, 225, 0.08);
   background:
-    radial-gradient(circle at 92% 8%, rgba(197, 34, 55, 0.08), transparent 26%),
-    rgba(26, 26, 28, 0.86);
+    radial-gradient(circle at 92% 8%, rgba(239, 86, 84, 0.11), transparent 27%),
+    rgba(29, 23, 26, 0.9);
 }
 
 :root[data-theme="dark"] #app .pc-figure-desc,
@@ -2733,7 +2750,7 @@ select {
 :root[data-theme="dark"] #app .mobile-location-name,
 :root[data-theme="dark"] #app .pc-figure-name,
 :root[data-theme="dark"] #app .mobile-figure-name {
-  color: #f5f5f7;
+  color: #feeee1;
 }
 
 :root[data-theme="dark"] #app .pc-side-item {
@@ -2754,20 +2771,20 @@ select {
 :root[data-theme="dark"] #app .highlight-tag,
 :root[data-theme="dark"] #app .pl-highlight,
 :root[data-theme="dark"] #app .detail-highlight {
-  background: rgba(239, 64, 87, 0.11);
-  color: #ff9aa8;
+  background: rgba(239, 86, 84, 0.12);
+  color: #ffaaa7;
 }
 
 :root[data-theme="dark"] #app .filter-chip,
 :root[data-theme="dark"] #app .filter-btn,
 :root[data-theme="dark"] #app .action-btn {
-  color: #b8b8bd;
-  background: rgba(118, 118, 128, 0.18);
+  color: #cbbdc0;
+  background: rgba(239, 86, 84, 0.09);
 }
 
 :root[data-theme="dark"] #app .pc-tabs,
 :root[data-theme="dark"] #app .mobile-tabs {
-  background: rgba(118, 118, 128, 0.18);
+  background: rgba(239, 86, 84, 0.09);
 }
 
 :root[data-theme="dark"] #app .pc-tab-btn,
@@ -2800,7 +2817,7 @@ select {
 :root[data-theme="dark"] #app .confirm-box,
 :root[data-theme="dark"] #overlay-root .role-panel {
   border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(28, 28, 30, 0.96);
+  background: rgba(29, 23, 26, 0.97);
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
 }
 
@@ -2812,7 +2829,7 @@ select {
 :root[data-theme="dark"] #app .review-body,
 :root[data-theme="dark"] #app .upload-body,
 :root[data-theme="dark"] #app .fact-modal-body {
-  background: #1c1c1e;
+  background: #1d171a;
 }
 
 :root[data-theme="dark"] #app .modal-title,
@@ -2823,7 +2840,7 @@ select {
 :root[data-theme="dark"] #app .review-target-name,
 :root[data-theme="dark"] #app .detail-value,
 :root[data-theme="dark"] #app .pl-info-value {
-  color: #f5f5f7;
+  color: #feeee1;
 }
 
 :root[data-theme="dark"] #app .modal-desc,
@@ -2844,8 +2861,8 @@ select {
 :root[data-theme="dark"] #app .upload-head {
   border-bottom-color: rgba(255, 255, 255, 0.09);
   background:
-    radial-gradient(circle at 92% 20%, rgba(197, 34, 55, 0.13), transparent 30%),
-    linear-gradient(135deg, #20191c, #141416);
+    radial-gradient(circle at 92% 20%, rgba(239, 86, 84, 0.14), transparent 31%),
+    linear-gradient(135deg, #21171b, #151114);
 }
 
 :root[data-theme="dark"] #app .field-input,
@@ -2857,7 +2874,7 @@ select {
 :root[data-theme="dark"] #app .mobile-ask-textarea {
   border-color: rgba(255, 255, 255, 0.12);
   background: rgba(118, 118, 128, 0.15);
-  color: #f5f5f7;
+  color: #feeee1;
 }
 
 :root[data-theme="dark"] #app .field-input::placeholder,
@@ -2898,7 +2915,7 @@ select {
 :root[data-theme="dark"] #app .review-footer,
 :root[data-theme="dark"] #app .upload-footer {
   border-top-color: rgba(255, 255, 255, 0.09);
-  background: rgba(28, 28, 30, 0.94);
+  background: rgba(29, 23, 26, 0.96);
 }
 
 :root[data-theme="dark"] #app .btn-cancel,
@@ -2919,18 +2936,18 @@ select {
 :root[data-theme="dark"] #app .role-item,
 :root[data-theme="dark"] #overlay-root .role-item {
   border-color: rgba(255, 255, 255, 0.07);
-  background: #242426;
+  background: #241b1f;
 }
 
 :root[data-theme="dark"] #app .role-item.active,
 :root[data-theme="dark"] #overlay-root .role-item.active {
-  border-color: rgba(239, 64, 87, 0.42);
-  background: linear-gradient(135deg, rgba(103, 24, 40, 0.5), rgba(36, 36, 38, 0.95));
+  border-color: rgba(239, 86, 84, 0.45);
+  background: linear-gradient(135deg, rgba(129, 2, 31, 0.42), rgba(38, 28, 32, 0.96));
 }
 
 :root[data-theme="dark"] #overlay-root .panel-title,
 :root[data-theme="dark"] #overlay-root .item-name {
-  color: #f5f5f7;
+  color: #feeee1;
 }
 
 :root[data-theme="dark"] #overlay-root .panel-sub,
@@ -2948,11 +2965,11 @@ select {
 }
 
 :root[data-theme="dark"] #overlay-root .panel-foot strong {
-  color: #ff8090;
+  color: #ff9d9a;
 }
 
 :root[data-theme="dark"] #overlay-root .item-check {
-  color: #ff7183;
+  color: var(--palette-silver-red);
 }
 
 :root[data-theme="dark"] #app .panel-close,
@@ -2977,7 +2994,7 @@ select {
 }
 
 :root[data-theme="dark"] #app .mobile-figure-quote {
-  color: #ff98a4;
+  color: #ffaaa7;
 }
 
 :root[data-theme="dark"] #app .reco-score {
@@ -2997,15 +3014,15 @@ select {
 :root[data-theme="dark"] #app .pc-side-era.era-modern,
 :root[data-theme="dark"] #app .m-loc-era.era-modern,
 :root[data-theme="dark"] #app .place-era.era-modern {
-  color: #ff9aa8;
-  background: rgba(239, 64, 87, 0.12);
+  color: #ffaaa7;
+  background: rgba(239, 86, 84, 0.12);
 }
 
 :root[data-theme="dark"] #app .m-loc-name,
 :root[data-theme="dark"] #app .mobile-info-title,
 :root[data-theme="dark"] #app .mobile-step-name,
 :root[data-theme="dark"] #app .pc-side-name {
-  color: #f5f5f7;
+  color: #feeee1;
 }
 
 :root[data-theme="dark"] #app .mobile-step-item {
@@ -3023,7 +3040,7 @@ select {
 :root[data-theme="dark"] #app .act-type {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.09) !important;
-  color: #f5f5f7 !important;
+  color: #feeee1 !important;
 }
 
 :root[data-theme="dark"] #app .act-status {
@@ -3033,7 +3050,7 @@ select {
 
 :root[data-theme="dark"] #app .reco-when,
 :root[data-theme="dark"] #app .act-tag-hint {
-  color: #ff91a0;
+  color: #ffaaa7;
 }
 
 :root[data-theme="dark"] #app .place-status {
@@ -3066,7 +3083,7 @@ select {
 :root[data-theme="dark"] #app .btn-reject {
   border-color: rgba(255, 111, 118, 0.22);
   background: rgba(255, 59, 48, 0.1);
-  color: #ff9aa2;
+  color: #ffaaa7;
 }
 
 :root[data-theme="dark"] #app .leaflet-control-attribution a {
@@ -3076,22 +3093,22 @@ select {
 :root[data-theme="dark"] #app .route-ai-hero {
   border-color: rgba(255, 255, 255, 0.08);
   background:
-    radial-gradient(circle at 90% 12%, rgba(239, 64, 87, 0.24), transparent 32%),
-    linear-gradient(140deg, #0f0f11 0%, #211519 58%, #41101b 100%);
+    radial-gradient(circle at 90% 12%, rgba(239, 86, 84, 0.3), transparent 33%),
+    linear-gradient(140deg, #090708 0%, #250b12 52%, #5c0017 100%);
 }
 
 :root[data-theme="dark"] #app .route-ai-panel .pc-preset-item,
 :root[data-theme="dark"] #app .route-ai-panel .mobile-preset-item,
 :root[data-theme="dark"] #app .route-ai-composer {
   border-color: rgba(255, 255, 255, 0.09);
-  background: rgba(36, 36, 38, 0.88);
+  background: rgba(35, 26, 30, 0.9);
 }
 
 :root[data-theme="dark"] #app .route-ai-panel .pc-preset-label,
 :root[data-theme="dark"] #app .route-ai-panel .mobile-preset-label,
 :root[data-theme="dark"] #app .route-ai-section-head > div > span,
 :root[data-theme="dark"] #app .route-ai-mobile-composer-title {
-  color: #f5f5f7;
+  color: #feeee1;
 }
 
 :root[data-theme="dark"] #app .pc-preset-hint,
@@ -3155,7 +3172,7 @@ body,
 
 :root[data-theme="dark"] #app .m-empty-step b,
 :root[data-theme="dark"] #app .pc-empty-steps b {
-  color: #ff8090;
+  color: #ff9d9a;
 }
 
 :root[data-theme="dark"] #app .m-empty-kicker,
@@ -3176,7 +3193,7 @@ body,
 
 :root[data-theme="dark"] #app .m-list-count {
   background: rgba(239, 64, 87, 0.12);
-  color: #ff91a0;
+  color: #ffaaa7;
 }
 
 :root[data-theme="dark"] #app .place-category {
@@ -3498,4 +3515,250 @@ body,
 :root[data-theme="dark"] #app .place-note.rejected {
   background: rgba(255, 59, 48, 0.09);
   color: #ff9e9a;
+}
+
+/* =========================================================
+   Silver Red / Lotus White / Burgundy finishing layer
+   Keeps semantic success, warning and category colors intact.
+   ========================================================= */
+
+:root {
+  accent-color: var(--palette-silver-red);
+}
+
+:root[data-theme="dark"] #app .filter-chip.active,
+:root[data-theme="dark"] #app .filter-btn.active,
+:root[data-theme="dark"] #app .pc-tab-btn.active,
+:root[data-theme="dark"] #app .mobile-tab-btn.active {
+  border-color: rgba(254, 238, 225, 0.22);
+  background: linear-gradient(180deg, #f66c68, var(--palette-silver-red));
+  color: var(--palette-burgundy-deep);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.22),
+    0 7px 20px rgba(239, 86, 84, 0.14);
+}
+
+:root[data-theme="dark"] #app .filter-chip.active .filter-count,
+:root[data-theme="dark"] #app .filter-btn.active .filter-count {
+  background: rgba(57, 0, 14, 0.12);
+  color: var(--palette-burgundy-deep);
+}
+
+:root[data-theme="dark"] #app .pc-tab-btn.active .app-icon {
+  color: var(--palette-burgundy-deep);
+}
+
+:root[data-theme="dark"] #app .route-ai-panel .pc-preset-item.selected,
+:root[data-theme="dark"] #app .route-ai-panel .mobile-preset-item.selected {
+  border-color: rgba(239, 86, 84, 0.34);
+  background:
+    radial-gradient(circle at 92% 10%, rgba(239, 86, 84, 0.12), transparent 36%),
+    rgba(45, 29, 34, 0.94);
+  box-shadow:
+    0 0 0 3px rgba(239, 86, 84, 0.06),
+    0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+:root[data-theme="dark"] #app .pc-footer {
+  border-top-color: rgba(254, 238, 225, 0.08);
+  background: linear-gradient(120deg, #16090d, #250b12);
+  color: #a79599;
+}
+
+#app .btn-primary,
+#app .mobile-btn-primary,
+#app .pc-btn-publish,
+#app .m-btn-publish,
+#app .pc-btn-upload,
+#app .m-btn-upload,
+#app .pc-empty-btn,
+#app .m-empty-btn,
+#app .review-submit,
+#app .btn-enroll,
+#app .btn-checkin,
+#app .loc-btn-checkin,
+#app .btn-submit,
+#app .btn-confirm:not(.reject),
+#app .nf-btn,
+#app .note-btn.save,
+#app .m-note-btn.save,
+#app .pc-btn-ask-submit,
+#app .mobile-btn-ask-submit {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, #f66c68, var(--palette-silver-red));
+  color: var(--palette-burgundy-deep);
+  text-shadow: none;
+}
+
+#app .btn-primary:hover,
+#app .mobile-btn-primary:hover,
+#app .pc-btn-publish:hover,
+#app .m-btn-publish:hover,
+#app .pc-btn-upload:hover,
+#app .m-btn-upload:hover,
+#app .review-submit:hover,
+#app .btn-enroll:hover,
+#app .btn-checkin:hover,
+#app .loc-btn-checkin:hover,
+#app .btn-submit:hover,
+#app .btn-confirm:not(.reject):hover,
+#app .nf-btn:hover,
+#app .note-btn.save:hover,
+#app .m-note-btn.save:hover,
+#app .pc-btn-ask-submit:hover,
+#app .mobile-btn-ask-submit:hover {
+  background: linear-gradient(180deg, #fb7a75, #e84a49);
+  box-shadow: 0 10px 24px rgba(129, 2, 31, 0.2);
+}
+
+#app .btn-primary:disabled,
+#app .mobile-btn-primary:disabled,
+#app .pc-btn-publish:disabled,
+#app .m-btn-publish:disabled,
+#app .review-submit:disabled,
+#app .btn-enroll:disabled,
+#app .btn-checkin:disabled,
+#app .loc-btn-checkin:disabled,
+#app .btn-submit:disabled,
+#app .pc-btn-ask-submit:disabled,
+#app .mobile-btn-ask-submit:disabled {
+  border-color: transparent;
+  background: rgba(121, 99, 106, 0.16);
+  color: var(--apple-tertiary);
+  box-shadow: none;
+}
+
+#app .theme-toggle {
+  background: rgba(254, 238, 225, 0.13);
+  border-color: rgba(254, 238, 225, 0.24);
+}
+
+#app .theme-toggle:hover {
+  background: rgba(254, 238, 225, 0.22);
+  border-color: rgba(254, 238, 225, 0.38);
+}
+
+#app .pc-logo-icon .cross-h,
+#app .pc-logo-icon .cross-v,
+#app .mobile-topbar-icon .cross-h,
+#app .mobile-topbar-icon .cross-v {
+  background: var(--palette-silver-red);
+}
+
+#app .pc-badge,
+#app .mobile-tabbar-badge {
+  background: var(--palette-silver-red);
+  color: var(--palette-burgundy-deep);
+  box-shadow: 0 3px 10px rgba(129, 2, 31, 0.2);
+}
+
+#app .filter-chip.active,
+#app .filter-btn.active,
+#app .pc-tab-btn.active,
+#app .mobile-tab-btn.active {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, #f66c68, var(--palette-silver-red));
+  color: var(--palette-burgundy-deep);
+}
+
+#app .loc-modal,
+#app .modal-card,
+#app .act-modal,
+#app .create-modal,
+#app .pl-modal,
+#app .review-modal,
+#app .upload-modal,
+#app .fact-modal-card,
+#app .confirm-box,
+#overlay-root .role-panel {
+  border-color: rgba(254, 238, 225, 0.68);
+  background: rgba(255, 249, 242, 0.95);
+}
+
+#app .review-textarea,
+#app .note-input,
+#app .field-input,
+#app .field-textarea,
+#app .m-note-input {
+  caret-color: var(--palette-silver-red);
+}
+
+#app .review-textarea:focus,
+#app .note-input:focus,
+#app .field-input:focus,
+#app .field-textarea:focus,
+#app .m-note-input:focus {
+  border-color: rgba(239, 86, 84, 0.5);
+  box-shadow: 0 0 0 4px rgba(239, 86, 84, 0.1);
+}
+
+:root[data-theme="dark"] #app .loc-modal,
+:root[data-theme="dark"] #app .modal-card,
+:root[data-theme="dark"] #app .act-modal,
+:root[data-theme="dark"] #app .create-modal,
+:root[data-theme="dark"] #app .pl-modal,
+:root[data-theme="dark"] #app .review-modal,
+:root[data-theme="dark"] #app .upload-modal,
+:root[data-theme="dark"] #app .fact-modal-card,
+:root[data-theme="dark"] #app .confirm-box,
+:root[data-theme="dark"] #overlay-root .role-panel {
+  border-color: rgba(254, 238, 225, 0.1);
+  background: rgba(29, 23, 26, 0.97);
+}
+
+/* Desktop map location list must share the dark map surface. */
+:root[data-theme="dark"] #app .pc-map-side {
+  border: 1px solid rgba(254, 238, 225, 0.09);
+  background: rgba(29, 23, 26, 0.96);
+  box-shadow:
+    0 1px 1px rgba(255, 255, 255, 0.025) inset,
+    0 18px 46px rgba(0, 0, 0, 0.34);
+}
+
+:root[data-theme="dark"] #app .pc-side-head {
+  border-bottom-color: rgba(254, 238, 225, 0.09);
+}
+
+:root[data-theme="dark"] #app .pc-side-title {
+  color: #feeee1;
+}
+
+:root[data-theme="dark"] #app .pc-side-count {
+  color: #ffaaa7;
+  background: rgba(239, 86, 84, 0.12);
+}
+
+:root[data-theme="dark"] #app .pc-side-item {
+  border-color: rgba(254, 238, 225, 0.055);
+  background: rgba(255, 255, 255, 0.028);
+}
+
+:root[data-theme="dark"] #app .pc-side-item:hover {
+  border-color: rgba(239, 86, 84, 0.2);
+  background: rgba(255, 255, 255, 0.065);
+}
+
+:root[data-theme="dark"] #app .pc-side-item.is-active {
+  border-color: rgba(239, 86, 84, 0.38);
+  background: rgba(239, 86, 84, 0.1);
+}
+
+:root[data-theme="dark"] #app .pc-side-item.is-checked {
+  background: rgba(76, 175, 80, 0.07);
+}
+
+:root[data-theme="dark"] #app .pc-side-name {
+  color: #feeee1;
+}
+
+:root[data-theme="dark"] #app .pc-side-meta {
+  color: #b9aaae;
+}
+
+:root[data-theme="dark"] #app .pc-side-status {
+  color: #8e7d82;
+}
+
+:root[data-theme="dark"] #app .pc-side-item.is-checked .pc-side-status {
+  color: #8ce6a2;
 }

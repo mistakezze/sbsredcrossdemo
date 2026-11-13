@@ -25,7 +25,7 @@
           </div>
         </div>
         <button v-if="can('publishActivity')" class="pc-btn-publish" @click="openCreate">
-          <AppIcon name="plus" size="15" /> 发布活动
+          <AppIcon name="plus" size="15" /> 提交活动
         </button>
       </div>
     </header>
@@ -49,9 +49,39 @@
         </div>
       </div>
       <button v-if="can('publishActivity')" class="m-btn-publish" @click="openCreate">
-        <AppIcon name="plus" size="15" /> 发布活动
+        <AppIcon name="plus" size="15" /> 提交活动
       </button>
     </header>
+
+    <section v-if="myReviewActivities.length" class="activity-review-strip">
+      <div class="activity-review-strip-head">
+        <span class="activity-review-strip-icon"><AppIcon name="clock" size="15" /></span>
+        <div>
+          <strong>我的活动申请</strong>
+          <small>审核通过后会自动出现在公开活动列表中</small>
+        </div>
+        <span class="activity-review-strip-count">{{ myReviewActivities.length }}</span>
+      </div>
+      <div class="activity-review-strip-list">
+        <article v-for="activity in myReviewActivities" :key="activity.id" class="activity-review-strip-item">
+          <span
+            class="activity-review-state"
+            :style="{
+              color: ACTIVITY_REVIEW_STATUS[reviewStatusOf(activity)].color,
+              background: ACTIVITY_REVIEW_STATUS[reviewStatusOf(activity)].color + '16'
+            }"
+          >
+            <AppIcon :name="ACTIVITY_REVIEW_STATUS[reviewStatusOf(activity)].icon" size="11" />
+            {{ ACTIVITY_REVIEW_STATUS[reviewStatusOf(activity)].label }}
+          </span>
+          <div>
+            <strong>{{ activity.title }}</strong>
+            <span>{{ activity.venue }} · {{ formatActivityTime(activity.startTime) }}</span>
+            <small v-if="activity.reviewNote">审核意见：{{ activity.reviewNote }}</small>
+          </div>
+        </article>
+      </div>
+    </section>
 
     <!-- ==============================
          算法推荐
@@ -181,7 +211,7 @@
             <div class="seats-track">
               <span
                 class="seats-fill"
-                :style="{ width: fillPercent(act) + '%', background: fillPercent(act) >= 100 ? '#9aa5b4' : typeOf(act.type).color }"
+                :style="{ width: fillPercent(act) + '%', background: fillPercent(act) >= 100 ? '#a79599' : typeOf(act.type).color }"
               ></span>
             </div>
             <span class="seats-text">{{ enrolledCount(act.id) }}/{{ act.capacity }}</span>
@@ -213,7 +243,7 @@
     <transition name="fade">
       <div v-if="detailAct" class="act-overlay" @click.self="closeDetail">
         <div class="act-modal" :class="{ 'is-mobile': isMobile }">
-          <div class="act-modal-banner" :style="{ background: `linear-gradient(135deg, ${typeOf(detailAct.type).color}, #b71c1c)` }">
+          <div class="act-modal-banner" :style="{ background: `linear-gradient(135deg, ${typeOf(detailAct.type).color}, #81021f)` }">
             <div class="banner-top">
               <span class="banner-type">
                 <AppIcon :name="typeOf(detailAct.type).icon" size="12" />
@@ -374,8 +404,8 @@
       <div v-if="showCreate" class="act-overlay" @click.self="closeCreate">
         <div class="create-modal" :class="{ 'is-mobile': isMobile }">
           <div class="create-head">
-            <span class="create-title">发布新活动</span>
-            <button class="banner-close dark" aria-label="关闭发布活动" @click="closeCreate">
+            <span class="create-title">提交活动审核</span>
+            <button class="banner-close dark" aria-label="关闭活动提交" @click="closeCreate">
               <AppIcon name="x" size="18" />
             </button>
           </div>
@@ -431,23 +461,32 @@
 
           <div class="create-footer">
             <button class="btn-cancel" @click="closeCreate">取消</button>
-            <button class="btn-submit" @click="submitCreate">发布活动</button>
+            <button class="btn-submit" @click="submitCreate">提交审核</button>
           </div>
         </div>
+      </div>
+    </transition>
+
+    <transition name="fade">
+      <div v-if="activityNotice" class="activity-submit-toast" role="status">
+        <AppIcon name="check" size="14" />
+        {{ activityNotice }}
       </div>
     </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import {
   useActivityStore,
   ACTIVITY_TYPES,
+  ACTIVITY_REVIEW_STATUS,
   ACTIVITY_RECO_WEIGHTS,
   ACTIVITY_COLD_START_WEIGHTS,
   STATUS_META,
   activityStatus,
+  reviewStatusOf,
   formatActivityTime,
   activityTimeHint,
   formatReviewTime
@@ -460,7 +499,8 @@ const { isMobile } = useViewport()
 const { currentRoleKey, currentUser, can } = useUserStore()
 
 const {
-  activities,
+  activities: allActivities,
+  approvedActivities: activities,
   enrolledCount,
   isEnrolled,
   enroll,
@@ -476,6 +516,15 @@ const {
   recommend
 } = useActivityStore()
 
+const myReviewActivities = computed(() =>
+  allActivities.value
+    .filter(activity =>
+      activity.organizerRole === currentRoleKey.value &&
+      reviewStatusOf(activity) !== 'approved'
+    )
+    .sort((a, b) => b.createdAt - a.createdAt)
+)
+
 // ==============================
 // 筛选
 // ==============================
@@ -490,7 +539,7 @@ const statusFilters = [
 ]
 
 const typeFilters = computed(() => [
-  { key: 'all', label: '全部类型', icon: 'clipboard', color: '#7a8599' },
+  { key: 'all', label: '全部类型', icon: 'clipboard', color: '#79636a' },
   ...Object.values(ACTIVITY_TYPES)
 ])
 
@@ -630,6 +679,8 @@ const doDeleteActivity = () => {
 // ==============================
 const showCreate = ref(false)
 const formError = ref('')
+const activityNotice = ref('')
+let activityNoticeTimer = null
 
 const toLocalInput = (ts) => {
   const d = new Date(ts)
@@ -710,8 +761,17 @@ const submitCreate = () => {
     },
     { roleKey: currentRoleKey.value, userName: currentUser.value.name }
   )
+  activityNotice.value = '活动已提交，等待管理员审核'
+  window.clearTimeout(activityNoticeTimer)
+  activityNoticeTimer = window.setTimeout(() => {
+    activityNotice.value = ''
+  }, 3200)
   closeCreate()
 }
+
+onBeforeUnmount(() => {
+  window.clearTimeout(activityNoticeTimer)
+})
 </script>
 
 <style scoped>
@@ -731,7 +791,7 @@ const submitCreate = () => {
   justify-content: space-between;
   gap: 30px;
   flex-wrap: wrap;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+  background: linear-gradient(135deg, #feeee1 0%, #fbe7dc 100%);
   border-radius: 24px;
   padding: 30px 34px;
 }
@@ -745,8 +805,8 @@ const submitCreate = () => {
   display: inline-block;
   padding: 7px 18px;
   background: #fff;
-  border: 2px solid #d32f2f;
-  color: #d32f2f;
+  border: 2px solid #ef5654;
+  color: #ef5654;
   border-radius: 50px;
   font-size: 12px;
   font-weight: 700;
@@ -756,7 +816,7 @@ const submitCreate = () => {
 
 .pc-header-title {
   font-size: clamp(20px, 2.4vw, 30px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 10px 0;
   font-weight: 800;
   line-height: 1.3;
@@ -764,7 +824,7 @@ const submitCreate = () => {
 
 .pc-header-desc {
   font-size: 14px;
-  color: #7a8599;
+  color: #79636a;
   margin: 0;
   line-height: 1.7;
   max-width: 560px;
@@ -795,21 +855,21 @@ const submitCreate = () => {
   display: block;
   font-size: 24px;
   font-weight: 800;
-  color: #d32f2f;
+  color: #ef5654;
   line-height: 1;
 }
 
 .pc-stat-label {
   display: block;
   font-size: 11.5px;
-  color: #7a8599;
+  color: #79636a;
   margin-top: 6px;
   font-weight: 600;
 }
 
 .pc-btn-publish {
   padding: 13px 24px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: #fff;
   border: none;
   border-radius: 13px;
@@ -828,7 +888,7 @@ const submitCreate = () => {
 }
 
 .m-act-header {
-  background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 60%, #fff0f3 100%);
+  background: linear-gradient(160deg, #feeee1 0%, #fbe7dc 60%, #fbe9df 100%);
   border-radius: 18px;
   padding: 18px 16px;
   display: flex;
@@ -842,7 +902,7 @@ const submitCreate = () => {
   padding: 5px 13px;
   background: rgba(255, 255, 255, 0.9);
   border: 1.5px solid rgba(211, 47, 47, 0.15);
-  color: #d32f2f;
+  color: #ef5654;
   border-radius: 50px;
   font-size: clamp(10px, 2.5vw, 12px);
   font-weight: 700;
@@ -850,7 +910,7 @@ const submitCreate = () => {
 
 .m-header-title {
   font-size: clamp(18px, 5vw, 23px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   font-weight: 800;
   line-height: 1.25;
@@ -859,7 +919,7 @@ const submitCreate = () => {
 
 .m-header-desc {
   font-size: clamp(11px, 3vw, 13px);
-  color: #8a95a8;
+  color: #9a858a;
   margin: 0;
   line-height: 1.6;
 }
@@ -883,14 +943,14 @@ const submitCreate = () => {
   display: block;
   font-size: clamp(16px, 4.4vw, 20px);
   font-weight: 800;
-  color: #d32f2f;
+  color: #ef5654;
   line-height: 1.1;
 }
 
 .m-stat-label {
   display: block;
   font-size: clamp(9px, 2.4vw, 11px);
-  color: #8a95a8;
+  color: #9a858a;
   margin-top: 3px;
   font-weight: 600;
 }
@@ -898,7 +958,7 @@ const submitCreate = () => {
 .m-btn-publish {
   margin-top: 4px;
   padding: 11px;
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: #fff;
   border: none;
   border-radius: 11px;
@@ -1059,7 +1119,7 @@ const submitCreate = () => {
 .reco-name {
   font-size: 14px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   line-height: 1.4;
   word-break: break-word;
@@ -1067,7 +1127,7 @@ const submitCreate = () => {
 
 .reco-venue {
   font-size: 11px;
-  color: #8a95a8;
+  color: #9a858a;
   word-break: break-word;
   line-height: 1.45;
 }
@@ -1100,11 +1160,11 @@ const submitCreate = () => {
 }
 
 .reco-when {
-  color: #d32f2f;
+  color: #ef5654;
 }
 
 .reco-seats {
-  color: #8a95a8;
+  color: #9a858a;
 }
 
 .reco-empty {
@@ -1112,7 +1172,7 @@ const submitCreate = () => {
   text-align: center;
   padding: 22px 0;
   font-size: 12.5px;
-  color: #8a95a8;
+  color: #9a858a;
 }
 
 /* ==============================
@@ -1146,7 +1206,7 @@ const submitCreate = () => {
 .filter-label {
   font-size: 11.5px;
   font-weight: 700;
-  color: #a0aab8;
+  color: #9a858a;
   flex-shrink: 0;
   margin-right: 2px;
 }
@@ -1155,9 +1215,9 @@ const submitCreate = () => {
   flex-shrink: 0;
   padding: 7px 14px;
   background: #fff;
-  border: 1.5px solid #eef1f5;
+  border: 1.5px solid #f4ece4;
   border-radius: 10px;
-  color: #7a8599;
+  color: #79636a;
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
@@ -1172,12 +1232,12 @@ const submitCreate = () => {
 }
 
 .filter-chip:hover {
-  border-color: #ffcdd2;
-  color: #d32f2f;
+  border-color: #f6c7bd;
+  color: #ef5654;
 }
 
 .filter-chip.active {
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   border-color: transparent;
   color: #fff;
   box-shadow: 0 4px 12px rgba(211, 47, 47, 0.24);
@@ -1203,7 +1263,7 @@ const submitCreate = () => {
   display: flex;
   text-align: left;
   background: #fff;
-  border: 1.5px solid #eef1f5;
+  border: 1.5px solid #f4ece4;
   border-radius: 18px;
   overflow: hidden;
   cursor: pointer;
@@ -1214,7 +1274,7 @@ const submitCreate = () => {
 
 .act-card:hover {
   transform: translateY(-3px);
-  border-color: #ffcdd2;
+  border-color: #f6c7bd;
   box-shadow: 0 12px 30px rgba(211, 47, 47, 0.12);
 }
 
@@ -1260,7 +1320,7 @@ const submitCreate = () => {
 .act-title {
   font-size: 15.5px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   line-height: 1.4;
   word-break: break-word;
@@ -1274,14 +1334,14 @@ const submitCreate = () => {
 
 .act-meta-item {
   font-size: 11.5px;
-  color: #8a95a8;
+  color: #9a858a;
   word-break: break-word;
   line-height: 1.45;
 }
 
 .act-desc {
   font-size: 12.5px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.65;
   margin: 0;
   word-break: break-word;
@@ -1317,7 +1377,7 @@ const submitCreate = () => {
   flex-shrink: 0;
   font-size: 11px;
   font-weight: 700;
-  color: #8a95a8;
+  color: #9a858a;
 }
 
 .act-card-foot {
@@ -1326,7 +1386,7 @@ const submitCreate = () => {
   justify-content: space-between;
   gap: 8px;
   padding-top: 8px;
-  border-top: 1px solid #f2f5f9;
+  border-top: 1px solid #f7efe6;
 }
 
 .act-rating {
@@ -1338,12 +1398,12 @@ const submitCreate = () => {
 .act-rating i {
   font-style: normal;
   font-weight: 600;
-  color: #b0bac7;
+  color: #b6a6a9;
   font-size: 10.5px;
 }
 
 .act-rating.is-empty {
-  color: #b0bac7;
+  color: #b6a6a9;
   font-weight: 600;
 }
 
@@ -1359,7 +1419,7 @@ const submitCreate = () => {
 .act-tag-hint {
   font-size: 11px;
   font-weight: 700;
-  color: #d32f2f;
+  color: #ef5654;
 }
 
 .act-empty {
@@ -1367,7 +1427,7 @@ const submitCreate = () => {
   text-align: center;
   padding: 46px 0;
   font-size: 13px;
-  color: #a0aab8;
+  color: #9a858a;
   background: #fff;
   border-radius: 18px;
 }
@@ -1475,13 +1535,13 @@ const submitCreate = () => {
 }
 
 .banner-close.dark {
-  background: #f4f6f9;
-  color: #7a8599;
+  background: #f8f0e7;
+  color: #79636a;
 }
 
 .banner-close.dark:hover {
-  background: #e8ebef;
-  color: #1a2332;
+  background: #efe4da;
+  color: #32181f;
 }
 
 .banner-title {
@@ -1512,7 +1572,7 @@ const submitCreate = () => {
   flex-direction: column;
   gap: 11px;
   padding: 14px;
-  background: #fafbfc;
+  background: #fbf4eb;
   border-radius: 13px;
   margin-bottom: 15px;
 }
@@ -1531,7 +1591,7 @@ const submitCreate = () => {
 
 .detail-label {
   font-size: 10.5px;
-  color: #a0aab8;
+  color: #9a858a;
   font-weight: 700;
   margin-bottom: 2px;
 }
@@ -1545,14 +1605,14 @@ const submitCreate = () => {
 }
 
 .detail-full {
-  color: #d32f2f;
+  color: #ef5654;
   font-weight: 800;
   margin-left: 4px;
 }
 
 .detail-desc {
   font-size: 13px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.75;
   margin: 0 0 14px 0;
   word-break: break-word;
@@ -1567,7 +1627,7 @@ const submitCreate = () => {
 
 .detail-highlight {
   font-size: 11.5px;
-  color: #d32f2f;
+  color: #ef5654;
   background: rgba(211, 47, 47, 0.08);
   padding: 5px 12px;
   border-radius: 16px;
@@ -1578,9 +1638,9 @@ const submitCreate = () => {
 /* 活动评级 */
 .act-reviews {
   padding: 14px;
-  background: #fafbfc;
+  background: #fbf4eb;
   border-radius: 13px;
-  border: 1.5px solid #eef1f5;
+  border: 1.5px solid #f4ece4;
 }
 
 .reviews-head {
@@ -1595,7 +1655,7 @@ const submitCreate = () => {
 .reviews-title {
   font-size: 13.5px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
 }
 
 .reviews-summary {
@@ -1606,7 +1666,7 @@ const submitCreate = () => {
 
 .reviews-avg {
   font-size: 11.5px;
-  color: #8a95a8;
+  color: #9a858a;
   font-weight: 600;
 }
 
@@ -1614,7 +1674,7 @@ const submitCreate = () => {
   padding: 13px;
   background: #fff;
   border-radius: 11px;
-  border: 1.5px solid #ffe0e0;
+  border: 1.5px solid #f5d8cd;
   margin-bottom: 14px;
 }
 
@@ -1629,7 +1689,7 @@ const submitCreate = () => {
 .review-form-label {
   font-size: 12px;
   font-weight: 700;
-  color: #5a6478;
+  color: #635057;
 }
 
 .review-form-score {
@@ -1646,7 +1706,7 @@ const submitCreate = () => {
   padding: 9px 12px;
   font-size: 12.5px;
   font-family: inherit;
-  color: #1a2332;
+  color: #32181f;
   line-height: 1.6;
   resize: vertical;
   outline: none;
@@ -1654,14 +1714,14 @@ const submitCreate = () => {
 }
 
 .review-textarea:focus {
-  border-color: #d32f2f;
+  border-color: #ef5654;
   box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.08);
 }
 
 .review-submit {
   width: 100%;
   padding: 10px;
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -1722,7 +1782,7 @@ const submitCreate = () => {
 
 .review-item {
   padding-top: 10px;
-  border-top: 1px solid #f0f2f5;
+  border-top: 1px solid #f3e8de;
 }
 
 .review-item:first-child {
@@ -1753,19 +1813,19 @@ const submitCreate = () => {
 .review-user {
   font-size: 12px;
   font-weight: 700;
-  color: #1a2332;
+  color: #32181f;
 }
 
 .review-time {
   font-size: 10.5px;
-  color: #a0aab8;
+  color: #9a858a;
   margin-left: auto;
 }
 
 .review-del {
   border: none;
   background: none;
-  color: #d32f2f;
+  color: #ef5654;
   font-size: 10.5px;
   font-weight: 600;
   cursor: pointer;
@@ -1780,7 +1840,7 @@ const submitCreate = () => {
 
 .review-content {
   font-size: 12px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.65;
   margin: 0;
   word-break: break-word;
@@ -1790,21 +1850,21 @@ const submitCreate = () => {
   padding: 14px 0;
   text-align: center;
   font-size: 12px;
-  color: #a0aab8;
+  color: #9a858a;
 }
 
 .act-modal-footer {
   display: flex;
   gap: 9px;
   padding: 14px 22px calc(18px + env(safe-area-inset-bottom, 0px));
-  border-top: 1.5px solid #f2f5f9;
+  border-top: 1.5px solid #f7efe6;
   flex-shrink: 0;
 }
 
 .btn-enroll {
   flex: 1;
   padding: 13px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -1827,8 +1887,8 @@ const submitCreate = () => {
 }
 
 .btn-enroll.disabled {
-  background: #e8ebef;
-  color: #9aa5b4;
+  background: #efe4da;
+  color: #a79599;
   box-shadow: none;
   cursor: default;
 }
@@ -1837,9 +1897,9 @@ const submitCreate = () => {
   flex-shrink: 0;
   padding: 13px 16px;
   background: #fff;
-  border: 1.5px solid #ffcdd2;
+  border: 1.5px solid #f6c7bd;
   border-radius: 12px;
-  color: #d32f2f;
+  color: #ef5654;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -1848,7 +1908,7 @@ const submitCreate = () => {
 }
 
 .btn-del-act:hover {
-  background: #fff5f5;
+  background: #feeee1;
 }
 
 /* ==============================
@@ -1878,14 +1938,14 @@ const submitCreate = () => {
   align-items: center;
   justify-content: space-between;
   padding: 18px 22px;
-  border-bottom: 1.5px solid #f2f5f9;
+  border-bottom: 1.5px solid #f7efe6;
   flex-shrink: 0;
 }
 
 .create-title {
   font-size: 16px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
 }
 
 .create-body {
@@ -1912,7 +1972,7 @@ const submitCreate = () => {
 .field-label {
   font-size: 11.5px;
   font-weight: 700;
-  color: #7a8599;
+  color: #79636a;
 }
 
 .field-input,
@@ -1924,7 +1984,7 @@ const submitCreate = () => {
   padding: 10px 12px;
   font-size: 13px;
   font-family: inherit;
-  color: #1a2332;
+  color: #32181f;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   background: #fff;
@@ -1932,7 +1992,7 @@ const submitCreate = () => {
 
 .field-input:focus,
 .field-textarea:focus {
-  border-color: #d32f2f;
+  border-color: #ef5654;
   box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.08);
 }
 
@@ -1949,10 +2009,10 @@ const submitCreate = () => {
 
 .type-option {
   padding: 7px 13px;
-  background: #fafbfc;
-  border: 1.5px solid #eef1f5;
+  background: #fbf4eb;
+  border: 1.5px solid #f4ece4;
   border-radius: 10px;
-  color: #7a8599;
+  color: #79636a;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -1978,17 +2038,17 @@ const submitCreate = () => {
   display: flex;
   gap: 9px;
   padding: 14px 22px calc(18px + env(safe-area-inset-bottom, 0px));
-  border-top: 1.5px solid #f2f5f9;
+  border-top: 1.5px solid #f7efe6;
   flex-shrink: 0;
 }
 
 .btn-cancel {
   flex: 1;
   padding: 12px;
-  background: #f4f6f9;
+  background: #f8f0e7;
   border: none;
   border-radius: 11px;
-  color: #7a8599;
+  color: #79636a;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
@@ -1996,13 +2056,13 @@ const submitCreate = () => {
 }
 
 .btn-cancel:hover {
-  background: #e8ebef;
+  background: #efe4da;
 }
 
 .btn-submit {
   flex: 1;
   padding: 12px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   border: none;
   border-radius: 11px;
   color: #fff;
@@ -2079,7 +2139,7 @@ const submitCreate = () => {
   background:
     radial-gradient(circle at 92% 10%, rgba(255, 255, 255, 0.9) 0 7%, transparent 7.3%),
     radial-gradient(circle at 80% 20%, rgba(197, 34, 55, 0.08), transparent 25%),
-    linear-gradient(135deg, #fffaf7 0%, #fff0ed 55%, #f8dde2 100%);
+    linear-gradient(135deg, #fef5ea 0%, #fcefe5 55%, #f1d4c8 100%);
   box-shadow: 0 16px 42px rgba(101, 35, 48, 0.07);
 }
 
@@ -2102,7 +2162,7 @@ const submitCreate = () => {
 
 .pc-header-desc,
 .m-header-desc {
-  color: #77717a;
+  color: #746469;
 }
 
 .pc-stat,
@@ -2115,7 +2175,7 @@ const submitCreate = () => {
 .pc-btn-publish,
 .m-btn-publish {
   border-radius: 14px;
-  background: linear-gradient(135deg, #c52237, #901528);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   box-shadow: 0 9px 22px rgba(147, 25, 44, 0.22);
 }
 
@@ -2153,7 +2213,7 @@ const submitCreate = () => {
 }
 
 .filter-chip.active {
-  background: linear-gradient(135deg, #c52237, #941629);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   box-shadow: 0 6px 18px rgba(145, 25, 44, 0.2);
 }
 
@@ -2182,7 +2242,7 @@ const submitCreate = () => {
 .btn-enroll,
 .btn-submit {
   border-radius: 12px;
-  background: linear-gradient(135deg, #c52237, #901528);
+  background: linear-gradient(135deg, #ef5654, #81021f);
 }
 
 .act-modal,
@@ -2212,6 +2272,171 @@ const submitCreate = () => {
 
   .act-card {
     border-radius: 17px;
+  }
+}
+
+.activity-review-strip {
+  padding: 16px 18px;
+  border: 1px solid rgba(129, 2, 31, 0.1);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 94% 5%, rgba(239, 86, 84, 0.12), transparent 30%),
+    var(--apple-surface);
+  box-shadow: var(--apple-shadow);
+}
+
+.activity-review-strip-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.activity-review-strip-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: rgba(239, 86, 84, 0.12);
+  color: var(--palette-burgundy);
+}
+
+.activity-review-strip-head > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.activity-review-strip-head strong {
+  color: var(--apple-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.activity-review-strip-head small {
+  color: var(--apple-tertiary);
+  font-size: 9.5px;
+}
+
+.activity-review-strip-count {
+  min-width: 22px;
+  margin-left: auto;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(239, 86, 84, 0.12);
+  color: var(--palette-burgundy);
+  font-size: 9px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.activity-review-strip-list {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.activity-review-strip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 11px;
+  border-radius: 12px;
+  background: rgba(129, 2, 31, 0.035);
+}
+
+.activity-review-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 3px 7px;
+  border-radius: 7px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.activity-review-strip-item > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.activity-review-strip-item strong {
+  color: var(--apple-ink);
+  font-size: 11.5px;
+  font-weight: 680;
+  line-height: 1.45;
+}
+
+.activity-review-strip-item span,
+.activity-review-strip-item small {
+  color: var(--apple-tertiary);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.activity-review-strip-item small {
+  color: var(--palette-burgundy);
+}
+
+.activity-submit-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  z-index: 2800;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 13px;
+  border: 1px solid rgba(254, 238, 225, 0.15);
+  border-radius: 999px;
+  background: rgba(49, 5, 17, 0.94);
+  color: var(--palette-lotus-white);
+  box-shadow: 0 10px 28px rgba(37, 0, 10, 0.24);
+  font-size: 10.5px;
+  font-weight: 620;
+  transform: translateX(-50%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+:root[data-theme="dark"] .activity-review-strip {
+  border-color: rgba(254, 238, 225, 0.09);
+}
+
+:root[data-theme="dark"] .activity-review-strip-icon,
+:root[data-theme="dark"] .activity-review-strip-count {
+  background: rgba(239, 86, 84, 0.13);
+  color: #ffaaa7;
+}
+
+:root[data-theme="dark"] .activity-review-strip-item {
+  background: rgba(239, 86, 84, 0.07);
+}
+
+:root[data-theme="dark"] .activity-review-strip-item small {
+  color: #ffaaa7;
+}
+
+@media (min-width: 769px) {
+  .activity-submit-toast {
+    bottom: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .activity-review-strip {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .activity-review-strip-item {
+    flex-direction: column;
+    gap: 7px;
   }
 }
 </style>

@@ -33,12 +33,41 @@ public class DeepSeekService {
     @Value("${deepseek.api.url:https://api.deepseek.com/chat/completions}")
     private String apiUrl;
 
-    @Value("${deepseek.api.model:deepseek-v4-pro}")
+    @Value("${deepseek.api.model:deepseek-flash}")
     private String model;
+
+    @Value("${deepseek.api.reasoning-effort:low}")
+    private String reasoningEffort;
 
     public DeepSeekService(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+    }
+
+    /**
+     * DeepSeek-Flash 的快速配置：
+     * 启用轻量思考，用 low 推理强度、较短输出上限和低温度减少响应等待。
+     */
+    private Map<String, Object> buildChatRequest(
+            String systemPrompt,
+            String userPrompt,
+            int maxTokens,
+            double temperature) {
+        Map<String, Object> request = new LinkedHashMap<>();
+        request.put("model", model);
+        request.put("messages", List.of(
+            new DeepSeekRequest.Message("system", systemPrompt),
+            new DeepSeekRequest.Message("user", userPrompt)
+        ));
+        request.put("temperature", temperature);
+        request.put("frequency_penalty", 0.2);
+        request.put("presence_penalty", 0.15);
+        request.put("response_format", Map.of("type", "json_object"));
+        request.put("thinking", Map.of("type", "enabled"));
+        request.put("reasoning_effort", reasoningEffort == null || reasoningEffort.isBlank() ? "low" : reasoningEffort);
+        request.put("max_tokens", maxTokens);
+        request.put("stream", false);
+        return request;
     }
 
     /**
@@ -70,27 +99,22 @@ public class DeepSeekService {
             return response;
         }
 
-        // 真实调用 DeepSeek
+        // 真实调用 DeepSeek：Flash + 轻量思考，减少首字与完整响应时间
         try {
             String prompt = buildPrompt(question, locations);
-            DeepSeekRequest request = new DeepSeekRequest();
-            request.setModel(model);
-            // 较高的 temperature + 频率/主题惩罚，让每次生成的内容更具多样性和新鲜感
-            request.setTemperature(0.9);
-            request.setFrequencyPenalty(0.5);
-            request.setPresencePenalty(0.3);
-            request.setMessages(List.of(
-                new DeepSeekRequest.Message("system", "你是一名严谨且富有文采的上海红十字文化导游，必须根据下方提供的真实地点生成路线，绝对不能编造不存在的地点。每次回答都要使用不同的表达方式、句式和切入角度，避免重复、模板化、套路化的描述。"),
-                new DeepSeekRequest.Message("user", prompt)
-            ));
-            // 让 DeepSeek 返回 JSON
-            request.setResponseFormat(Map.of("type", "json_object"));
+            Map<String, Object> request = buildChatRequest(
+                "你是一名严谨且富有文采的上海红十字文化导游，必须根据提供的真实地点生成路线，"
+                    + "绝对不能编造地点。直接返回精简、完整的 JSON，不展示思考过程。",
+                prompt,
+                3600,
+                0.55
+            );
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Authorization", "Bearer " + apiKey.trim());
 
-            HttpEntity<DeepSeekRequest> entity = new HttpEntity<>(request, headers);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
 
             logger.info("调用 DeepSeek API: {}", apiUrl);
             ResponseEntity<DeepSeekResponse> resp = restTemplate.exchange(
@@ -101,6 +125,7 @@ public class DeepSeekService {
             if (ds != null && ds.getChoices() != null && !ds.getChoices().isEmpty()) {
                 content = ds.getChoices().get(0).getMessage().getContent();
             }
+            logger.info("DeepSeek 路线响应字符数: {}", content == null ? 0 : content.length());
 
             // 解析 JSON 响应
             AiRouteResponse parsed = parseJsonResponse(content);
@@ -146,34 +171,34 @@ public class DeepSeekService {
         // 第三部分：输出要求（超级详细）
         sb.append("请为用户生成一份详尽的专业游览方案，必须严格按照以下 JSON 格式返回，只返回 JSON，不要任何解释文字：\n\n");
         sb.append("{\n");
-        sb.append("  \"routeGenerationProcess\": \"用 3-6 句话详细描述本次路线生成的过程：第一步分析用户需求（时间/兴趣/出行场景）；第二步从地点数据库中筛选符合主题的地点，说明筛选理由；第三步确定浏览顺序，解释为什么这样安排（例如按时间线、主题相关性、地理位置等）；第四步估算每站参观时长并与用户可用时间匹配；第五步补充亮点推荐与注意事项。\",\n");
+        sb.append("  \"routeGenerationProcess\": \"用 2 句话说明筛选地点、安排顺序和匹配时间的主要思路。\",\n");
         sb.append("  \"steps\": [\n");
         sb.append("    {\n");
         sb.append("      \"name\": \"地点全称（必须与上方数据库中的名称完全一致）\",\n");
-        sb.append("      \"meta\": \"简短标签，例如：'博物馆 · 约2小时'、'机构 · 约1.5小时'\",\n");
-        sb.append("      \"desc\": \"3-5句话，详细说明该站点在路线中的角色定位、参观价值、核心理由。必须基于上方数据库中的简介展开，不可编造数据。\",\n");
-        sb.append("      \"history\": \"1-2句简短历史故事或背景（例如：'成立于1932年，是全国最早的红十字分支机构之一'），必须基于真实历史。\",\n");
-        sb.append("      \"bestTime\": \"最佳游览时间段及理由（例如：'建议工作日上午9:00-11:00，此时团队参观较少，可安静参观'）\",\n");
-        sb.append("      \"ticket\": \"门票和预约信息（例如：'免费开放，需提前3天在【上海市红十字会】公众号预约；每周一闭馆'）\",\n");
-        sb.append("      \"highlights\": [\"亮点1\", \"亮点2\", \"亮点3\", \"亮点4\"],\n");
-        sb.append("      \"photoSpots\": [\"打卡点1\", \"打卡点2\", \"打卡点3\"],\n");
-        sb.append("      \"nearbyFood\": \"附近餐饮推荐（具体到街名或商场名，例如：'出门左转200米淮海中路有光明邨大酒家，招牌蟹粉小笼约68元；H5商场B1层有实惠的工作套餐约35元'）\",\n");
-        sb.append("      \"practicalTips\": [\"实用贴士1（如：停车不便，建议地铁）\", \"实用贴士2（如：有免费行李寄存）\", \"实用贴士3（如：馆内设无障碍通道）\"],\n");
-        sb.append("      \"tips\": [\"快速贴士1\", \"快速贴士2\"]\n");
+        sb.append("      \"meta\": \"类别 · 建议时长\",\n");
+        sb.append("      \"desc\": \"2句话说明站点在路线中的角色、参观价值和推荐理由，必须基于上方简介。\",\n");
+        sb.append("      \"history\": \"1 句真实历史背景。\",\n");
+        sb.append("      \"bestTime\": \"建议时段及一句简短理由\",\n");
+        sb.append("      \"ticket\": \"门票与预约信息，保持简短\",\n");
+        sb.append("      \"highlights\": [\"亮点1\", \"亮点2\", \"亮点3\"],\n");
+        sb.append("      \"photoSpots\": [\"打卡点1\", \"打卡点2\"],\n");
+        sb.append("      \"nearbyFood\": \"一条附近餐饮建议，不得编造精确门牌号\",\n");
+        sb.append("      \"practicalTips\": [\"实用贴士1\", \"实用贴士2\"],\n");
+        sb.append("      \"tips\": [\"快速贴士\"]\n");
         sb.append("    }\n");
         sb.append("  ],\n");
-        sb.append("  \"summary\": [\"路线亮点总结1（30字以内）\", \"路线亮点总结2（30字以内）\", \"路线亮点总结3（30字以内）\"]\n");
+        sb.append("  \"summary\": [\"路线亮点1（20字以内）\", \"路线亮点2（20字以内）\"]\n");
         sb.append("}\n\n");
 
         // 第四部分：硬性约束
         sb.append("【硬性规则，必须遵守】\n");
-        sb.append("1. steps 数量控制在 3-6 个，根据用户问题中的时间/兴趣偏好选择合适的数量。\n");
+        sb.append("1. steps 数量控制在 3-5 个，根据用户问题中的时间/兴趣偏好选择合适的数量。\n");
         sb.append("2. name 必须与【地点数据库】中的名称完全一致，不得修改、不得编造。\n");
-        sb.append("3. desc 必须基于【地点数据库】中的简介展开，每条 desc 不低于 3 句话。\n");
+        sb.append("3. desc 必须基于【地点数据库】中的简介展开，每条 desc 固定 2 句话。\n");
         sb.append("4. history、nearbyFood、bestTime 必须真实合理，不得编造门牌号、具体餐厅名称（使用'XX路'等模糊描述即可）或闭馆日。\n");
         sb.append("5. routeGenerationProcess 必须清晰描述思考过程，不要重复路线步骤的内容，要体现『为什么这样安排』。\n");
         sb.append("6. 返回的必须是合法 JSON，不要有任何额外文字。\n");
-        sb.append("7. 【表达多样化】每个字段的措辞、句式、切入角度必须随场景变化，不要使用'本场馆是''承载着''绝佳''不可错过'等高频模板句。每条 desc 至少有一处独特视角（例如历史细节、人道主义故事、参观动线、对比反差等）。highlights、photoSpots、practicalTips 也要避免与历史输出雷同。\n");
+        sb.append("7. 【表达精简】字段措辞简洁具体，不使用'承载着''绝佳''不可错过'等套话；每站至少有一处独特视角。\n");
         sb.append("8. 【结合上下文】根据用户问题的具体场景（亲子/拍照/深度/半天/一天/医疗等）调整语言风格：亲子场景语气活泼，深度场景强调历史厚重感，拍照场景突出视觉亮点，半天场景突出节奏紧凑。\n");
 
         return sb.toString();
@@ -350,24 +375,19 @@ public class DeepSeekService {
         try {
             String prompt = buildRecommendPrompt(req, locations);
 
-            DeepSeekRequest dsReq = new DeepSeekRequest();
-            dsReq.setModel(model);
-            dsReq.setTemperature(0.95);
-            dsReq.setFrequencyPenalty(0.5);
-            dsReq.setPresencePenalty(0.35);
-            dsReq.setMessages(List.of(
-                new DeepSeekRequest.Message("system",
-                    "你是一位熟悉上海红十字文化的资深策展人，擅长根据访客的兴趣与经历为其挑选最合适的地点。"
-                        + "推荐理由必须贴合访客的真实经历，不能空泛夸奖；每次回答都要换用不同的句式与切入角度，避免套话。"),
-                new DeepSeekRequest.Message("user", prompt)
-            ));
-            dsReq.setResponseFormat(Map.of("type", "json_object"));
+            Map<String, Object> dsReq = buildChatRequest(
+                "你是一位熟悉上海红十字文化的策展人。根据访客经历挑选地点，"
+                    + "推荐理由要具体、简洁，直接返回完整 JSON。",
+                prompt,
+                1500,
+                0.65
+            );
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Authorization", "Bearer " + apiKey.trim());
 
-            HttpEntity<DeepSeekRequest> entity = new HttpEntity<>(dsReq, headers);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(dsReq, headers);
 
             logger.info("调用 DeepSeek API 进行地点推荐: {}", apiUrl);
             ResponseEntity<DeepSeekResponse> resp = restTemplate.exchange(
@@ -440,7 +460,7 @@ public class DeepSeekService {
         sb.append("    {\n");
         sb.append("      \"name\": \"地点全称（必须与候选地点完全一致）\",\n");
         sb.append("      \"category\": \"该地点的类别\",\n");
-        sb.append("      \"reason\": \"2-3 句话。必须结合访客的打卡历史或高分偏好来说明为什么推荐这里，不要说放之四海而皆准的空话。\",\n");
+        sb.append("      \"reason\": \"1-2 句话。必须结合访客的打卡历史或高分偏好说明推荐理由，避免空泛套话。\",\n");
         sb.append("      \"highlight\": \"最值得做的一件具体的事（一个动作，不是泛泛的形容词）\",\n");
         sb.append("      \"bestTime\": \"建议到访的时间段与理由\",\n");
         sb.append("      \"tip\": \"一条实用提示（交通、预约、注意事项等）\"\n");
@@ -449,7 +469,7 @@ public class DeepSeekService {
         sb.append("}\n\n");
 
         sb.append("【硬性规则】\n");
-        sb.append("1. 推荐 3-4 个地点，全部必须来自候选地点，不得编造或改写名称。\n");
+        sb.append("1. 推荐 3 个地点，全部必须来自候选地点，不得编造或改写名称。\n");
         sb.append("2. 优先推荐访客还没打卡过的地点；若候选几乎都去过，可推荐重访，但要说明「这次可以看什么不一样的东西」。\n");
         sb.append("3. reason 必须体现个性化：提到访客去过的地方、偏好过的类别，或直接回应用户的偏好描述。\n");
         sb.append("4. 同一批推荐中，每个地点的推荐理由句式、切入角度要各不相同，禁止套用同一模板。\n");

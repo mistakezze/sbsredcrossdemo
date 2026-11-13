@@ -306,7 +306,7 @@ const confirmDelete = () => {
 
 /* ========== PC 页面头部 ========== */
 .pc-page-header {
-  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+  background: linear-gradient(135deg, #feeee1 0%, #fbe7dc 100%);
   border-radius: 24px;
   padding: 48px;
   margin-bottom: 40px;
@@ -346,8 +346,8 @@ const confirmDelete = () => {
   display: inline-block;
   padding: 8px 20px;
   background: white;
-  border: 2px solid #d32f2f;
-  color: #d32f2f;
+  border: 2px solid #ef5654;
+  color: #ef5654;
   border-radius: 50px;
   font-size: 13px;
   font-weight: 600;
@@ -366,11 +366,11 @@ const confirmDelete = () => {
 
 .pc-page-title {
   font-size: clamp(22px, 5vw, 40px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 16px 0;
   font-weight: 800;
   position: relative;
-  background: linear-gradient(135deg, #1a2332, #d32f2f, #1a2332);
+  background: linear-gradient(135deg, #32181f, #ef5654, #32181f);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -389,7 +389,7 @@ const confirmDelete = () => {
 
 .pc-page-desc {
   font-size: 16px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.7;
   margin: 0;
   max-width: 500px;
@@ -425,7 +425,7 @@ const confirmDelete = () => {
 .pc-stats-number {
   font-size: 48px;
   font-weight: 800;
-  color: #d32f2f;
+  color: #ef5654;
   line-height: 1;
   position: relative;
   text-shadow: 0 2px 12px rgba(211, 47, 47, 0.2);
@@ -438,7 +438,7 @@ const confirmDelete = () => {
   right: -12px;
   width: 10px;
   height: 10px;
-  background: #ff7043;
+  background: #ef5654;
   border-radius: 50%;
   animation: pc-dotPulse 2s ease-in-out infinite;
 }
@@ -450,7 +450,7 @@ const confirmDelete = () => {
 
 .pc-stats-label {
   font-size: 13px;
-  color: #7a8599;
+  color: #79636a;
   margin-top: 10px;
   letter-spacing: 0.5px;
 }
@@ -476,7 +476,7 @@ const confirmDelete = () => {
   width: 140px;
   height: 140px;
   margin: 0 auto 28px;
-  background: linear-gradient(135deg, #fff5f5, #ffeaea);
+  background: linear-gradient(135deg, #feeee1, #fbe7dc);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -507,7 +507,7 @@ const confirmDelete = () => {
 .pc-empty-cross {
   width: 70px;
   height: 70px;
-  background: #d32f2f;
+  background: #ef5654;
   border-radius: 18px;
   opacity: 0.25;
   position: relative;
@@ -525,7 +525,7 @@ const confirmDelete = () => {
 
 .pc-ec-h, .pc-ec-v {
   position: absolute;
-  background: #d32f2f;
+  background: #ef5654;
   opacity: 1;
   box-shadow: 0 2px 8px rgba(211, 47, 47, 0.4);
 }
@@ -535,20 +535,20 @@ const confirmDelete = () => {
 
 .pc-empty-title {
   font-size: 24px;
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 12px 0;
   font-weight: 700;
 }
 
 .pc-empty-desc {
   font-size: 15px;
-  color: #5a6478;
+  color: #635057;
   margin: 0 0 28px 0;
 }
 
 .pc-empty-btn {
   padding: 14px 36px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   border: none;
   border-radius: 12px;
@@ -603,7 +603,7 @@ const confirmDelete = () => {
   justify-content: space-between;
   margin-bottom: 32px;
   padding-bottom: 20px;
-  border-bottom: 2px solid #f0f2f5;
+  border-bottom: 2px solid #f3e8de;
   position: relative;
 }
 
@@ -614,7 +614,7 @@ const confirmDelete = () => {
   left: 0;
   height: 2px;
   width: 80px;
-  background: linear-gradient(90deg, #d32f2f, #ff7043);
+  background: linear-gradient(90deg, #ef5654, #ef5654);
   border-radius: 2px;
   animation: pc-lineSweep 2s ease-out;
 }
@@ -626,19 +626,19 @@ const confirmDelete = () => {
 
 .pc-list-title {
   font-size: 20px;
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   font-weight: 700;
 }
 
 .pc-list-count {
   font-size: 13px;
-  color: #7a8599;
+  color: #79636a;
   background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(255, 112, 67, 0.1));
   padding: 6px 14px;
   border-radius: 8px;
   font-weight: 600;
-  color: #d32f2f;
+  color: #ef5654;
 }
 
 .pc-timeline {
@@ -673,8 +673,8 @@ const confirmDelete = () => {
 .pc-timeline-item:hover .pc-timeline-card {
   transform: translateX(8px);
   box-shadow: 0 10px 32px rgba(211, 47, 47, 0.18);
-  border-color: #d32f2f;
-  background: linear-gradient(135deg, #fff8f8 0%, #ffffff 100%);
+  border-color: #ef5654;
+  background: linear-gradient(135deg, #fff7ed 0%, #fffaf3 100%);
 }
 
 .pc-timeline-left {
@@ -689,8 +689,8 @@ const confirmDelete = () => {
 .pc-timeline-dot {
   width: 40px;
   height: 40px;
-  background: #f0f2f5;
-  color: #7a8599;
+  background: #f3e8de;
+  color: #79636a;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -715,7 +715,7 @@ const confirmDelete = () => {
 }
 
 .pc-timeline-item:hover .pc-timeline-dot {
-  background: linear-gradient(135deg, #d32f2f, #ff7043);
+  background: linear-gradient(135deg, #ef5654, #ef5654);
   color: white;
   transform: scale(1.1);
   box-shadow: 0 6px 16px rgba(211, 47, 47, 0.4);
@@ -732,7 +732,7 @@ const confirmDelete = () => {
 }
 
 .pc-timeline-dot.pc-first-dot {
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   box-shadow: 0 6px 16px rgba(211, 47, 47, 0.35);
   animation: pc-firstDotPulse 3s ease-in-out infinite;
@@ -759,7 +759,7 @@ const confirmDelete = () => {
   left: 0;
   width: 100%;
   height: 50%;
-  background: linear-gradient(180deg, transparent, #d32f2f, transparent);
+  background: linear-gradient(180deg, transparent, #ef5654, transparent);
   animation: pc-lineFlow 2.5s ease-in-out infinite;
 }
 
@@ -770,7 +770,7 @@ const confirmDelete = () => {
 
 .pc-timeline-card {
   flex: 1;
-  background: #fafbfc;
+  background: #fbf4eb;
   border: 2px solid transparent;
   border-radius: 16px;
   padding: 20px 24px;
@@ -788,7 +788,7 @@ const confirmDelete = () => {
 
 .pc-card-location {
   font-size: 17px;
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   font-weight: 700;
   line-height: 1.4;
@@ -798,7 +798,7 @@ const confirmDelete = () => {
 }
 
 .pc-timeline-item:hover .pc-card-location {
-  color: #d32f2f;
+  color: #ef5654;
 }
 
 .pc-card-tags {
@@ -823,13 +823,13 @@ const confirmDelete = () => {
 
 .pc-card-era.era-modern {
   background: rgba(211, 47, 47, 0.1);
-  color: #c62828;
+  color: #81021f;
 }
 
 .pc-card-category {
   font-size: 11px;
   color: white;
-  background: linear-gradient(135deg, #d32f2f, #ff7043);
+  background: linear-gradient(135deg, #ef5654, #ef5654);
   padding: 4px 12px;
   border-radius: 8px;
   font-weight: 600;
@@ -849,7 +849,7 @@ const confirmDelete = () => {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #7a8599;
+  color: #79636a;
   word-break: break-word;
   overflow-wrap: break-word;
 }
@@ -912,7 +912,7 @@ const confirmDelete = () => {
 
 .pc-view-detail {
   font-size: 13px;
-  color: #d32f2f;
+  color: #ef5654;
   font-weight: 600;
   transition: transform 0.3s ease;
   position: relative;
@@ -924,8 +924,8 @@ const confirmDelete = () => {
 
 .pc-delete-btn {
   background: transparent;
-  border: 1px solid #e5e9ef;
-  color: #7a8599;
+  border: 1px solid #eadfd6;
+  color: #79636a;
   padding: 6px 16px;
   border-radius: 8px;
   font-size: 12px;
@@ -935,9 +935,9 @@ const confirmDelete = () => {
 }
 
 .pc-delete-btn:hover {
-  background: linear-gradient(135deg, #fff5f5, #ffeaea);
-  color: #d32f2f;
-  border-color: #d32f2f;
+  background: linear-gradient(135deg, #feeee1, #fbe7dc);
+  color: #ef5654;
+  border-color: #ef5654;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
 }
@@ -948,7 +948,7 @@ const confirmDelete = () => {
 
 /* ========== 移动端页面头部 ========== */
 .m-page-header {
-  background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 40%, #fff0f3 100%);
+  background: linear-gradient(160deg, #feeee1 0%, #fbe7dc 40%, #fbe9df 100%);
   border-radius: 18px;
   padding: clamp(18px, 4.5vw, 26px) clamp(16px, 4vw, 22px);
   margin-bottom: clamp(14px, 3vw, 20px);
@@ -981,7 +981,7 @@ const confirmDelete = () => {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1.5px solid rgba(211, 47, 47, 0.15);
-  color: #d32f2f;
+  color: #ef5654;
   border-radius: 50px;
   font-size: clamp(10px, 2.5vw, 12px);
   font-weight: 700;
@@ -994,7 +994,7 @@ const confirmDelete = () => {
 
 .m-page-title {
   font-size: clamp(19px, 5vw, 25px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   font-weight: 800;
   position: relative;
@@ -1002,7 +1002,7 @@ const confirmDelete = () => {
   word-break: break-word;
   overflow-wrap: break-word;
   line-height: 1.25;
-  background: linear-gradient(135deg, #1a2332 30%, #d32f2f 70%, #c62828);
+  background: linear-gradient(135deg, #32181f 30%, #ef5654 70%, #81021f);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -1030,14 +1030,14 @@ const confirmDelete = () => {
 .m-stats-number {
   font-size: clamp(22px, 5.5vw, 30px);
   font-weight: 800;
-  color: #d32f2f;
+  color: #ef5654;
   line-height: 1;
   position: relative;
 }
 
 .m-stats-label {
   font-size: clamp(11px, 2.8vw, 13px);
-  color: #8a95a8;
+  color: #9a858a;
   letter-spacing: 0.5px;
   font-weight: 600;
 }
@@ -1061,7 +1061,7 @@ const confirmDelete = () => {
   width: clamp(80px, 22vw, 110px);
   height: clamp(80px, 22vw, 110px);
   margin: 0 auto clamp(16px, 4vw, 24px);
-  background: linear-gradient(135deg, #fff5f5, #ffeaea);
+  background: linear-gradient(135deg, #feeee1, #fbe7dc);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1072,7 +1072,7 @@ const confirmDelete = () => {
 .m-empty-cross {
   width: clamp(40px, 11vw, 56px);
   height: clamp(40px, 11vw, 56px);
-  background: #d32f2f;
+  background: #ef5654;
   border-radius: 12px;
   opacity: 0.28;
   position: relative;
@@ -1084,7 +1084,7 @@ const confirmDelete = () => {
 
 .m-ec-h, .m-ec-v {
   position: absolute;
-  background: #d32f2f;
+  background: #ef5654;
   opacity: 1;
 }
 
@@ -1093,7 +1093,7 @@ const confirmDelete = () => {
 
 .m-empty-title {
   font-size: clamp(16px, 4.5vw, 20px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 clamp(8px, 2vw, 12px) 0;
   font-weight: 700;
   word-break: break-word;
@@ -1102,7 +1102,7 @@ const confirmDelete = () => {
 
 .m-empty-desc {
   font-size: clamp(12px, 3vw, 14px);
-  color: #8a95a8;
+  color: #9a858a;
   margin: 0 0 clamp(20px, 5vw, 28px) 0;
   line-height: 1.65;
   word-break: break-word;
@@ -1114,7 +1114,7 @@ const confirmDelete = () => {
   width: 100%;
   max-width: 320px;
   padding: clamp(14px, 3.2vw, 16px) clamp(16px, 4vw, 24px);
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   border: none;
   border-radius: 14px;
@@ -1148,7 +1148,7 @@ const confirmDelete = () => {
 }
 
 .m-timeline-item:active .m-timeline-card {
-  background: linear-gradient(135deg, #fff8f8 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #fff7ed 0%, #fffaf3 100%);
   transform: scale(0.98);
 }
 
@@ -1164,8 +1164,8 @@ const confirmDelete = () => {
 .m-timeline-dot {
   width: clamp(24px, 6vw, 30px);
   height: clamp(24px, 6vw, 30px);
-  background: #f0f2f5;
-  color: #7a8599;
+  background: #f3e8de;
+  color: #79636a;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1179,7 +1179,7 @@ const confirmDelete = () => {
 }
 
 .m-timeline-dot.m-first-dot {
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   box-shadow: 0 3px 10px rgba(211, 47, 47, 0.3);
 }
@@ -1193,7 +1193,7 @@ const confirmDelete = () => {
 
 .m-timeline-card {
   flex: 1;
-  background: #ffffff;
+  background: #fffaf3;
   border-radius: 16px;
   padding: clamp(12px, 3vw, 16px) clamp(14px, 3.5vw, 18px);
   margin-bottom: clamp(10px, 2.5vw, 14px);
@@ -1219,7 +1219,7 @@ const confirmDelete = () => {
 
 .m-card-location {
   font-size: clamp(14px, 3.6vw, 16px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   font-weight: 700;
   line-height: 1.35;
@@ -1252,13 +1252,13 @@ const confirmDelete = () => {
 
 .m-card-era.era-modern {
   background: rgba(211, 47, 47, 0.1);
-  color: #c62828;
+  color: #81021f;
 }
 
 .m-card-category {
   font-size: clamp(10px, 2.4vw, 11px);
   color: white;
-  background: linear-gradient(135deg, #d32f2f, #e53935);
+  background: linear-gradient(135deg, #ef5654, #ef5654);
   padding: clamp(3px, 0.8vw, 4px) clamp(8px, 2vw, 10px);
   border-radius: 8px;
   font-weight: 700;
@@ -1279,7 +1279,7 @@ const confirmDelete = () => {
   align-items: flex-start;
   gap: clamp(6px, 1.5vw, 8px);
   font-size: clamp(11px, 2.8vw, 13px);
-  color: #8a95a8;
+  color: #9a858a;
   word-break: break-word;
   overflow-wrap: break-word;
   line-height: 1.55;
@@ -1314,7 +1314,7 @@ const confirmDelete = () => {
 
 .m-view-detail {
   font-size: clamp(11px, 2.8vw, 13px);
-  color: #d32f2f;
+  color: #ef5654;
   font-weight: 700;
   flex: 1;
   word-break: break-word;
@@ -1323,7 +1323,7 @@ const confirmDelete = () => {
 .m-delete-btn {
   background: transparent;
   border: 1.5px solid rgba(211, 47, 47, 0.12);
-  color: #8a95a8;
+  color: #9a858a;
   padding: clamp(5px, 1.3vw, 7px) clamp(10px, 2.5vw, 14px);
   border-radius: 10px;
   font-size: clamp(11px, 2.6vw, 12px);
@@ -1334,8 +1334,8 @@ const confirmDelete = () => {
 }
 
 .m-delete-btn:active {
-  background: linear-gradient(135deg, #fff5f5, #ffeaea);
-  color: #d32f2f;
+  background: linear-gradient(135deg, #feeee1, #fbe7dc);
+  color: #ef5654;
   border-color: rgba(211, 47, 47, 0.3);
   transform: scale(0.96);
 }
@@ -1372,14 +1372,14 @@ const confirmDelete = () => {
 
 .confirm-title {
   font-size: 20px;
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 12px 0;
   font-weight: 700;
 }
 
 .confirm-desc {
   font-size: 14px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.7;
   margin: 0 0 24px 0;
   word-break: break-word;
@@ -1403,16 +1403,16 @@ const confirmDelete = () => {
 }
 
 .confirm-btn.cancel {
-  background: #f0f2f5;
-  color: #5a6478;
+  background: #f3e8de;
+  color: #635057;
 }
 
 .confirm-btn.cancel:hover {
-  background: #e5e9ef;
+  background: #eadfd6;
 }
 
 .confirm-btn.danger {
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
 }
@@ -1475,11 +1475,11 @@ const confirmDelete = () => {
    ======= 视觉升级 =======
    ============================== */
 .checkins {
-  --journey-red: #c52237;
+  --journey-red: #ef5654;
   --journey-red-deep: #8d1424;
-  --journey-ink: #202331;
+  --journey-ink: #32181f;
   --journey-muted: #778093;
-  --journey-cream: #fffaf7;
+  --journey-cream: #fef5ea;
   --journey-line: rgba(129, 45, 58, 0.12);
 }
 
@@ -1538,7 +1538,7 @@ const confirmDelete = () => {
   margin-bottom: 14px;
   font-size: clamp(34px, 4.2vw, 54px);
   letter-spacing: -1.5px;
-  background: linear-gradient(120deg, #202331 20%, #a9152b 100%);
+  background: linear-gradient(120deg, #32181f 20%, #a9152b 100%);
   -webkit-text-fill-color: transparent;
   animation: none;
 }
@@ -1774,11 +1774,11 @@ const confirmDelete = () => {
   padding: 8px 12px;
   border: 1px solid #f0e5e6;
   border-radius: 10px;
-  background: #fcfaf9;
+  background: #fffaf4;
 }
 
 .pc-empty-steps b {
-  color: #c52237;
+  color: #ef5654;
   font-size: 10px;
 }
 
@@ -1798,7 +1798,7 @@ const confirmDelete = () => {
 .pc-empty-btn {
   min-width: 190px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #c52237, #95182a);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   box-shadow: 0 10px 24px rgba(150, 27, 44, 0.22);
 }
 
@@ -1829,7 +1829,7 @@ const confirmDelete = () => {
 
 .pc-empty-secondary:hover {
   border-color: rgba(197, 34, 55, 0.35);
-  background: #fff8f8;
+  background: #fff7ed;
   color: #b31d33;
 }
 
@@ -1842,7 +1842,7 @@ const confirmDelete = () => {
   background:
     radial-gradient(circle at 92% 2%, rgba(255, 255, 255, 0.24), transparent 31%),
     radial-gradient(circle at -8% 108%, rgba(255, 181, 185, 0.2), transparent 35%),
-    linear-gradient(135deg, #9d1227 0%, #c52237 56%, #d94855 100%);
+    linear-gradient(135deg, #81021f 0%, #ef5654 56%, #d94855 100%);
   box-shadow: 0 18px 38px rgba(111, 16, 34, 0.23);
 }
 
@@ -2101,7 +2101,7 @@ const confirmDelete = () => {
   padding: 9px 10px;
   border: 1px solid #f1e7e7;
   border-radius: 12px;
-  background: #fcfaf9;
+  background: #fffaf4;
   color: #746c76;
   font-size: 10px;
   font-weight: 600;
@@ -2127,7 +2127,7 @@ const confirmDelete = () => {
   width: 100%;
   padding: 14px 18px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #c52237, #92182a);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   box-shadow: 0 10px 22px rgba(150, 25, 43, 0.24);
 }
 

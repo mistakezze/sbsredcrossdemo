@@ -61,7 +61,8 @@
 - 支持急救培训、志愿服务、人道讲座、无偿献血、公益筹款五类活动
 - 支持活动报名、取消报名、查看报名人数与剩余名额
 - 支持活动评分与文字评价
-- 管理员和企业/地点用户可以发布活动
+- 企业/地点用户提交的活动进入待审核状态，管理员通过后才会公开展示
+- 管理员可按待审核、已通过、已驳回筛选并填写审核意见
 - 管理员可以删除活动和不当评价
 - 根据角色行为提供个性化活动推荐或冷启动推荐
 
@@ -93,6 +94,8 @@
 | 志愿者 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
 
 当前角色保存在 `redcross_current_role` 中。志愿者同时显示星级荣誉标识。
+
+注册用户支持从 100 名带独立偏好的模拟账号中随机抽取 5 名登录。模拟账号的评价、打卡和活动偏好会进入 UserCF 与低秩模型，用于形成更真实的用户矩阵和推荐验证数据。
 
 ### 📱 响应式双 UI
 
@@ -413,8 +416,9 @@ server.port=8080
 
 deepseek.api.key=${DEEPSEEK_API_KEY:}
 deepseek.api.url=https://api.deepseek.com/chat/completions
-deepseek.api.model=deepseek-v4-pro
-deepseek.api.timeout-seconds=30
+deepseek.api.model=deepseek-flash
+deepseek.api.reasoning-effort=low
+deepseek.api.timeout-seconds=90
 
 app.cors.allowed-origins=
 app.rate-limit.requests-per-minute=10
@@ -507,6 +511,14 @@ npm run build
 Invoke-RestMethod http://localhost:8080/api/ai/status
 ```
 
+验证地点与活动推荐算法：
+
+```text
+http://localhost:5173/recommendation-check.html
+```
+
+该页面会直接调用项目中的 UserCF、低秩模型和业务排序模块，并以 `PASS / FAIL` 展示断言结果。
+
 重置前端演示数据：
 
 ```js
@@ -590,7 +602,7 @@ location.reload()
 
 > 2026-06-24
 
-- 模型默认值对齐为 `deepseek-v4-pro`
+- 模型默认值对齐为 `deepseek-flash`
 - 与 `application.properties` 保持一致
 
 ---

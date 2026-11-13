@@ -85,7 +85,7 @@
               :class="{ 'pc-step-checked': hasCheckedIn(loc.id) }"
               @click="openModal(loc)"
             >
-              <div class="pc-step-number" :style="{ background: hasCheckedIn(loc.id) ? '#4caf50' : '#d32f2f' }">{{ index + 1 }}</div>
+              <div class="pc-step-number" :style="{ background: hasCheckedIn(loc.id) ? '#4caf50' : '#ef5654' }">{{ index + 1 }}</div>
               <div class="pc-step-content">
                 <div class="pc-step-name">{{ loc.name }}</div>
                 <div class="pc-step-place">{{ loc.location }} · {{ loc.category }}</div>
@@ -186,22 +186,69 @@
         </div>
 
         <!-- AI 加载中：实时显示生成过程 -->
-        <div v-if="aiLoading && !aiAnswer" class="pc-ai-card pc-ai-loading-card">
-          <div class="pc-ai-loading-header">
-            <span class="pc-loading-orb"></span>
-            <span class="pc-loading-title">AI 正在为您规划路线</span>
+        <div
+          v-if="aiLoading && !aiAnswer"
+          class="pc-ai-card pc-ai-loading-card route-ai-loading-card"
+          aria-live="polite"
+        >
+          <div class="route-loading-glow" aria-hidden="true"></div>
+          <div class="route-loading-header">
+            <div class="route-loading-visual" aria-hidden="true">
+              <span class="route-loading-orbit"></span>
+              <span class="route-loading-orb">
+                <AppIcon name="sparkles" size="21" />
+              </span>
+            </div>
+            <div class="route-loading-copy">
+              <span class="route-loading-eyebrow">AI ROUTE ENGINE</span>
+              <h3>正在生成您的专属路线</h3>
+              <p>正在综合兴趣、距离与参观节奏，请稍候片刻。</p>
+            </div>
+            <span class="route-loading-live"><i></i> AI 处理中</span>
           </div>
-          <ul class="pc-loading-steps">
+
+          <div class="route-loading-progress-row">
+            <span>路线规划进度</span>
+            <strong>{{ loadingProgressPercent }}%</strong>
+          </div>
+          <div
+            class="route-loading-track"
+            role="progressbar"
+            aria-label="AI 路线规划进度"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            :aria-valuenow="loadingProgressPercent"
+          >
+            <span :style="{ width: loadingProgressPercent + '%' }"></span>
+          </div>
+
+          <ol class="route-loading-steps">
             <li
               v-for="(step, i) in loadingPhases"
-              :key="i"
-              class="pc-loading-step"
+              :key="step"
+              class="route-loading-step"
               :class="{ active: loadingPhaseIndex === i, done: loadingPhaseIndex > i }"
             >
-              <span class="pc-loading-step-dot"></span>
-              <span class="pc-loading-step-text">{{ step }}</span>
+              <span class="route-loading-step-icon">
+                <AppIcon
+                  :name="loadingPhaseIndex > i ? 'check' : loadingPhaseIndex === i ? 'sparkles' : 'circle'"
+                  size="13"
+                />
+              </span>
+              <span class="route-loading-step-copy">
+                <strong>{{ step }}</strong>
+                <small>{{ loadingPhaseIndex > i ? '已完成' : loadingPhaseIndex === i ? '正在处理' : '等待中' }}</small>
+              </span>
+              <span v-if="loadingPhaseIndex === i" class="route-loading-wave" aria-hidden="true">
+                <i></i><i></i><i></i>
+              </span>
             </li>
-          </ul>
+          </ol>
+
+          <div class="route-loading-foot">
+            <span><AppIcon name="lock" size="12" /> 结果只会使用当前地点库生成</span>
+            <span>{{ loadingPhaseIndex + 1 }} / {{ loadingPhases.length }}</span>
+          </div>
         </div>
 
         <!-- AI 回答结果区域 -->
@@ -381,7 +428,7 @@
               :class="{ 'mobile-step-checked': hasCheckedIn(loc.id) }"
               @click="openModal(loc)"
             >
-              <div class="mobile-step-number" :style="{ background: hasCheckedIn(loc.id) ? '#4caf50' : '#d32f2f' }">{{ index + 1 }}</div>
+              <div class="mobile-step-number" :style="{ background: hasCheckedIn(loc.id) ? '#4caf50' : '#ef5654' }">{{ index + 1 }}</div>
               <div class="mobile-step-content">
                 <div class="mobile-step-name">{{ loc.name }}</div>
                 <div class="mobile-step-place">{{ loc.location }}</div>
@@ -473,22 +520,69 @@
         </div>
 
         <!-- AI 加载中：实时显示生成过程 -->
-        <div v-if="aiLoading && !aiAnswer" class="mobile-ai-card mobile-ai-loading-card">
-          <div class="mobile-ai-loading-header">
-            <span class="mobile-loading-orb"></span>
-            <span class="mobile-loading-title">AI 正在为您规划路线</span>
+        <div
+          v-if="aiLoading && !aiAnswer"
+          class="mobile-ai-card mobile-ai-loading-card route-ai-loading-card"
+          aria-live="polite"
+        >
+          <div class="route-loading-glow" aria-hidden="true"></div>
+          <div class="route-loading-header">
+            <div class="route-loading-visual" aria-hidden="true">
+              <span class="route-loading-orbit"></span>
+              <span class="route-loading-orb">
+                <AppIcon name="sparkles" size="18" />
+              </span>
+            </div>
+            <div class="route-loading-copy">
+              <span class="route-loading-eyebrow">AI ROUTE ENGINE</span>
+              <h3>正在生成您的专属路线</h3>
+              <p>综合兴趣、距离与参观节奏。</p>
+            </div>
+            <span class="route-loading-live"><i></i> AI 处理中</span>
           </div>
-          <ul class="mobile-loading-steps">
+
+          <div class="route-loading-progress-row">
+            <span>路线规划进度</span>
+            <strong>{{ loadingProgressPercent }}%</strong>
+          </div>
+          <div
+            class="route-loading-track"
+            role="progressbar"
+            aria-label="AI 路线规划进度"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            :aria-valuenow="loadingProgressPercent"
+          >
+            <span :style="{ width: loadingProgressPercent + '%' }"></span>
+          </div>
+
+          <ol class="route-loading-steps">
             <li
               v-for="(step, i) in loadingPhases"
-              :key="i"
-              class="mobile-loading-step"
+              :key="step"
+              class="route-loading-step"
               :class="{ active: loadingPhaseIndex === i, done: loadingPhaseIndex > i }"
             >
-              <span class="mobile-loading-step-dot"></span>
-              <span class="mobile-loading-step-text">{{ step }}</span>
+              <span class="route-loading-step-icon">
+                <AppIcon
+                  :name="loadingPhaseIndex > i ? 'check' : loadingPhaseIndex === i ? 'sparkles' : 'circle'"
+                  size="12"
+                />
+              </span>
+              <span class="route-loading-step-copy">
+                <strong>{{ step }}</strong>
+                <small>{{ loadingPhaseIndex > i ? '已完成' : loadingPhaseIndex === i ? '正在处理' : '等待中' }}</small>
+              </span>
+              <span v-if="loadingPhaseIndex === i" class="route-loading-wave" aria-hidden="true">
+                <i></i><i></i><i></i>
+              </span>
             </li>
-          </ul>
+          </ol>
+
+          <div class="route-loading-foot">
+            <span><AppIcon name="lock" size="11" /> 仅使用当前地点库</span>
+            <span>{{ loadingPhaseIndex + 1 }} / {{ loadingPhases.length }}</span>
+          </div>
         </div>
 
         <!-- AI 结果（紧凑） -->
@@ -879,14 +973,17 @@ const aiAnswer = ref(null)
 
 // 加载阶段文案（用于实时展示 AI 思考过程）
 const loadingPhases = [
-  '分析您的需求与偏好...',
-  '从地点库中筛选符合主题的场馆...',
-  '设计浏览顺序与参观动线...',
-  '估算每站参观时长并匹配您的可用时间...',
-  '补充亮点、餐饮与拍照点等实用信息...',
+  '分析需求与偏好',
+  '筛选主题匹配地点',
+  '设计游览顺序与动线',
+  '匹配参观时长与节奏',
+  '补充餐饮、拍照与贴士',
 ]
 const loadingPhaseIndex = ref(0)
 let loadingTimer = null
+const loadingProgressPercent = computed(() =>
+  Math.min(94, Math.round(((loadingPhaseIndex.value + 0.6) / loadingPhases.length) * 100))
+)
 
 // 打字机：把 routeGenerationProcess 逐字显示
 const displayedProcess = ref('')
@@ -1363,8 +1460,8 @@ const clearAnswer = () => {
   display: inline-block;
   padding: 10px 24px;
   background: white;
-  border: 2px solid #d32f2f;
-  color: #d32f2f;
+  border: 2px solid #ef5654;
+  color: #ef5654;
   border-radius: 50px;
   font-size: 13px;
   font-weight: 700;
@@ -1381,10 +1478,10 @@ const clearAnswer = () => {
 
 .pc-page-title {
   font-size: clamp(18px, 4vw, 38px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 16px 0;
   font-weight: 800;
-  background: linear-gradient(135deg, #1a2332 0%, #d32f2f 50%, #1a2332 100%);
+  background: linear-gradient(135deg, #32181f 0%, #ef5654 50%, #32181f 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -1399,7 +1496,7 @@ const clearAnswer = () => {
 
 .pc-page-subtitle {
   font-size: 16px;
-  color: #7a8599;
+  color: #79636a;
   margin: 0 auto;
   line-height: 1.8;
   max-width: 720px;
@@ -1434,7 +1531,7 @@ const clearAnswer = () => {
   border: none;
   border-radius: 12px;
   background: transparent;
-  color: #7a8599;
+  color: #79636a;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -1442,12 +1539,12 @@ const clearAnswer = () => {
 }
 
 .pc-tab-btn:hover {
-  color: #d32f2f;
+  color: #ef5654;
   background: rgba(211, 47, 47, 0.05);
 }
 
 .pc-tab-btn.active {
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   box-shadow: 0 6px 16px rgba(211, 47, 47, 0.35);
   animation: tabActive 0.3s ease-out;
@@ -1479,7 +1576,7 @@ const clearAnswer = () => {
 }
 
 .pc-loc-card {
-  background: #ffffff;
+  background: #fffaf3;
   border-radius: 22px;
   padding: 28px;
   display: flex;
@@ -1500,7 +1597,7 @@ const clearAnswer = () => {
   top: 0;
   bottom: 0;
   width: 5px;
-  background: linear-gradient(180deg, #d32f2f, #ff7043);
+  background: linear-gradient(180deg, #ef5654, #ef5654);
   border-radius: 20px 0 0 20px;
   transition: width 0.3s ease;
 }
@@ -1533,7 +1630,7 @@ const clearAnswer = () => {
 
 .pc-loc-card:hover {
   transform: translateX(8px);
-  border-color: #ff7043;
+  border-color: #ef5654;
   box-shadow: 0 12px 40px rgba(255, 112, 67, 0.18);
 }
 
@@ -1548,7 +1645,7 @@ const clearAnswer = () => {
 
 .pc-loc-card.pc-loc-checked {
   border-color: #c8e6c9;
-  background: linear-gradient(135deg, #f1f8e9 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #f1f8e9 0%, #fffaf3 100%);
 }
 
 .pc-loc-card.pc-loc-checked::before {
@@ -1564,7 +1661,7 @@ const clearAnswer = () => {
   flex-shrink: 0;
   width: 52px;
   height: 52px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   font-size: 24px;
   font-weight: 800;
@@ -1595,7 +1692,7 @@ const clearAnswer = () => {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #ff7043;
+  background: #ef5654;
   animation: dotPulse 2s ease-in-out infinite;
 }
 
@@ -1613,7 +1710,7 @@ const clearAnswer = () => {
   width: 72px;
   height: 72px;
   border-radius: 18px;
-  background: linear-gradient(135deg, #fff5f5, #ffe0e0);
+  background: linear-gradient(135deg, #feeee1, #f5d8cd);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1624,7 +1721,7 @@ const clearAnswer = () => {
 
 .pc-loc-card:hover .pc-loc-icon {
   transform: rotate(5deg) scale(1.08);
-  background: linear-gradient(135deg, #ffe0e0, #ffcccc);
+  background: linear-gradient(135deg, #f5d8cd, #f0c9bd);
 }
 
 .pc-cross-outer {
@@ -1638,7 +1735,7 @@ const clearAnswer = () => {
   position: absolute;
   top: 50%;
   left: 50%;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(211, 47, 47, 0.3);
   transition: all 0.3s ease;
@@ -1658,7 +1755,7 @@ const clearAnswer = () => {
 
 .pc-loc-card:hover .pc-cross-h,
 .pc-loc-card:hover .pc-cross-v {
-  background: linear-gradient(135deg, #ff7043, #d32f2f);
+  background: linear-gradient(135deg, #ef5654, #ef5654);
   box-shadow: 0 4px 14px rgba(255, 112, 67, 0.5);
 }
 
@@ -1683,7 +1780,7 @@ const clearAnswer = () => {
 
 .pc-loc-name {
   font-size: 22px;
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 8px 0;
   font-weight: 700;
   transition: color 0.3s ease;
@@ -1693,7 +1790,7 @@ const clearAnswer = () => {
 }
 
 .pc-loc-card:hover .pc-loc-name {
-  color: #d32f2f;
+  color: #ef5654;
 }
 
 .pc-loc-card.pc-loc-checked:hover .pc-loc-name {
@@ -1702,7 +1799,7 @@ const clearAnswer = () => {
 
 .pc-loc-meta {
   font-size: 13px;
-  color: #7a8599;
+  color: #79636a;
   margin-bottom: 12px;
   font-weight: 500;
   word-break: break-word;
@@ -1724,7 +1821,7 @@ const clearAnswer = () => {
 
 .pc-loc-desc {
   font-size: 14px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.8;
   margin: 0 0 16px 0;
   word-break: break-word;
@@ -1739,7 +1836,7 @@ const clearAnswer = () => {
 
 .pc-loc-tag {
   font-size: 12px;
-  color: #d32f2f;
+  color: #ef5654;
   background: rgba(211, 47, 47, 0.1);
   padding: 6px 14px;
   border-radius: 20px;
@@ -1774,13 +1871,13 @@ const clearAnswer = () => {
 }
 
 .pc-status-todo {
-  color: #ff7043;
+  color: #ef5654;
   background: linear-gradient(135deg, rgba(255, 112, 67, 0.1), rgba(255, 112, 67, 0.05));
   border: 2px solid rgba(255, 112, 67, 0.3);
 }
 
 .pc-loc-card:hover .pc-status-todo {
-  background: linear-gradient(135deg, #ff7043, #d32f2f);
+  background: linear-gradient(135deg, #ef5654, #ef5654);
   color: white;
   transform: translateX(4px);
   box-shadow: 0 6px 16px rgba(255, 112, 67, 0.35);
@@ -1816,14 +1913,14 @@ const clearAnswer = () => {
   transform: translateX(-50%);
   width: 250px;
   height: 3px;
-  background: linear-gradient(90deg, transparent, #d32f2f, transparent);
+  background: linear-gradient(90deg, transparent, #ef5654, transparent);
   opacity: 0.5;
 }
 
 .pc-info-title {
   font-size: 22px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
   text-align: center;
   margin-bottom: 26px;
   letter-spacing: 1px;
@@ -1840,7 +1937,7 @@ const clearAnswer = () => {
   align-items: center;
   gap: 14px;
   padding: 16px 20px;
-  background: #fafbfc;
+  background: #fbf4eb;
   border-radius: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -1862,7 +1959,7 @@ const clearAnswer = () => {
 
 .pc-step-item:hover {
   background: white;
-  border-color: #d32f2f;
+  border-color: #ef5654;
   transform: translateX(6px);
   box-shadow: 0 6px 20px rgba(211, 47, 47, 0.12);
 }
@@ -1914,7 +2011,7 @@ const clearAnswer = () => {
 .pc-step-name {
   font-size: 15px;
   font-weight: 700;
-  color: #1a2332;
+  color: #32181f;
   margin-bottom: 4px;
   transition: color 0.3s ease;
   word-break: break-word;
@@ -1923,7 +2020,7 @@ const clearAnswer = () => {
 }
 
 .pc-step-item:hover .pc-step-name {
-  color: #d32f2f;
+  color: #ef5654;
 }
 
 .pc-step-item.pc-step-checked:hover .pc-step-name {
@@ -1932,7 +2029,7 @@ const clearAnswer = () => {
 
 .pc-step-place {
   font-size: 12px;
-  color: #7a8599;
+  color: #79636a;
   word-break: break-word;
   overflow-wrap: break-word;
 }
@@ -1940,7 +2037,7 @@ const clearAnswer = () => {
 .pc-step-status {
   flex-shrink: 0;
   font-size: 13px;
-  color: #d32f2f;
+  color: #ef5654;
   font-weight: 600;
   transition: transform 0.3s ease;
   z-index: 1;
@@ -1971,7 +2068,7 @@ const clearAnswer = () => {
   gap: 18px;
   padding-bottom: 24px;
   margin-bottom: 24px;
-  border-bottom: 2px solid #f0f2f5;
+  border-bottom: 2px solid #f3e8de;
 }
 
 .pc-ai-icon {
@@ -1979,7 +2076,7 @@ const clearAnswer = () => {
   width: 64px;
   height: 64px;
   border-radius: 18px;
-  background: linear-gradient(135deg, #1a2332, #d32f2f);
+  background: linear-gradient(135deg, #32181f, #ef5654);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1999,14 +2096,14 @@ const clearAnswer = () => {
 
 .pc-ai-title {
   font-size: 22px;
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 8px 0;
   font-weight: 800;
 }
 
 .pc-ai-subtitle {
   font-size: 14px;
-  color: #7a8599;
+  color: #79636a;
   margin: 0;
   line-height: 1.7;
 }
@@ -2023,7 +2120,7 @@ const clearAnswer = () => {
   align-items: center;
   gap: 12px;
   padding: 18px 20px;
-  background: linear-gradient(135deg, #fafbfc, #f5f7fa);
+  background: linear-gradient(135deg, #fbf4eb, #fbf4eb);
   border: 2px solid transparent;
   border-radius: 16px;
   cursor: pointer;
@@ -2043,7 +2140,7 @@ const clearAnswer = () => {
 
 .pc-preset-item:hover {
   transform: translateY(-3px);
-  border-color: #d32f2f;
+  border-color: #ef5654;
   background: white;
   box-shadow: 0 10px 28px rgba(211, 47, 47, 0.18);
 }
@@ -2053,8 +2150,8 @@ const clearAnswer = () => {
 }
 
 .pc-preset-item.selected {
-  border-color: #d32f2f;
-  background: linear-gradient(135deg, #fff5f5, #ffecec);
+  border-color: #ef5654;
+  background: linear-gradient(135deg, #feeee1, #f9e2d8);
   box-shadow: 0 8px 24px rgba(211, 47, 47, 0.2);
 }
 
@@ -2075,21 +2172,21 @@ const clearAnswer = () => {
 
 .pc-preset-label {
   font-size: 14px;
-  color: #1a2332;
+  color: #32181f;
   font-weight: 600;
   line-height: 1.5;
   flex: 1;
 }
 
 .pc-preset-item:hover .pc-preset-label {
-  color: #d32f2f;
+  color: #ef5654;
 }
 
 .pc-preset-spinner {
   width: 18px;
   height: 18px;
   border: 3px solid rgba(211, 47, 47, 0.2);
-  border-top-color: #d32f2f;
+  border-top-color: #ef5654;
   border-radius: 50%;
   animation: spinSpin 0.8s linear infinite;
   flex-shrink: 0;
@@ -2155,7 +2252,7 @@ const clearAnswer = () => {
 }
 
 .pc-ask-textarea:focus {
-  border-color: #d32f2f;
+  border-color: #ef5654;
   box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.08);
   background: #fffaf5;
 }
@@ -2167,7 +2264,7 @@ const clearAnswer = () => {
   gap: 8px;
   padding: 0 22px;
   min-width: 128px;
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -2180,7 +2277,7 @@ const clearAnswer = () => {
 }
 
 .pc-btn-ask-submit:hover:not(:disabled) {
-  background: linear-gradient(135deg, #c62828, #a61b1b);
+  background: linear-gradient(135deg, #81021f, #a61b1b);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(211, 47, 47, 0.35);
 }
@@ -2224,7 +2321,7 @@ const clearAnswer = () => {
 
 /* AI 结果卡片 */
 .pc-ai-result-card {
-  background: linear-gradient(135deg, #ffffff 0%, #fffaf5 100%);
+  background: linear-gradient(135deg, #fffaf3 0%, #fffaf5 100%);
   border: 2px solid rgba(211, 47, 47, 0.15);
 }
 
@@ -2238,7 +2335,7 @@ const clearAnswer = () => {
 .pc-result-badge {
   display: inline-block;
   padding: 10px 22px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   border-radius: 12px;
   font-size: 14px;
@@ -2256,8 +2353,8 @@ const clearAnswer = () => {
 .pc-btn-refresh {
   padding: 10px 20px;
   background: transparent;
-  color: #7a8599;
-  border: 2px solid #e5e9ef;
+  color: #79636a;
+  border: 2px solid #eadfd6;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
@@ -2266,13 +2363,13 @@ const clearAnswer = () => {
 }
 
 .pc-btn-refresh:hover {
-  color: #d32f2f;
-  border-color: #d32f2f;
+  color: #ef5654;
+  border-color: #ef5654;
   background: rgba(211, 47, 47, 0.05);
 }
 
 .pc-ai-result-question {
-  background: #f8fafc;
+  background: #fcf5ec;
   padding: 16px 20px;
   border-radius: 12px;
   margin-bottom: 28px;
@@ -2284,13 +2381,13 @@ const clearAnswer = () => {
 
 .pc-q-label {
   font-size: 13px;
-  color: #7a8599;
+  color: #79636a;
   font-weight: 600;
 }
 
 .pc-q-text {
   font-size: 14px;
-  color: #1a2332;
+  color: #32181f;
   font-weight: 700;
 }
 
@@ -2327,7 +2424,7 @@ const clearAnswer = () => {
 }
 
 .pc-ai-step-item:hover {
-  border-color: #d32f2f;
+  border-color: #ef5654;
   transform: translateX(4px);
   box-shadow: 0 10px 28px rgba(211, 47, 47, 0.15);
 }
@@ -2337,7 +2434,7 @@ const clearAnswer = () => {
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #d32f2f, #ff7043);
+  background: linear-gradient(135deg, #ef5654, #ef5654);
   color: white;
   display: flex;
   align-items: center;
@@ -2354,7 +2451,7 @@ const clearAnswer = () => {
 
 .pc-ai-step-name {
   font-size: clamp(12px, 2vw, 17px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 6px 0;
   font-weight: 700;
   transition: color 0.3s ease;
@@ -2364,12 +2461,12 @@ const clearAnswer = () => {
 }
 
 .pc-ai-step-item:hover .pc-ai-step-name {
-  color: #d32f2f;
+  color: #ef5654;
 }
 
 .pc-ai-step-meta {
   font-size: 12px;
-  color: #d32f2f;
+  color: #ef5654;
   font-weight: 600;
   margin-bottom: 10px;
   letter-spacing: 0.5px;
@@ -2379,7 +2476,7 @@ const clearAnswer = () => {
 
 .pc-ai-step-desc {
   font-size: 14px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.8;
   margin: 0 0 14px 0;
   word-break: break-word;
@@ -2527,14 +2624,14 @@ const clearAnswer = () => {
   font-size: 12px;
   padding: 5px 12px;
   background: rgba(211, 47, 47, 0.08);
-  color: #d32f2f;
+  color: #ef5654;
   border-radius: 20px;
   font-weight: 500;
 }
 
 /* 原始文本内容区 */
 .pc-ai-raw-content {
-  background: #f8fafc;
+  background: #fcf5ec;
   padding: 24px;
   border-radius: 14px;
   margin-bottom: 24px;
@@ -2542,7 +2639,7 @@ const clearAnswer = () => {
 
 .pc-ai-raw-text {
   font-size: 14px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.9;
   margin: 0;
   white-space: pre-wrap;
@@ -2639,7 +2736,7 @@ const clearAnswer = () => {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1.5px solid rgba(211, 47, 47, 0.15);
-  color: #d32f2f;
+  color: #ef5654;
   border-radius: 50px;
   font-size: clamp(10px, 2.5vw, 12px);
   font-weight: 700;
@@ -2650,7 +2747,7 @@ const clearAnswer = () => {
 
 .mobile-page-title {
   font-size: clamp(18px, 5.5vw, 24px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 10px 0;
   font-weight: 800;
   line-height: 1.3;
@@ -2659,7 +2756,7 @@ const clearAnswer = () => {
 
 .mobile-page-subtitle {
   font-size: clamp(11px, 3vw, 13px);
-  color: #8a95a8;
+  color: #9a858a;
   margin: 0 auto;
   line-height: 1.65;
   max-width: 100%;
@@ -2698,7 +2795,7 @@ const clearAnswer = () => {
   border: none;
   border-radius: 10px;
   background: transparent;
-  color: #8a95a8;
+  color: #9a858a;
   font-size: clamp(12px, 3.5vw, 14px);
   font-weight: 600;
   cursor: pointer;
@@ -2707,12 +2804,12 @@ const clearAnswer = () => {
 
 .mobile-tab-btn:active {
   background: rgba(211, 47, 47, 0.06);
-  color: #d32f2f;
+  color: #ef5654;
   transform: scale(0.97);
 }
 
 .mobile-tab-btn.active {
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
 }
@@ -2725,7 +2822,7 @@ const clearAnswer = () => {
 }
 
 .mobile-loc-card {
-  background: #ffffff;
+  background: #fffaf3;
   border-radius: 16px;
   padding: 16px;
   display: flex;
@@ -2740,7 +2837,7 @@ const clearAnswer = () => {
 }
 
 .mobile-loc-card:active {
-  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #feeee1 0%, #fffaf3 100%);
   border-color: rgba(211, 47, 47, 0.12);
   transform: scale(0.99);
   box-shadow: 0 1px 8px rgba(211, 47, 47, 0.08);
@@ -2748,7 +2845,7 @@ const clearAnswer = () => {
 
 .mobile-loc-card.mobile-loc-checked {
   border-color: rgba(76, 175, 80, 0.15);
-  background: linear-gradient(135deg, rgba(76, 175, 80, 0.04) 0%, #ffffff 100%);
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.04) 0%, #fffaf3 100%);
 }
 
 .mobile-loc-number {
@@ -2756,7 +2853,7 @@ const clearAnswer = () => {
   width: 32px;
   height: 32px;
   min-width: 32px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   font-size: clamp(12px, 3.5vw, 14px);
   font-weight: 800;
@@ -2781,7 +2878,7 @@ const clearAnswer = () => {
 
 .mobile-loc-name {
   font-size: clamp(13px, 4vw, 16px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 4px 0;
   font-weight: 700;
   word-break: break-word;
@@ -2790,7 +2887,7 @@ const clearAnswer = () => {
 
 .mobile-loc-meta {
   font-size: clamp(10px, 2.8vw, 12px);
-  color: #7a8599;
+  color: #79636a;
   margin-bottom: 6px;
   font-weight: 500;
   word-break: break-word;
@@ -2810,7 +2907,7 @@ const clearAnswer = () => {
 
 .mobile-loc-desc {
   font-size: clamp(11px, 3vw, 13px);
-  color: #6b7a90;
+  color: #7b676c;
   line-height: 1.65;
   margin: 0 0 8px 0;
   word-break: break-word;
@@ -2824,7 +2921,7 @@ const clearAnswer = () => {
 
 .mobile-loc-tag {
   font-size: clamp(9px, 2.5vw, 11px);
-  color: #d32f2f;
+  color: #ef5654;
   background: rgba(211, 47, 47, 0.06);
   padding: 3px 10px;
   border-radius: 12px;
@@ -2843,7 +2940,7 @@ const clearAnswer = () => {
   font-size: 14px;
   font-weight: 700;
   background: rgba(255, 112, 67, 0.1);
-  color: #ff7043;
+  color: #ef5654;
   margin-top: 2px;
 }
 
@@ -2866,7 +2963,7 @@ const clearAnswer = () => {
 .mobile-info-title {
   font-size: clamp(12px, 3.5vw, 14px);
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
   text-align: center;
   margin-bottom: 16px;
   letter-spacing: 0.5px;
@@ -2891,7 +2988,7 @@ const clearAnswer = () => {
 }
 
 .mobile-step-item:active {
-  background: #fff5f5;
+  background: #feeee1;
   border-color: rgba(211, 47, 47, 0.1);
   transform: scale(0.99);
 }
@@ -2927,7 +3024,7 @@ const clearAnswer = () => {
 .mobile-step-name {
   font-size: clamp(11px, 3.2vw, 13px);
   font-weight: 700;
-  color: #1a2332;
+  color: #32181f;
   margin-bottom: 2px;
   word-break: break-word;
   line-height: 1.35;
@@ -2935,7 +3032,7 @@ const clearAnswer = () => {
 
 .mobile-step-place {
   font-size: clamp(9px, 2.5vw, 11px);
-  color: #7a8599;
+  color: #79636a;
   word-break: break-word;
   line-height: 1.4;
 }
@@ -2943,7 +3040,7 @@ const clearAnswer = () => {
 .mobile-step-status {
   flex-shrink: 0;
   font-size: 14px;
-  color: #d32f2f;
+  color: #ef5654;
   font-weight: 600;
 }
 
@@ -2968,7 +3065,7 @@ const clearAnswer = () => {
   gap: 10px;
   padding-bottom: 14px;
   margin-bottom: 14px;
-  border-bottom: 1.5px solid #f0f2f5;
+  border-bottom: 1.5px solid #f3e8de;
   justify-content: center;
 }
 
@@ -2978,7 +3075,7 @@ const clearAnswer = () => {
 
 .mobile-ai-title {
   font-size: clamp(12px, 3.5vw, 15px);
-  color: #1a2332;
+  color: #32181f;
   font-weight: 800;
 }
 
@@ -2995,7 +3092,7 @@ const clearAnswer = () => {
   align-items: center;
   gap: 8px;
   padding: 12px 14px;
-  background: linear-gradient(135deg, #fafbfc, #f5f7fa);
+  background: linear-gradient(135deg, #fbf4eb, #fbf4eb);
   border: 1.5px solid transparent;
   border-radius: 12px;
   cursor: pointer;
@@ -3003,14 +3100,14 @@ const clearAnswer = () => {
 }
 
 .mobile-preset-item:active {
-  background: #fff5f5;
-  border-color: #ffcdd2;
+  background: #feeee1;
+  border-color: #f6c7bd;
   transform: scale(0.99);
 }
 
 .mobile-preset-item.selected {
-  border-color: #d32f2f;
-  background: linear-gradient(135deg, #fff5f5, #ffecec);
+  border-color: #ef5654;
+  background: linear-gradient(135deg, #feeee1, #f9e2d8);
   box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15);
 }
 
@@ -3026,7 +3123,7 @@ const clearAnswer = () => {
 
 .mobile-preset-label {
   font-size: clamp(11px, 3.2vw, 13px);
-  color: #1a2332;
+  color: #32181f;
   font-weight: 600;
   line-height: 1.45;
   flex: 1;
@@ -3037,7 +3134,7 @@ const clearAnswer = () => {
   width: 14px;
   height: 14px;
   border: 2px solid rgba(211, 47, 47, 0.2);
-  border-top-color: #d32f2f;
+  border-top-color: #ef5654;
   border-radius: 50%;
   animation: spinSpin 0.8s linear infinite;
   flex-shrink: 0;
@@ -3084,14 +3181,14 @@ const clearAnswer = () => {
 }
 
 .mobile-ask-textarea:focus {
-  border-color: #d32f2f;
+  border-color: #ef5654;
   box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.08);
 }
 
 .mobile-btn-ask-submit {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -3108,7 +3205,7 @@ const clearAnswer = () => {
 }
 
 .mobile-btn-ask-submit:active:not(:disabled) {
-  background: linear-gradient(135deg, #b71c1c, #a61b1b);
+  background: linear-gradient(135deg, #81021f, #a61b1b);
   transform: scale(0.99);
 }
 
@@ -3130,7 +3227,7 @@ const clearAnswer = () => {
 
 /* AI 结果 - 移动端 */
 .mobile-ai-result-card {
-  background: linear-gradient(135deg, #ffffff 0%, #fffaf5 100%);
+  background: linear-gradient(135deg, #fffaf3 0%, #fffaf5 100%);
   border: 1.5px solid rgba(211, 47, 47, 0.15);
 }
 
@@ -3144,7 +3241,7 @@ const clearAnswer = () => {
 
 .mobile-result-badge {
   padding: 6px 14px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   border-radius: 8px;
   font-size: clamp(10px, 2.8vw, 12px);
@@ -3156,8 +3253,8 @@ const clearAnswer = () => {
 .mobile-btn-refresh {
   padding: 6px 12px;
   background: transparent;
-  color: #7a8599;
-  border: 1.5px solid #e5e9ef;
+  color: #79636a;
+  border: 1.5px solid #eadfd6;
   border-radius: 8px;
   font-size: clamp(10px, 2.8vw, 12px);
   font-weight: 600;
@@ -3166,13 +3263,13 @@ const clearAnswer = () => {
 }
 
 .mobile-btn-refresh:active {
-  color: #d32f2f;
-  border-color: #d32f2f;
+  color: #ef5654;
+  border-color: #ef5654;
   background: rgba(211, 47, 47, 0.05);
 }
 
 .mobile-ai-result-question {
-  background: #f8fafc;
+  background: #fcf5ec;
   padding: 10px 12px;
   border-radius: 8px;
   margin-bottom: 14px;
@@ -3180,7 +3277,7 @@ const clearAnswer = () => {
 
 .mobile-q-text {
   font-size: clamp(11px, 3vw, 13px);
-  color: #1a2332;
+  color: #32181f;
   font-weight: 700;
   word-break: break-word;
   line-height: 1.5;
@@ -3214,7 +3311,7 @@ const clearAnswer = () => {
   height: 32px;
   min-width: 32px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #d32f2f, #ff7043);
+  background: linear-gradient(135deg, #ef5654, #ef5654);
   color: white;
   display: flex;
   align-items: center;
@@ -3231,7 +3328,7 @@ const clearAnswer = () => {
 
 .mobile-ai-step-name {
   font-size: clamp(12px, 3.5vw, 15px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 3px 0;
   font-weight: 700;
   word-break: break-word;
@@ -3240,7 +3337,7 @@ const clearAnswer = () => {
 
 .mobile-ai-step-meta {
   font-size: clamp(10px, 2.8vw, 11px);
-  color: #d32f2f;
+  color: #ef5654;
   font-weight: 600;
   letter-spacing: 0.3px;
   word-break: break-word;
@@ -3249,7 +3346,7 @@ const clearAnswer = () => {
 
 .mobile-ai-step-desc {
   font-size: clamp(11px, 3vw, 13px);
-  color: #5a6478;
+  color: #635057;
   line-height: 1.65;
   margin: 0 0 10px 0;
   word-break: break-word;
@@ -3354,7 +3451,7 @@ const clearAnswer = () => {
 
 /* AI 原始内容 - 移动端 */
 .mobile-ai-raw-content {
-  background: #f8fafc;
+  background: #fcf5ec;
   padding: 14px;
   border-radius: 10px;
   margin-bottom: 14px;
@@ -3362,7 +3459,7 @@ const clearAnswer = () => {
 
 .mobile-ai-raw-text {
   font-size: clamp(11px, 3vw, 13px);
-  color: #5a6478;
+  color: #635057;
   line-height: 1.8;
   margin: 0;
   white-space: pre-wrap;
@@ -3441,7 +3538,7 @@ const clearAnswer = () => {
 .modal-image {
   position: relative;
   aspect-ratio: 16 / 9;
-  background: linear-gradient(135deg, var(--accent-color), #ff7043);
+  background: linear-gradient(135deg, var(--accent-color), #ef5654);
   overflow: hidden;
 }
 
@@ -3506,7 +3603,7 @@ const clearAnswer = () => {
   border-radius: 50%;
   border: none;
   background: rgba(255, 255, 255, 0.95);
-  color: #1a2332;
+  color: #32181f;
   font-size: 28px;
   cursor: pointer;
   display: flex;
@@ -3519,13 +3616,13 @@ const clearAnswer = () => {
 }
 
 .modal-close:hover {
-  background: #d32f2f;
+  background: #ef5654;
   color: white;
   transform: rotate(90deg) scale(1.1);
 }
 
 .modal-close:active {
-  background: #b71c1c;
+  background: #81021f;
   color: white;
   transform: scale(0.95);
 }
@@ -3536,7 +3633,7 @@ const clearAnswer = () => {
 
 .modal-title {
   font-size: 28px;
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 12px 0;
   font-weight: 800;
   word-break: break-word;
@@ -3544,7 +3641,7 @@ const clearAnswer = () => {
 }
 
 .modal-place {
-  color: #7a8599;
+  color: #79636a;
   font-size: 15px;
   margin-bottom: 22px;
   font-weight: 500;
@@ -3552,7 +3649,7 @@ const clearAnswer = () => {
 
 .modal-desc {
   font-size: 15px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.9;
   margin: 0 0 24px 0;
   word-break: break-word;
@@ -3610,7 +3707,7 @@ const clearAnswer = () => {
 .highlights-label {
   font-size: 13px;
   font-weight: 700;
-  color: #7a8599;
+  color: #79636a;
   margin-bottom: 14px;
   letter-spacing: 0.5px;
 }
@@ -3647,9 +3744,9 @@ const clearAnswer = () => {
 .modal-reviews {
   margin-bottom: 24px;
   padding: 18px 20px;
-  background: #fafbfc;
+  background: #fbf4eb;
   border-radius: 14px;
-  border: 1.5px solid #eef1f5;
+  border: 1.5px solid #f4ece4;
 }
 
 .reviews-head {
@@ -3670,12 +3767,12 @@ const clearAnswer = () => {
 .reviews-title {
   font-size: 14px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
 }
 
 .reviews-count {
   font-size: 12px;
-  color: #98a2b3;
+  color: #a08e92;
 }
 
 .reviews-head-right {
@@ -3697,7 +3794,7 @@ const clearAnswer = () => {
   gap: 5px;
   margin-bottom: 16px;
   padding-bottom: 14px;
-  border-bottom: 1px dashed #e5e9ef;
+  border-bottom: 1px dashed #eadfd6;
 }
 
 .dist-row {
@@ -3710,14 +3807,14 @@ const clearAnswer = () => {
   flex-shrink: 0;
   width: 26px;
   font-size: 11px;
-  color: #98a2b3;
+  color: #a08e92;
   text-align: right;
 }
 
 .dist-track {
   flex: 1;
   height: 6px;
-  background: #eef1f5;
+  background: #f4ece4;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -3734,7 +3831,7 @@ const clearAnswer = () => {
   flex-shrink: 0;
   width: 20px;
   font-size: 11px;
-  color: #98a2b3;
+  color: #a08e92;
   text-align: right;
 }
 
@@ -3743,7 +3840,7 @@ const clearAnswer = () => {
   padding: 14px;
   background: #fff;
   border-radius: 12px;
-  border: 1.5px solid #ffe0e0;
+  border: 1.5px solid #f5d8cd;
   margin-bottom: 16px;
 }
 
@@ -3758,7 +3855,7 @@ const clearAnswer = () => {
 .review-form-label {
   font-size: 12.5px;
   font-weight: 700;
-  color: #5a6478;
+  color: #635057;
 }
 
 .review-form-score {
@@ -3775,7 +3872,7 @@ const clearAnswer = () => {
   padding: 10px 12px;
   font-size: 13px;
   font-family: inherit;
-  color: #1a2332;
+  color: #32181f;
   line-height: 1.65;
   resize: vertical;
   outline: none;
@@ -3784,14 +3881,14 @@ const clearAnswer = () => {
 }
 
 .review-textarea:focus {
-  border-color: #d32f2f;
+  border-color: #ef5654;
   box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.08);
 }
 
 .review-submit {
   width: 100%;
   padding: 10px;
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -3803,7 +3900,7 @@ const clearAnswer = () => {
 }
 
 .review-submit:hover:not(:disabled) {
-  background: linear-gradient(135deg, #c62828, #a61b1b);
+  background: linear-gradient(135deg, #81021f, #a61b1b);
 }
 
 .review-submit:disabled {
@@ -3863,7 +3960,7 @@ const clearAnswer = () => {
 
 .review-item {
   padding-top: 12px;
-  border-top: 1px solid #f0f2f5;
+  border-top: 1px solid #f3e8de;
 }
 
 .review-item:first-child {
@@ -3895,7 +3992,7 @@ const clearAnswer = () => {
 .review-user {
   font-size: 12.5px;
   font-weight: 700;
-  color: #1a2332;
+  color: #32181f;
 }
 
 .review-star-tag {
@@ -3909,14 +4006,14 @@ const clearAnswer = () => {
 
 .review-time {
   font-size: 11px;
-  color: #a0aab8;
+  color: #9a858a;
   margin-left: auto;
 }
 
 .review-del {
   border: none;
   background: none;
-  color: #d32f2f;
+  color: #ef5654;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -3932,7 +4029,7 @@ const clearAnswer = () => {
 
 .review-content {
   font-size: 12.5px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.7;
   margin: 0;
   word-break: break-word;
@@ -3942,7 +4039,7 @@ const clearAnswer = () => {
   padding: 18px 0;
   text-align: center;
   font-size: 12.5px;
-  color: #a0aab8;
+  color: #9a858a;
 }
 
 .modal-note-box {
@@ -3974,14 +4071,14 @@ const clearAnswer = () => {
 }
 
 .modal-note-input {
-  background: #f8fafc;
+  background: #fcf5ec;
   padding: 20px;
   border-radius: 14px;
 }
 
 .modal-note-input .note-label {
   font-size: 13px;
-  color: #5a6478;
+  color: #635057;
   font-weight: 700;
   margin-bottom: 12px;
 }
@@ -3993,7 +4090,7 @@ const clearAnswer = () => {
   border-radius: 12px;
   padding: 14px 16px;
   font-size: 14px;
-  color: #1a2332;
+  color: #32181f;
   font-family: inherit;
   resize: vertical;
   background: white;
@@ -4003,7 +4100,7 @@ const clearAnswer = () => {
 
 .note-input:focus {
   outline: none;
-  border-color: #d32f2f;
+  border-color: #ef5654;
   box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.1);
 }
 
@@ -4014,7 +4111,7 @@ const clearAnswer = () => {
 .btn-checkin {
   width: 100%;
   padding: 16px 32px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   border: none;
   border-radius: 14px;
@@ -4050,7 +4147,7 @@ const clearAnswer = () => {
 
 .btn-checkin:active {
   transform: translateY(0);
-  background: linear-gradient(135deg, #b71c1c, #a61b1b);
+  background: linear-gradient(135deg, #81021f, #a61b1b);
 }
 
 .btn-checked {
@@ -4324,7 +4421,7 @@ const clearAnswer = () => {
   background:
     radial-gradient(circle at 90% 8%, rgba(255, 255, 255, 0.9) 0 8%, transparent 8.3%),
     radial-gradient(circle at 88% 25%, rgba(197, 34, 55, 0.07), transparent 22%),
-    linear-gradient(135deg, #fffaf7 0%, #fff0ed 54%, #f8dde2 100%);
+    linear-gradient(135deg, #fef5ea 0%, #fcefe5 54%, #f1d4c8 100%);
   box-shadow: 0 16px 42px rgba(101, 35, 48, 0.07);
 }
 
@@ -4356,7 +4453,7 @@ const clearAnswer = () => {
 .mobile-page-title {
   position: relative;
   z-index: 1;
-  color: #202331;
+  color: #32181f;
   letter-spacing: -0.8px;
   background: none;
   -webkit-text-fill-color: currentColor;
@@ -4367,7 +4464,7 @@ const clearAnswer = () => {
 .mobile-page-subtitle {
   position: relative;
   z-index: 1;
-  color: #77717a;
+  color: #746469;
 }
 
 .pc-tabs,
@@ -4381,7 +4478,7 @@ const clearAnswer = () => {
 
 .pc-tab-btn.active,
 .mobile-tab-btn.active {
-  background: linear-gradient(135deg, #c52237, #941629);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   box-shadow: 0 7px 18px rgba(151, 25, 44, 0.22);
 }
 
@@ -4438,19 +4535,19 @@ const clearAnswer = () => {
 .pc-custom-ask,
 .mobile-custom-ask {
   border-color: rgba(131, 105, 111, 0.09);
-  background: linear-gradient(145deg, #fffdfb, #fbf7f6);
+  background: linear-gradient(145deg, #fff8f0, #fbf7f6);
 }
 
 .pc-preset-item.selected,
 .mobile-preset-item.selected {
   border-color: rgba(197, 34, 55, 0.2);
-  background: #fff2f2;
+  background: #fae9df;
 }
 
 .pc-btn-ask-submit,
 .mobile-btn-ask-submit,
 .btn-checkin {
-  background: linear-gradient(135deg, #c52237, #901528);
+  background: linear-gradient(135deg, #ef5654, #81021f);
 }
 
 .modal-card {
@@ -4536,6 +4633,435 @@ const clearAnswer = () => {
   .route-detail-enter-active .modal-card,
   .route-detail-leave-active .modal-card {
     transition-duration: 0.01ms;
+  }
+}
+
+/* AI route generation progress */
+#app .route-ai-loading-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 26px;
+  border: 1px solid var(--apple-separator);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(239, 86, 84, 0.14), transparent 34%),
+    radial-gradient(circle at 8% 110%, rgba(129, 2, 31, 0.08), transparent 34%),
+    linear-gradient(145deg, var(--apple-surface-solid), var(--rc-cream));
+  box-shadow:
+    0 1px 1px rgba(255, 255, 255, 0.035) inset,
+    0 18px 42px rgba(37, 18, 24, 0.1);
+  color: var(--apple-ink);
+}
+
+.route-loading-glow {
+  position: absolute;
+  top: -120px;
+  right: -80px;
+  z-index: -1;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(239, 86, 84, 0.16), transparent 66%);
+  filter: blur(5px);
+  animation: routeLoadingGlow 3.2s ease-in-out infinite;
+}
+
+.route-loading-header {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 15px;
+}
+
+.route-loading-visual {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+}
+
+.route-loading-orbit {
+  position: absolute;
+  inset: 2px;
+  border: 1px solid rgba(239, 86, 84, 0.24);
+  border-top-color: var(--palette-silver-red);
+  border-radius: 50%;
+  box-shadow: 0 0 24px rgba(239, 86, 84, 0.1);
+  animation: routeLoadingOrbit 2.8s linear infinite;
+}
+
+.route-loading-orbit::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--palette-silver-red);
+  box-shadow: 0 0 9px rgba(239, 86, 84, 0.58);
+}
+
+.route-loading-orb {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 13px;
+  background: linear-gradient(145deg, var(--palette-silver-red), var(--palette-burgundy));
+  color: var(--palette-lotus-white);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.2) inset,
+    0 8px 20px rgba(129, 2, 31, 0.2);
+  animation: routeLoadingPulse 1.8s ease-in-out infinite;
+}
+
+#app .route-loading-copy {
+  min-width: 0;
+}
+
+.route-loading-eyebrow {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--palette-silver-red);
+  font-size: 8.5px;
+  font-weight: 760;
+  letter-spacing: 0.14em;
+}
+
+#app .route-loading-copy h3 {
+  margin: 0;
+  color: var(--apple-ink);
+  font-size: 18px;
+  font-weight: 720;
+  letter-spacing: -0.025em;
+}
+
+.route-loading-copy p {
+  margin-top: 3px;
+  color: var(--apple-secondary);
+  font-size: 10.5px;
+  line-height: 1.55;
+}
+
+.route-loading-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border: 1px solid rgba(239, 86, 84, 0.16);
+  border-radius: 999px;
+  background: rgba(239, 86, 84, 0.08);
+  color: var(--apple-secondary);
+  font-size: 8.5px;
+  font-weight: 680;
+  white-space: nowrap;
+}
+
+.route-loading-live i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--palette-silver-red);
+  box-shadow: 0 0 0 0 rgba(239, 86, 84, 0.28);
+  animation: routeLoadingDot 1.6s ease-out infinite;
+}
+
+.route-loading-progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0 7px;
+  color: var(--apple-tertiary);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.route-loading-progress-row strong {
+  color: var(--palette-silver-red);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.route-loading-track {
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(129, 2, 31, 0.075);
+}
+
+.route-loading-track > span {
+  position: relative;
+  display: block;
+  height: 100%;
+  min-width: 8%;
+  overflow: hidden;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--palette-burgundy), var(--palette-silver-red));
+  box-shadow: 0 0 12px rgba(239, 86, 84, 0.25);
+  transition: width 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.route-loading-track > span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.48), transparent);
+  transform: translateX(-100%);
+  animation: routeLoadingShimmer 1.6s ease-in-out infinite;
+}
+
+.route-loading-steps {
+  display: grid;
+  gap: 5px;
+  margin: 17px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.route-loading-step {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 43px;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  color: var(--apple-tertiary);
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.route-loading-step.active {
+  border-color: rgba(239, 86, 84, 0.2);
+  background: rgba(239, 86, 84, 0.075);
+  color: var(--apple-ink);
+}
+
+.route-loading-step.done {
+  color: var(--apple-secondary);
+}
+
+.route-loading-step-icon {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(129, 2, 31, 0.08);
+  border-radius: 9px;
+  background: rgba(129, 2, 31, 0.035);
+  color: var(--apple-tertiary);
+}
+
+.route-loading-step.done .route-loading-step-icon {
+  border-color: rgba(76, 175, 80, 0.15);
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.route-loading-step.active .route-loading-step-icon {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: linear-gradient(145deg, #f66c68, var(--palette-silver-red));
+  color: var(--palette-burgundy-deep);
+  box-shadow: 0 5px 13px rgba(129, 2, 31, 0.13);
+}
+
+.route-loading-step-copy {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.route-loading-step-copy strong {
+  color: inherit;
+  font-size: 10.5px;
+  font-weight: 620;
+  line-height: 1.45;
+}
+
+.route-loading-step.active .route-loading-step-copy strong {
+  color: var(--apple-ink);
+  font-weight: 700;
+}
+
+.route-loading-step-copy small {
+  flex-shrink: 0;
+  color: var(--apple-tertiary);
+  font-size: 8.5px;
+}
+
+.route-loading-step.active .route-loading-step-copy small {
+  color: var(--palette-silver-red);
+}
+
+.route-loading-wave {
+  height: 13px;
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.route-loading-wave i {
+  width: 2px;
+  height: 5px;
+  border-radius: 2px;
+  background: var(--palette-silver-red);
+  animation: routeLoadingWave 0.8s ease-in-out infinite alternate;
+}
+
+.route-loading-wave i:nth-child(2) {
+  height: 9px;
+  animation-delay: 0.13s;
+}
+
+.route-loading-wave i:nth-child(3) {
+  height: 6px;
+  animation-delay: 0.26s;
+}
+
+.route-loading-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 13px;
+  padding-top: 11px;
+  border-top: 1px solid rgba(129, 2, 31, 0.07);
+  color: var(--apple-tertiary);
+  font-size: 8.5px;
+}
+
+.route-loading-foot span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@keyframes routeLoadingOrbit {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes routeLoadingPulse {
+  0%, 100% { transform: scale(0.94); }
+  50% { transform: scale(1); }
+}
+
+@keyframes routeLoadingDot {
+  0% { box-shadow: 0 0 0 0 rgba(239, 86, 84, 0.34); }
+  70%, 100% { box-shadow: 0 0 0 7px rgba(239, 86, 84, 0); }
+}
+
+@keyframes routeLoadingShimmer {
+  60%, 100% { transform: translateX(100%); }
+}
+
+@keyframes routeLoadingWave {
+  to { height: 12px; opacity: 0.52; }
+}
+
+@keyframes routeLoadingGlow {
+  0%, 100% { opacity: 0.62; transform: scale(0.94); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+
+@media (max-width: 768px) {
+  #app .route-ai-loading-card {
+    padding: 17px 15px;
+    border-radius: 20px;
+  }
+
+  .route-loading-header {
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 11px;
+  }
+
+  .route-loading-visual {
+    width: 44px;
+    height: 44px;
+  }
+
+  .route-loading-orbit {
+    inset: 1px;
+  }
+
+  .route-loading-orb {
+    width: 32px;
+    height: 32px;
+    border-radius: 11px;
+  }
+
+  #app .route-loading-copy h3 {
+    font-size: 16px;
+  }
+
+  .route-loading-copy p {
+    font-size: 9.5px;
+  }
+
+  .route-loading-live {
+    grid-column: 2;
+    width: fit-content;
+    margin-top: -4px;
+    padding: 4px 8px;
+    font-size: 8px;
+  }
+
+  .route-loading-progress-row {
+    margin-top: 15px;
+  }
+
+  .route-loading-steps {
+    gap: 4px;
+    margin-top: 13px;
+  }
+
+  .route-loading-step {
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    gap: 8px;
+    min-height: 39px;
+    padding: 6px 8px;
+  }
+
+  .route-loading-step-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+  }
+
+  .route-loading-step-copy {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .route-loading-step-copy strong {
+    font-size: 9.7px;
+  }
+
+  .route-loading-step-copy small {
+    font-size: 8px;
+  }
+
+  .route-loading-foot {
+    font-size: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-loading-orbit,
+  .route-loading-orb,
+  .route-loading-live i,
+  .route-loading-track > span::after,
+  .route-loading-wave i,
+  .route-loading-glow {
+    animation: none;
   }
 }
 </style>

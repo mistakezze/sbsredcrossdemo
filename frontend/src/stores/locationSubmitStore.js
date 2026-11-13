@@ -19,13 +19,13 @@ export const PLACE_CATEGORIES = [
 ]
 
 // 自动分配的颜色
-const COLORS = ['#d32f2f', '#e53935', '#ef5350', '#ff7043', '#f4511e', '#c62828']
+const COLORS = ['#ef5654', '#f47a76', '#f9a39a', '#81021f', '#9d1934', '#5d0017']
 
 // 审核状态
 export const SUBMIT_STATUS = {
   pending: { key: 'pending', label: '待审核', color: '#f9a825', icon: 'clock' },
   approved: { key: 'approved', label: '已通过', color: '#2e7d32', icon: 'check' },
-  rejected: { key: 'rejected', label: '已驳回', color: '#c62828', icon: 'x' }
+  rejected: { key: 'rejected', label: '已驳回', color: '#81021f', icon: 'x' }
 }
 
 const buildSeed = () => {
@@ -43,7 +43,7 @@ const buildSeed = () => {
       highlights: ['沉浸式情景剧场', '模拟灾区体验通道', '青少年人道课堂'],
       lat: 31.2565,
       lng: 121.482,
-      color: '#d32f2f',
+      color: '#ef5654',
       submitterRole: 'venue',
       submitterName: '企业/地点用户',
       status: 'pending',
@@ -63,7 +63,7 @@ const buildSeed = () => {
       highlights: ['急救技能微课堂', '志愿者现场注册', '独居老人结对帮扶'],
       lat: 31.1955,
       lng: 121.4432,
-      color: '#ef5350',
+      color: '#f47a76',
       submitterRole: 'venue',
       submitterName: '企业/地点用户',
       status: 'approved',
@@ -82,7 +82,7 @@ const buildSeed = () => {
       highlights: [],
       lat: 31.23,
       lng: 121.47,
-      color: '#ff7043',
+      color: '#ef5654',
       submitterRole: 'venue',
       submitterName: '企业/地点用户',
       status: 'rejected',

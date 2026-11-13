@@ -13,7 +13,7 @@
 
     <template v-if="checkin && !isMobile">
       <div class="detail-content">
-        <section class="hero-section" :style="{ '--accent-color': location?.color || '#d32f2f' }">
+        <section class="hero-section" :style="{ '--accent-color': location?.color || '#ef5654' }">
           <div class="hero-content">
             <span class="hero-category">{{ checkin.category }}</span>
             <h1 class="hero-title">{{ checkin.locationName }}</h1>
@@ -102,7 +102,7 @@
 
     <template v-if="checkin && isMobile">
       <div class="mobile-content">
-        <section class="m-hero-section" :style="{ '--accent-color': location?.color || '#d32f2f' }">
+        <section class="m-hero-section" :style="{ '--accent-color': location?.color || '#ef5654' }">
           <span class="m-hero-category">{{ checkin.category }}</span>
           <h1 class="m-hero-title">{{ checkin.locationName }}</h1>
           <div class="m-hero-place"><AppIcon name="pin" size="13" /> {{ checkin.location }}</div>
@@ -254,8 +254,8 @@ const saveNote = () => {
 
 .back-btn {
   background: white;
-  border: 2px solid #e5e9ef;
-  color: #5a6478;
+  border: 2px solid #eadfd6;
+  color: #635057;
   padding: 10px 20px;
   border-radius: 10px;
   font-size: 14px;
@@ -266,9 +266,9 @@ const saveNote = () => {
 }
 
 .back-btn:hover {
-  border-color: #d32f2f;
-  color: #d32f2f;
-  background: #fff5f5;
+  border-color: #ef5654;
+  color: #ef5654;
+  background: #feeee1;
   transform: translateX(-4px);
   box-shadow: 0 4px 12px rgba(211, 47, 47, 0.1);
 }
@@ -296,21 +296,21 @@ const saveNote = () => {
 
 .not-found h2 {
   font-size: 22px;
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 12px 0;
   word-break: break-word;
 }
 
 .not-found p {
   font-size: 14px;
-  color: #5a6478;
+  color: #635057;
   margin: 0 0 28px 0;
   word-break: break-word;
 }
 
 .nf-btn {
   padding: 12px 28px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: white;
   border: none;
   border-radius: 10px;
@@ -340,7 +340,7 @@ const saveNote = () => {
 }
 
 .nf-btn:hover {
-  background: #b71c1c;
+  background: #81021f;
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(211, 47, 47, 0.4);
 }
@@ -351,7 +351,7 @@ const saveNote = () => {
 
 /* Hero 区块 */
 .hero-section {
-  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+  background: linear-gradient(135deg, #feeee1 0%, #fbe7dc 100%);
   border-radius: 24px;
   padding: 48px;
   margin-bottom: 32px;
@@ -386,7 +386,7 @@ const saveNote = () => {
 .hero-category {
   display: inline-block;
   padding: 8px 20px;
-  background: linear-gradient(135deg, var(--accent-color), #ff7043);
+  background: linear-gradient(135deg, var(--accent-color), #ef5654);
   color: white;
   border-radius: 10px;
   font-size: 12px;
@@ -406,12 +406,12 @@ const saveNote = () => {
 
 .hero-title {
   font-size: 36px;
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 16px 0;
   font-weight: 800;
   line-height: 1.3;
   position: relative;
-  background: linear-gradient(135deg, #1a2332, var(--accent-color), #1a2332);
+  background: linear-gradient(135deg, #32181f, var(--accent-color), #32181f);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -429,7 +429,7 @@ const saveNote = () => {
 
 .hero-place {
   font-size: 16px;
-  color: #5a6478;
+  color: #635057;
   margin-bottom: 20px;
   position: relative;
   z-index: 1;
@@ -483,7 +483,7 @@ const saveNote = () => {
 
 .checkin-date {
   font-size: 14px;
-  color: #7a8599;
+  color: #79636a;
   font-weight: 500;
 }
 
@@ -523,7 +523,7 @@ const saveNote = () => {
   transform: translateX(-50%);
   width: 120px;
   height: 3px;
-  background: linear-gradient(90deg, transparent, var(--accent-color, #d32f2f), transparent);
+  background: linear-gradient(90deg, transparent, var(--accent-color, #ef5654), transparent);
   opacity: 0.4;
   animation: topLineSweep 2s ease-out;
 }
@@ -535,7 +535,7 @@ const saveNote = () => {
 
 .section-title {
   font-size: clamp(12px, 2vw, 18px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 16px 0;
   font-weight: 700;
   position: relative;
@@ -551,13 +551,13 @@ const saveNote = () => {
   left: 0;
   width: 40px;
   height: 3px;
-  background: linear-gradient(90deg, var(--accent-color, #d32f2f), #ff7043);
+  background: linear-gradient(90deg, var(--accent-color, #ef5654), #ef5654);
   border-radius: 2px;
 }
 
 .section-text {
   font-size: 15px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.9;
   margin: 0;
   word-break: break-word;
@@ -575,7 +575,7 @@ const saveNote = () => {
   align-items: flex-start;
   gap: 14px;
   padding: 12px 0;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid #f3e8de;
   transition: all 0.3s ease;
   position: relative;
 }
@@ -591,7 +591,7 @@ const saveNote = () => {
 .highlight-marker {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, var(--accent-color, #d32f2f), #ff7043);
+  background: linear-gradient(135deg, var(--accent-color, #ef5654), #ef5654);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -611,7 +611,7 @@ const saveNote = () => {
 
 .highlight-text {
   font-size: clamp(12px, 2vw, 15px);
-  color: #5a6478;
+  color: #635057;
   line-height: 1.7;
   padding-top: 3px;
   word-break: break-word;
@@ -713,7 +713,7 @@ const saveNote = () => {
   border-radius: 10px;
   padding: 12px 14px;
   font-size: 15px;
-  color: #1a2332;
+  color: #32181f;
   font-family: inherit;
   resize: vertical;
   background: white;
@@ -747,8 +747,8 @@ const saveNote = () => {
 
 .note-btn.cancel {
   background: white;
-  color: #7a8599;
-  border: 2px solid #e5e9ef;
+  color: #79636a;
+  border: 2px solid #eadfd6;
 }
 
 .note-btn.cancel:hover {
@@ -782,22 +782,22 @@ const saveNote = () => {
   flex-direction: column;
   gap: 8px;
   padding: 18px 20px;
-  background: linear-gradient(135deg, #fafbfc, #f5f7fa);
+  background: linear-gradient(135deg, #fbf4eb, #fbf4eb);
   border-radius: 14px;
   border: 2px solid transparent;
   transition: all 0.35s ease;
 }
 
 .info-item:hover {
-  border-color: var(--accent-color, #d32f2f);
-  background: linear-gradient(135deg, #fff8f8, #ffffff);
+  border-color: var(--accent-color, #ef5654);
+  background: linear-gradient(135deg, #fff7ed, #fffaf3);
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(211, 47, 47, 0.12);
 }
 
 .info-item .info-label {
   font-size: 11px;
-  color: #7a8599;
+  color: #79636a;
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -805,7 +805,7 @@ const saveNote = () => {
 
 .info-item .info-value {
   font-size: 15px;
-  color: #1a2332;
+  color: #32181f;
   font-weight: 600;
   line-height: 1.5;
   word-break: break-word;
@@ -821,7 +821,7 @@ const saveNote = () => {
 }
 
 .m-hero-section {
-  background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 40%, #fff0f3 100%);
+  background: linear-gradient(160deg, #feeee1 0%, #fbe7dc 40%, #fbe9df 100%);
   border-radius: 20px;
   padding: clamp(20px, 5vw, 28px) clamp(16px, 4vw, 22px);
   margin-bottom: 16px;
@@ -845,7 +845,7 @@ const saveNote = () => {
 .m-hero-category {
   display: inline-block;
   padding: 5px 14px;
-  background: linear-gradient(135deg, var(--accent-color), #e53935);
+  background: linear-gradient(135deg, var(--accent-color), #ef5654);
   color: white;
   border-radius: 8px;
   font-size: clamp(10px, 2.5vw, 12px);
@@ -859,7 +859,7 @@ const saveNote = () => {
 
 .m-hero-title {
   font-size: clamp(18px, 5vw, 24px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 10px 0;
   font-weight: 800;
   line-height: 1.3;
@@ -867,7 +867,7 @@ const saveNote = () => {
   z-index: 1;
   word-break: break-word;
   overflow-wrap: break-word;
-  background: linear-gradient(135deg, #1a2332 30%, var(--accent-color) 70%);
+  background: linear-gradient(135deg, #32181f 30%, var(--accent-color) 70%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -876,7 +876,7 @@ const saveNote = () => {
 
 .m-hero-place {
   font-size: clamp(12px, 3vw, 14px);
-  color: #8a95a8;
+  color: #9a858a;
   margin-bottom: 12px;
   position: relative;
   z-index: 1;
@@ -905,14 +905,14 @@ const saveNote = () => {
 
 .m-checkin-date {
   font-size: clamp(11px, 2.8vw, 13px);
-  color: #8a95a8;
+  color: #9a858a;
   font-weight: 500;
   word-break: break-word;
 }
 
 /* 移动端 info 区块 */
 .m-info-section {
-  background: #ffffff;
+  background: #fffaf3;
   border-radius: 18px;
   padding: clamp(16px, 4vw, 20px) clamp(14px, 3.5vw, 18px);
   box-shadow: 0 2px 16px rgba(26, 35, 50, 0.05);
@@ -924,7 +924,7 @@ const saveNote = () => {
 
 .m-section-title {
   font-size: clamp(12px, 3.5vw, 15px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 10px 0;
   font-weight: 700;
   position: relative;
@@ -940,13 +940,13 @@ const saveNote = () => {
   left: 0;
   width: 28px;
   height: 3px;
-  background: linear-gradient(90deg, var(--accent-color, #d32f2f), #ff7043);
+  background: linear-gradient(90deg, var(--accent-color, #ef5654), #ef5654);
   border-radius: 2px;
 }
 
 .m-section-text {
   font-size: clamp(12px, 3vw, 14px);
-  color: #6b7a90;
+  color: #7b676c;
   line-height: 1.8;
   margin: 0;
   word-break: break-word;
@@ -975,7 +975,7 @@ const saveNote = () => {
 .m-highlight-marker {
   width: 24px;
   height: 24px;
-  background: linear-gradient(135deg, var(--accent-color, #d32f2f), #e53935);
+  background: linear-gradient(135deg, var(--accent-color, #ef5654), #ef5654);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -989,7 +989,7 @@ const saveNote = () => {
 
 .m-highlight-text {
   font-size: clamp(12px, 3vw, 14px);
-  color: #6b7a90;
+  color: #7b676c;
   line-height: 1.7;
   padding-top: 2px;
   word-break: break-word;
@@ -1075,7 +1075,7 @@ const saveNote = () => {
   border-radius: 8px;
   padding: 10px 12px;
   font-size: clamp(13px, 3.3vw, 15px);
-  color: #1a2332;
+  color: #32181f;
   font-family: inherit;
   resize: vertical;
   background: white;
@@ -1110,8 +1110,8 @@ const saveNote = () => {
 
 .m-note-btn.cancel {
   background: white;
-  color: #7a8599;
-  border: 1.5px solid #e5e9ef;
+  color: #79636a;
+  border: 1.5px solid #eadfd6;
 }
 
 .m-note-btn.cancel:active {
@@ -1144,21 +1144,21 @@ const saveNote = () => {
   flex-direction: column;
   gap: 6px;
   padding: 14px 16px;
-  background: linear-gradient(135deg, #fafbfc, #f5f7fa);
+  background: linear-gradient(135deg, #fbf4eb, #fbf4eb);
   border-radius: 12px;
   border: 1.5px solid transparent;
   transition: all 0.2s ease;
 }
 
 .m-info-item:active {
-  border-color: var(--accent-color, #d32f2f);
-  background: linear-gradient(135deg, #fff8f8, #ffffff);
+  border-color: var(--accent-color, #ef5654);
+  background: linear-gradient(135deg, #fff7ed, #fffaf3);
   transform: scale(0.99);
 }
 
 .m-info-label {
   font-size: clamp(10px, 2.5vw, 11px);
-  color: #8a95a8;
+  color: #9a858a;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -1166,7 +1166,7 @@ const saveNote = () => {
 
 .m-info-value {
   font-size: clamp(13px, 3.3vw, 15px);
-  color: #1a2332;
+  color: #32181f;
   font-weight: 600;
   line-height: 1.5;
   word-break: break-word;
@@ -1232,7 +1232,7 @@ const saveNote = () => {
   background:
     radial-gradient(circle at 92% 8%, rgba(255, 255, 255, 0.82) 0 7%, transparent 7.3%),
     radial-gradient(circle at 82% 24%, rgba(197, 34, 55, 0.09), transparent 24%),
-    linear-gradient(145deg, #a11329 0%, #c52237 58%, #d84a58 100%);
+    linear-gradient(145deg, #81021f 0%, #ef5654 58%, #d84a58 100%);
   box-shadow: 0 20px 48px rgba(110, 20, 38, 0.2);
 }
 
@@ -1278,7 +1278,7 @@ const saveNote = () => {
 .nf-btn,
 .note-btn.save,
 .m-note-btn.save {
-  background: linear-gradient(135deg, #c52237, #901528);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   border-radius: 11px;
 }
 
@@ -1290,7 +1290,7 @@ const saveNote = () => {
 
 .m-note-input {
   border-color: rgba(138, 65, 79, 0.12);
-  background: #fffdfb;
+  background: #fff8f0;
 }
 
 @media (max-width: 600px) {

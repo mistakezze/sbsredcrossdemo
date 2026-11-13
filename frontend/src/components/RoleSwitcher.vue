@@ -40,8 +40,8 @@
               v-for="r in ROLES"
               :key="r.key"
               class="role-item"
-              :class="{ active: r.key === currentRoleKey }"
-              @click="select(r.key)"
+              :class="{ active: isRoleActive(r) }"
+              @click="selectRole(r)"
             >
               <span class="item-avatar" :style="{ background: r.color }">
                 <AppIcon :name="r.icon" size="18" />
@@ -55,11 +55,44 @@
                 </span>
                 <span class="item-desc">{{ r.desc }}</span>
               </span>
-              <span v-if="r.key === currentRoleKey" class="item-check">
+              <span v-if="isRoleActive(r)" class="item-check">
                 <AppIcon name="check" size="15" />
               </span>
             </button>
           </div>
+
+          <transition name="fade">
+            <section v-if="registeredOpen" class="registered-account-picker">
+              <div class="registered-account-head">
+                <div>
+                  <span>选择登录账号</span>
+                  <small>从 {{ registeredUserCount }} 名注册用户中随机抽取 5 名</small>
+                </div>
+                <button class="registered-refresh" @click="refreshRegisteredAccounts">
+                  <AppIcon name="sparkles" size="12" />
+                  换一批
+                </button>
+              </div>
+              <div class="registered-account-list">
+                <button
+                  v-for="account in registeredAccountSample"
+                  :key="account.id"
+                  class="registered-account-item"
+                  :class="{ active: currentRoleKey === account.id }"
+                  @click="selectRegisteredAccount(account)"
+                >
+                  <span class="registered-account-avatar" :style="{ background: account.color }">
+                    <AppIcon :name="account.icon" size="16" />
+                  </span>
+                  <span class="registered-account-copy">
+                    <strong>{{ account.name }}</strong>
+                    <small>{{ account.preferredActivityLabels.join(' · ') }}</small>
+                  </span>
+                  <AppIcon v-if="currentRoleKey === account.id" name="check" size="14" />
+                </button>
+              </div>
+            </section>
+          </transition>
 
           <div class="panel-foot">
             当前身份：<strong>{{ currentUser.name }}</strong>
@@ -78,21 +111,52 @@ import { ref, watch, onUnmounted } from 'vue'
 import { useUserStore } from '../stores/userStore'
 import { useViewport } from '../composables/useViewport'
 
-const { ROLES, currentRoleKey, currentUser, setRole } = useUserStore()
+const {
+  ROLES,
+  currentRoleKey,
+  currentUser,
+  registeredAccountSample,
+  refreshRegisteredAccounts,
+  registeredUserCount,
+  setRole
+} = useUserStore()
 const { isMobile } = useViewport()
 
 const open = ref(false)
+const registeredOpen = ref(false)
 
 const toggle = () => {
   open.value = !open.value
+  if (open.value) {
+    registeredOpen.value = currentUser.value.permissionRole === 'member'
+    if (currentUser.value.simulated) refreshRegisteredAccounts()
+  } else {
+    registeredOpen.value = false
+  }
 }
 
 const close = () => {
   open.value = false
 }
 
-const select = (key) => {
-  setRole(key)
+const isRoleActive = (role) =>
+  role.key === currentRoleKey.value ||
+  (role.key === 'member' && currentUser.value.permissionRole === 'member')
+
+const selectRole = (role) => {
+  if (role.key === 'member') {
+    setRole('member')
+    registeredOpen.value = true
+    return
+  }
+  setRole(role.key)
+  registeredOpen.value = false
+  close()
+}
+
+const selectRegisteredAccount = (account) => {
+  setRole(account.id)
+  registeredOpen.value = false
   close()
 }
 
@@ -120,7 +184,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   padding: 6px 12px 6px 6px;
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(254, 238, 225, 0.13);
   border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 50px;
   cursor: pointer;
@@ -130,7 +194,7 @@ onUnmounted(() => {
 }
 
 .role-trigger:hover {
-  background: rgba(255, 255, 255, 0.26);
+  background: rgba(254, 238, 225, 0.23);
 }
 
 .trigger-avatar {
@@ -205,7 +269,7 @@ onUnmounted(() => {
   width: 360px;
   max-height: calc(100vh - 120px);
   overflow-y: auto;
-  background: #fff;
+  background: rgba(255, 249, 242, 0.96);
   border-radius: 18px;
   box-shadow: 0 24px 64px rgba(15, 26, 43, 0.28);
   z-index: 2000;
@@ -232,7 +296,7 @@ onUnmounted(() => {
   gap: 12px;
   padding-bottom: 14px;
   margin-bottom: 12px;
-  border-bottom: 1.5px solid #f0f2f5;
+  border-bottom: 1.5px solid rgba(129, 2, 31, 0.09);
 }
 
 .panel-head-text {
@@ -244,12 +308,12 @@ onUnmounted(() => {
 .panel-title {
   font-size: 16px;
   font-weight: 800;
-  color: #1a2332;
+  color: var(--palette-burgundy-deep);
 }
 
 .panel-sub {
   font-size: 12px;
-  color: #98a2b3;
+  color: var(--apple-secondary);
 }
 
 .panel-close {
@@ -257,9 +321,9 @@ onUnmounted(() => {
   width: 28px;
   height: 28px;
   border: none;
-  background: #f4f6f9;
+  background: rgba(129, 2, 31, 0.06);
   border-radius: 50%;
-  color: #7a8599;
+  color: var(--apple-secondary);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
@@ -267,8 +331,8 @@ onUnmounted(() => {
 }
 
 .panel-close:hover {
-  background: #e8ebef;
-  color: #1a2332;
+  background: rgba(129, 2, 31, 0.12);
+  color: var(--palette-burgundy);
 }
 
 /* ========== 角色列表 ========== */
@@ -283,7 +347,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: #fafbfc;
+  background: rgba(255, 250, 244, 0.82);
   border: 1.5px solid transparent;
   border-radius: 12px;
   cursor: pointer;
@@ -294,16 +358,16 @@ onUnmounted(() => {
 }
 
 .role-item:hover {
-  background: #fff;
-  border-color: #ffcdd2;
+  background: #fffaf3;
+  border-color: rgba(239, 86, 84, 0.3);
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(211, 47, 47, 0.08);
+  box-shadow: 0 7px 20px rgba(129, 2, 31, 0.08);
 }
 
 .role-item.active {
-  background: linear-gradient(135deg, #fff5f5, #ffecec);
-  border-color: #d32f2f;
-  box-shadow: 0 4px 14px rgba(211, 47, 47, 0.14);
+  background: linear-gradient(135deg, #feeee1, #fbe7dc);
+  border-color: var(--palette-silver-red);
+  box-shadow: 0 5px 16px rgba(129, 2, 31, 0.13);
 }
 
 .item-avatar {
@@ -337,7 +401,7 @@ onUnmounted(() => {
 .item-name {
   font-size: 14px;
   font-weight: 700;
-  color: #1a2332;
+  color: var(--palette-burgundy-deep);
 }
 
 .item-star {
@@ -351,7 +415,7 @@ onUnmounted(() => {
 
 .item-desc {
   font-size: 11.5px;
-  color: #7a8599;
+  color: var(--apple-secondary);
   line-height: 1.45;
   word-break: break-word;
 }
@@ -360,25 +424,154 @@ onUnmounted(() => {
   flex-shrink: 0;
   font-size: 15px;
   font-weight: 800;
-  color: #d32f2f;
+  color: var(--palette-silver-red);
 }
 
 .panel-foot {
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1.5px solid #f0f2f5;
+  border-top: 1.5px solid rgba(129, 2, 31, 0.09);
   font-size: 12px;
-  color: #7a8599;
+  color: var(--apple-secondary);
   line-height: 1.6;
 }
 
 .panel-foot strong {
-  color: #d32f2f;
+  color: var(--palette-burgundy);
 }
 
 .foot-star {
   color: #b7791f;
   font-weight: 600;
+}
+
+.registered-account-picker {
+  margin-top: 13px;
+  padding: 13px;
+  border: 1px solid var(--apple-separator);
+  border-radius: 15px;
+  background: var(--apple-fill);
+}
+
+.registered-account-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.registered-account-head > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.registered-account-head span {
+  color: var(--apple-ink);
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.registered-account-head small {
+  color: var(--apple-tertiary);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.registered-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 4px 7px;
+  border: 1px solid var(--apple-separator);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.42);
+  color: var(--apple-secondary);
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.registered-account-list {
+  display: grid;
+  gap: 6px;
+}
+
+.registered-account-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 9px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: var(--apple-surface-solid);
+  color: var(--apple-secondary);
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.registered-account-item:hover {
+  transform: translateX(2px);
+  border-color: rgba(239, 86, 84, 0.22);
+}
+
+.registered-account-item.active {
+  border-color: rgba(239, 86, 84, 0.36);
+  background: rgba(239, 86, 84, 0.1);
+  color: var(--palette-burgundy);
+}
+
+.registered-account-avatar {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 10px;
+  color: var(--palette-lotus-white);
+  box-shadow: 0 3px 8px rgba(68, 2, 18, 0.16);
+}
+
+.registered-account-copy {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.registered-account-copy strong {
+  color: var(--apple-ink);
+  font-size: 11px;
+  font-weight: 680;
+}
+
+.registered-account-copy small {
+  overflow: hidden;
+  color: var(--apple-tertiary);
+  font-size: 8.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root[data-theme="dark"] .registered-refresh,
+:root[data-theme="dark"] .registered-account-item {
+  background: rgba(255, 255, 255, 0.055);
+}
+
+:root[data-theme="dark"] .registered-account-item.active {
+  border-color: rgba(239, 86, 84, 0.38);
+  background: rgba(239, 86, 84, 0.12);
+  color: #ffaaa7;
 }
 
 /* ========== 过渡动画 ========== */

@@ -2,6 +2,11 @@ import { ref, computed } from 'vue'
 import { fitUserCF } from '../utils/userCF'
 import { fitLowRankPreference } from '../utils/lowRankModel'
 import { buildCollaborativeSignal } from '../utils/cfBlend'
+import {
+  SIMULATED_ACTIVITY_REVIEWS,
+  SIMULATED_ACTIVITY_ENROLLMENTS,
+  SIMULATED_USER_BY_ID
+} from '../data/demoUsers'
 
 const STORAGE_KEY = 'redcross_activity_state_v2'
 const DAY = 86400000
@@ -38,9 +43,9 @@ export const ACTIVITY_COLD_START_WEIGHTS = {
 // 活动类型
 export const ACTIVITY_TYPES = {
   training: { key: 'training', label: '急救培训', icon: 'firstAid', color: '#0288d1' },
-  volunteer: { key: 'volunteer', label: '志愿服务', icon: 'handshake', color: '#d32f2f' },
+  volunteer: { key: 'volunteer', label: '志愿服务', icon: 'handshake', color: '#ef5654' },
   lecture: { key: 'lecture', label: '人道讲座', icon: 'book', color: '#7b1fa2' },
-  blood: { key: 'blood', label: '无偿献血', icon: 'blood', color: '#c62828' },
+  blood: { key: 'blood', label: '无偿献血', icon: 'blood', color: '#81021f' },
   fundraiser: { key: 'fundraiser', label: '公益筹款', icon: 'gift', color: '#f9a825' }
 }
 
@@ -283,19 +288,46 @@ const buildSeed = () => {
   }
 }
 
+export const ACTIVITY_REVIEW_STATUS = {
+  pending: { key: 'pending', label: '待审核', color: '#f9a825', icon: 'clock' },
+  approved: { key: 'approved', label: '已通过', color: '#2e7d32', icon: 'check' },
+  rejected: { key: 'rejected', label: '已驳回', color: '#81021f', icon: 'x' }
+}
+
+export const reviewStatusOf = (activity) =>
+  ACTIVITY_REVIEW_STATUS[activity?.reviewStatus] ? activity.reviewStatus : 'approved'
+
+const normalizeActivity = (activity) => ({
+  ...activity,
+  reviewStatus: reviewStatusOf(activity),
+  reviewNote: activity.reviewNote || '',
+  reviewedAt: activity.reviewedAt || null,
+  reviewedBy: activity.reviewedBy || null
+})
+
 const loadFromStorage = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return buildSeed()
+    if (!raw) {
+      const seed = buildSeed()
+      seed.activities = seed.activities.map(normalizeActivity)
+      return seed
+    }
     const parsed = JSON.parse(raw)
-    if (!parsed || !Array.isArray(parsed.activities)) return buildSeed()
+    if (!parsed || !Array.isArray(parsed.activities)) {
+      const seed = buildSeed()
+      seed.activities = seed.activities.map(normalizeActivity)
+      return seed
+    }
     return {
-      activities: parsed.activities,
+      activities: parsed.activities.map(normalizeActivity),
       enrollments: parsed.enrollments || [],
       reviews: parsed.reviews || []
     }
   } catch {
-    return buildSeed()
+    const seed = buildSeed()
+    seed.activities = seed.activities.map(normalizeActivity)
+    return seed
   }
 }
 
@@ -320,7 +352,7 @@ export const activityStatus = (activity) => {
 export const STATUS_META = {
   upcoming: { key: 'upcoming', label: '即将开始', color: '#0288d1' },
   ongoing: { key: 'ongoing', label: '进行中', color: '#2e7d32' },
-  ended: { key: 'ended', label: '已结束', color: '#9aa5b4' }
+  ended: { key: 'ended', label: '已结束', color: '#a79599' }
 }
 
 export const formatActivityTime = (ts) => {
@@ -353,6 +385,23 @@ export const formatReviewTime = (ts) => {
 
 export const useActivityStore = () => {
   const activities = computed(() => state.value.activities)
+  const approvedActivities = computed(() =>
+    state.value.activities.filter(activity => reviewStatusOf(activity) === 'approved')
+  )
+  const pendingActivities = computed(() =>
+    state.value.activities
+      .filter(activity => reviewStatusOf(activity) === 'pending')
+      .sort((a, b) => b.createdAt - a.createdAt)
+  )
+  const activityReviewStats = computed(() =>
+    state.value.activities.reduce(
+      (result, activity) => {
+        result[reviewStatusOf(activity)] += 1
+        return result
+      },
+      { pending: 0, approved: 0, rejected: 0 }
+    )
+  )
   const enrollments = computed(() => state.value.enrollments)
   const reviews = computed(() => state.value.reviews)
 
@@ -375,7 +424,7 @@ export const useActivityStore = () => {
 
   const enroll = (activityId, roleKey, userName) => {
     const act = state.value.activities.find(a => a.id === Number(activityId))
-    if (!act) return false
+    if (!act || reviewStatusOf(act) !== 'approved') return false
     if (isEnrolled(activityId, roleKey)) return false
     if (enrolledCount(activityId) >= act.capacity) return false
     state.value.enrollments.push({
@@ -427,7 +476,7 @@ export const useActivityStore = () => {
   // 未结束的活动需已报名才能评级；已结束的活动所有可评价角色都能补评
   const canReview = (activityId, roleKey) => {
     const act = state.value.activities.find(a => a.id === Number(activityId))
-    if (!act) return false
+    if (!act || reviewStatusOf(act) !== 'approved') return false
     if (myReviewOf(activityId, roleKey)) return false
     if (activityStatus(act) === 'ended') return true
     return isEnrolled(activityId, roleKey)
@@ -480,6 +529,10 @@ export const useActivityStore = () => {
       baseEnrolled: 0,
       organizerRole: organizer.roleKey,
       organizerName: organizer.userName,
+      reviewStatus: 'pending',
+      reviewNote: '',
+      reviewedAt: null,
+      reviewedBy: null,
       createdAt: Date.now()
     })
     persist()
@@ -500,6 +553,28 @@ export const useActivityStore = () => {
     return true
   }
 
+  const approveActivity = (activityId, note, reviewer) => {
+    const activity = state.value.activities.find(a => a.id === Number(activityId))
+    if (!activity) return false
+    activity.reviewStatus = 'approved'
+    activity.reviewNote = (note || '').trim() || '活动信息完整，审核通过。'
+    activity.reviewedAt = Date.now()
+    activity.reviewedBy = reviewer?.userName || '管理员'
+    persist()
+    return true
+  }
+
+  const rejectActivity = (activityId, note, reviewer) => {
+    const activity = state.value.activities.find(a => a.id === Number(activityId))
+    if (!activity) return false
+    activity.reviewStatus = 'rejected'
+    activity.reviewNote = (note || '').trim() || '活动信息需要补充，请修改后重新提交。'
+    activity.reviewedAt = Date.now()
+    activity.reviewedBy = reviewer?.userName || '管理员'
+    persist()
+    return true
+  }
+
   // ==============================
   // 算法推荐
   // ==============================
@@ -514,7 +589,7 @@ export const useActivityStore = () => {
     }
 
     const items = Object.values(TYPE_INDEX).map(id => ({ id }))
-    const explicit = state.value.reviews
+    const explicit = [...state.value.reviews, ...SIMULATED_ACTIVITY_REVIEWS]
       .map(r => ({ ...r, typeIndex: typeIndexOf(r.activityId) }))
       .filter(r => r.typeIndex)
       .map(r => ({
@@ -523,13 +598,15 @@ export const useActivityStore = () => {
         rating: r.rating,
         timestamp: r.timestamp
       }))
-    const implicit = state.value.enrollments
+    const implicit = [...state.value.enrollments, ...SIMULATED_ACTIVITY_ENROLLMENTS]
       .map(e => ({ ...e, typeIndex: typeIndexOf(e.activityId) }))
       .filter(e => e.typeIndex)
       .map(e => ({ locationId: e.typeIndex, timestamp: e.timestamp }))
 
     // 角色名优先取真实记录里的署名，缺失时退回角色 key
     const roleNameOf = (key) => {
+      const simulatedName = SIMULATED_USER_BY_ID.get(key)?.name
+      if (simulatedName) return simulatedName
       const record =
         state.value.reviews.find(r => r.roleKey === key) ||
         state.value.enrollments.find(e => e.roleKey === key)
@@ -573,8 +650,10 @@ export const useActivityStore = () => {
   const recommend = (roleKey, limit = 4) => {
     const now = Date.now()
 
-    const myEnrollments = state.value.enrollments.filter(e => e.roleKey === roleKey)
-    const myReviews = state.value.reviews.filter(r => r.roleKey === roleKey)
+    const allEnrollments = [...state.value.enrollments, ...SIMULATED_ACTIVITY_ENROLLMENTS]
+    const allReviews = [...state.value.reviews, ...SIMULATED_ACTIVITY_REVIEWS]
+    const myEnrollments = allEnrollments.filter(e => e.roleKey === roleKey)
+    const myReviews = allReviews.filter(r => r.roleKey === roleKey)
     const isColdStart = myEnrollments.length === 0 && myReviews.length === 0
     const weights = isColdStart ? ACTIVITY_COLD_START_WEIGHTS : ACTIVITY_RECO_WEIGHTS
 
@@ -594,8 +673,12 @@ export const useActivityStore = () => {
 
     // 2. 候选：未结束、未报名的活动
     const candidates = state.value.activities.filter(a => {
+      if (reviewStatusOf(a) !== 'approved') return false
       if (activityStatus(a) === 'ended') return false
-      return !isEnrolled(a.id, roleKey)
+      const enrolled =
+        isEnrolled(a.id, roleKey) ||
+        allEnrollments.some(e => e.activityId === a.id && e.roleKey === roleKey)
+      return !enrolled
     })
 
     // 3. 协同过滤信号（冷启动时跳过，省掉无意义训练）
@@ -711,6 +794,9 @@ export const useActivityStore = () => {
 
   return {
     activities,
+    approvedActivities,
+    pendingActivities,
+    activityReviewStats,
     enrollments,
     reviews,
     enrollmentsOf,
@@ -725,6 +811,8 @@ export const useActivityStore = () => {
     addReview,
     removeReview,
     createActivity,
+    approveActivity,
+    rejectActivity,
     removeActivity,
     recommend
   }

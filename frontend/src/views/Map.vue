@@ -285,7 +285,7 @@
     <transition name="fade">
       <div v-if="selectedLoc" class="loc-overlay" @click.self="closeDetail">
         <div class="loc-modal" :class="{ 'loc-modal-mobile': isMobile }">
-          <div class="loc-banner" :style="{ background: `linear-gradient(135deg, ${selectedLoc.color}, #b71c1c)` }">
+          <div class="loc-banner" :style="{ background: `linear-gradient(135deg, ${selectedLoc.color}, #81021f)` }">
             <div class="loc-banner-top">
               <span class="loc-era-tag"><AppIcon :name="ERAS[selectedLoc.era].icon" size="13" /> {{ ERAS[selectedLoc.era].label }}</span>
               <button class="loc-close" aria-label="关闭地点详情" @click="closeDetail">
@@ -359,6 +359,10 @@ import { useLocationStore, ERAS } from '../stores/locationStore'
 import { useCheckinStore } from '../stores/checkinStore'
 import { useReviewStore } from '../stores/reviewStore'
 import { useUserStore } from '../stores/userStore'
+import {
+  SIMULATED_LOCATION_REVIEWS,
+  simulatedLocationCheckinsFor
+} from '../data/demoUsers'
 import { useViewport } from '../composables/useViewport'
 import { wgs84ToGcj02, haversineKm } from '../utils/coordTransform'
 import { recommendPlaces, RECO_WEIGHTS } from '../utils/placeRecommend'
@@ -470,13 +474,18 @@ const toggleSort = () => {
 // 算法推荐地点（UserCF + 低秩偏好 + 内容特征）
 // ==============================
 const roleNameOf = (key) => getRole(key)?.name || key
+const algorithmReviews = computed(() => [...reviews.value, ...SIMULATED_LOCATION_REVIEWS])
+const algorithmCheckins = computed(() => [
+  ...checkins.value,
+  ...simulatedLocationCheckinsFor(currentRoleKey.value)
+])
 
 // 协同过滤第一路：UserCF 邻域法，找口味相近的访客
 const userCFModel = computed(() =>
   fitUserCF({
     locations: locations.value,
-    checkins: checkins.value,
-    reviews: reviews.value,
+    checkins: algorithmCheckins.value,
+    reviews: algorithmReviews.value,
     currentRoleKey: currentRoleKey.value,
     roleNameOf
   })
@@ -486,8 +495,8 @@ const userCFModel = computed(() =>
 const lowRankModel = computed(() =>
   fitLowRankPreference({
     locations: locations.value,
-    checkins: checkins.value,
-    reviews: reviews.value,
+    checkins: algorithmCheckins.value,
+    reviews: algorithmReviews.value,
     currentRoleKey: currentRoleKey.value,
     roleNameOf
   })
@@ -496,8 +505,8 @@ const lowRankModel = computed(() =>
 const recoResult = computed(() =>
   recommendPlaces({
     locations: locations.value,
-    checkins: checkins.value,
-    reviews: reviews.value,
+    checkins: algorithmCheckins.value,
+    reviews: algorithmReviews.value,
     userLocation: userLocation.value,
     currentRoleKey: currentRoleKey.value,
     roleNameOf,
@@ -733,7 +742,7 @@ const renderUser = () => {
   }).addTo(userLayer)
   L.circleMarker(pos, {
     radius: 8,
-    color: '#ffffff',
+    color: '#fffaf3',
     weight: 3,
     fillColor: '#1976d2',
     fillOpacity: 1
@@ -895,7 +904,7 @@ watch(isMobile, () => {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: #fff;
   font-size: 15px;
   font-weight: 800;
@@ -959,7 +968,7 @@ watch(isMobile, () => {
 }
 
 :deep(.rc-tip) {
-  background: #1a2332;
+  background: #32181f;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -970,7 +979,7 @@ watch(isMobile, () => {
 }
 
 :deep(.rc-tip::before) {
-  border-top-color: #1a2332;
+  border-top-color: #32181f;
 }
 
 :deep(.leaflet-container) {
@@ -1261,7 +1270,7 @@ watch(isMobile, () => {
 .ai-card-name {
   font-size: 13.5px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
   line-height: 1.4;
   word-break: break-word;
   flex: 1;
@@ -1392,7 +1401,7 @@ watch(isMobile, () => {
 .reco-name {
   font-size: 13px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
   line-height: 1.4;
   word-break: break-word;
   flex: 1;
@@ -1415,7 +1424,7 @@ watch(isMobile, () => {
   gap: 6px;
   flex-wrap: wrap;
   font-size: 10.5px;
-  color: #8a95a8;
+  color: #9a858a;
 }
 
 .reco-era {
@@ -1431,7 +1440,7 @@ watch(isMobile, () => {
 
 .reco-era.era-modern {
   background: rgba(211, 47, 47, 0.1);
-  color: #c62828;
+  color: #81021f;
 }
 
 .reco-rating {
@@ -1500,9 +1509,9 @@ watch(isMobile, () => {
   gap: 6px;
   padding: 9px 16px;
   background: #fff;
-  border: 1.5px solid #eef1f5;
+  border: 1.5px solid #f4ece4;
   border-radius: 12px;
-  color: #7a8599;
+  color: #79636a;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -1518,12 +1527,12 @@ watch(isMobile, () => {
 }
 
 .filter-btn:hover {
-  border-color: #ffcdd2;
-  color: #d32f2f;
+  border-color: #f6c7bd;
+  color: #ef5654;
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, #d32f2f, #c62828);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   border-color: transparent;
   color: #fff;
   box-shadow: 0 5px 16px rgba(211, 47, 47, 0.26);
@@ -1545,9 +1554,9 @@ watch(isMobile, () => {
   flex-shrink: 0;
   padding: 9px 15px;
   background: #fff;
-  border: 1.5px solid #eef1f5;
+  border: 1.5px solid #f4ece4;
   border-radius: 12px;
-  color: #5a6478;
+  color: #635057;
   font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
@@ -1563,9 +1572,9 @@ watch(isMobile, () => {
 }
 
 .action-btn:hover:not(:disabled) {
-  border-color: #d32f2f;
-  color: #d32f2f;
-  background: #fff5f5;
+  border-color: #ef5654;
+  color: #ef5654;
+  background: #feeee1;
 }
 
 .action-btn.active {
@@ -1629,7 +1638,7 @@ watch(isMobile, () => {
   align-items: center;
   gap: 6px;
   font-size: 11.5px;
-  color: #8a95a8;
+  color: #9a858a;
   font-weight: 600;
 }
 
@@ -1641,7 +1650,7 @@ watch(isMobile, () => {
 }
 
 .legend-dot.history { background: #b8860b; }
-.legend-dot.modern { background: #d32f2f; }
+.legend-dot.modern { background: #ef5654; }
 .legend-dot.checked { background: #4caf50; }
 .legend-dot.me { background: #1976d2; }
 
@@ -1654,7 +1663,7 @@ watch(isMobile, () => {
   justify-content: space-between;
   gap: 32px;
   flex-wrap: wrap;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+  background: linear-gradient(135deg, #feeee1 0%, #fbe7dc 100%);
   border-radius: 24px;
   padding: 30px 34px;
 }
@@ -1668,8 +1677,8 @@ watch(isMobile, () => {
   display: inline-block;
   padding: 7px 18px;
   background: #fff;
-  border: 2px solid #d32f2f;
-  color: #d32f2f;
+  border: 2px solid #ef5654;
+  color: #ef5654;
   border-radius: 50px;
   font-size: 12px;
   font-weight: 700;
@@ -1679,7 +1688,7 @@ watch(isMobile, () => {
 
 .pc-header-title {
   font-size: clamp(20px, 2.4vw, 30px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0 0 10px 0;
   font-weight: 800;
   line-height: 1.3;
@@ -1687,7 +1696,7 @@ watch(isMobile, () => {
 
 .pc-header-desc {
   font-size: 14px;
-  color: #7a8599;
+  color: #79636a;
   margin: 0;
   line-height: 1.7;
   max-width: 540px;
@@ -1710,19 +1719,19 @@ watch(isMobile, () => {
 .pc-stat-value {
   font-size: 26px;
   font-weight: 800;
-  color: #d32f2f;
+  color: #ef5654;
   line-height: 1;
 }
 
 .pc-stat-total {
   font-size: 14px;
-  color: #b0bac7;
+  color: #b6a6a9;
   font-weight: 600;
 }
 
 .pc-stat-label {
   font-size: 12px;
-  color: #7a8599;
+  color: #79636a;
   margin: 6px 0 8px;
   font-weight: 600;
 }
@@ -1737,7 +1746,7 @@ watch(isMobile, () => {
 .pc-stat-bar span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #ff7043, #d32f2f);
+  background: linear-gradient(90deg, #ef5654, #ef5654);
   border-radius: 4px;
   transition: width 0.5s ease;
 }
@@ -1758,18 +1767,18 @@ watch(isMobile, () => {
   justify-content: space-between;
   padding-bottom: 14px;
   margin-bottom: 14px;
-  border-bottom: 2px solid #f2f5f9;
+  border-bottom: 2px solid #f7efe6;
 }
 
 .pc-side-title {
   font-size: 16px;
   font-weight: 800;
-  color: #1a2332;
+  color: #32181f;
 }
 
 .pc-side-count {
   font-size: 12px;
-  color: #d32f2f;
+  color: #ef5654;
   background: rgba(211, 47, 47, 0.08);
   padding: 4px 11px;
   border-radius: 8px;
@@ -1789,7 +1798,7 @@ watch(isMobile, () => {
   align-items: center;
   gap: 12px;
   padding: 11px 12px;
-  background: #fafbfc;
+  background: #fbf4eb;
   border: 1.5px solid transparent;
   border-radius: 12px;
   cursor: pointer;
@@ -1801,13 +1810,13 @@ watch(isMobile, () => {
 
 .pc-side-item:hover {
   background: #fff;
-  border-color: #ffcdd2;
+  border-color: #f6c7bd;
   transform: translateX(3px);
 }
 
 .pc-side-item.is-active {
-  border-color: #d32f2f;
-  background: #fff5f5;
+  border-color: #ef5654;
+  background: #feeee1;
 }
 
 .pc-side-item.is-checked {
@@ -1843,7 +1852,7 @@ watch(isMobile, () => {
 .pc-side-name {
   font-size: 13px;
   font-weight: 700;
-  color: #1a2332;
+  color: #32181f;
   word-break: break-word;
   line-height: 1.35;
 }
@@ -1853,7 +1862,7 @@ watch(isMobile, () => {
   align-items: center;
   gap: 6px;
   font-size: 11.5px;
-  color: #8a95a8;
+  color: #9a858a;
   word-break: break-word;
 }
 
@@ -1872,7 +1881,7 @@ watch(isMobile, () => {
 
 .pc-side-era.era-modern {
   background: rgba(211, 47, 47, 0.1);
-  color: #c62828;
+  color: #81021f;
 }
 
 .pc-side-distance {
@@ -1895,7 +1904,7 @@ watch(isMobile, () => {
    移动端
    ============================== */
 .m-map-header {
-  background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 60%, #fff0f3 100%);
+  background: linear-gradient(160deg, #feeee1 0%, #fbe7dc 60%, #fbe9df 100%);
   border-radius: 18px;
   padding: 18px 16px;
   display: flex;
@@ -1909,7 +1918,7 @@ watch(isMobile, () => {
   padding: 5px 13px;
   background: rgba(255, 255, 255, 0.9);
   border: 1.5px solid rgba(211, 47, 47, 0.15);
-  color: #d32f2f;
+  color: #ef5654;
   border-radius: 50px;
   font-size: clamp(10px, 2.5vw, 12px);
   font-weight: 700;
@@ -1917,7 +1926,7 @@ watch(isMobile, () => {
 
 .m-header-title {
   font-size: clamp(18px, 5vw, 23px);
-  color: #1a2332;
+  color: #32181f;
   margin: 0;
   font-weight: 800;
   line-height: 1.25;
@@ -1926,7 +1935,7 @@ watch(isMobile, () => {
 
 .m-header-desc {
   font-size: clamp(11px, 3vw, 13px);
-  color: #8a95a8;
+  color: #9a858a;
   margin: 0;
   line-height: 1.6;
 }
@@ -1950,13 +1959,13 @@ watch(isMobile, () => {
   display: block;
   font-size: clamp(16px, 4.4vw, 20px);
   font-weight: 800;
-  color: #d32f2f;
+  color: #ef5654;
   line-height: 1.1;
 }
 
 .m-stat-value i {
   font-size: clamp(10px, 2.8vw, 12px);
-  color: #b0bac7;
+  color: #b6a6a9;
   font-style: normal;
   font-weight: 600;
 }
@@ -1964,7 +1973,7 @@ watch(isMobile, () => {
 .m-stat-label {
   display: block;
   font-size: clamp(9px, 2.4vw, 11px);
-  color: #8a95a8;
+  color: #9a858a;
   margin-top: 3px;
   font-weight: 600;
 }
@@ -2025,7 +2034,7 @@ watch(isMobile, () => {
 .m-loc-name {
   font-size: clamp(12px, 3.4vw, 14px);
   font-weight: 700;
-  color: #1a2332;
+  color: #32181f;
   word-break: break-word;
   line-height: 1.35;
 }
@@ -2035,7 +2044,7 @@ watch(isMobile, () => {
   align-items: center;
   gap: 5px;
   font-size: clamp(10px, 2.6vw, 11px);
-  color: #8a95a8;
+  color: #9a858a;
   word-break: break-word;
 }
 
@@ -2054,7 +2063,7 @@ watch(isMobile, () => {
 
 .m-loc-era.era-modern {
   background: rgba(211, 47, 47, 0.1);
-  color: #c62828;
+  color: #81021f;
 }
 
 .m-loc-distance {
@@ -2199,7 +2208,7 @@ watch(isMobile, () => {
 
 .loc-rating-text {
   font-size: 12px;
-  color: #8a95a8;
+  color: #9a858a;
   font-weight: 600;
 }
 
@@ -2214,7 +2223,7 @@ watch(isMobile, () => {
 
 .loc-desc {
   font-size: 13.5px;
-  color: #5a6478;
+  color: #635057;
   line-height: 1.8;
   margin: 0 0 16px 0;
   word-break: break-word;
@@ -2229,7 +2238,7 @@ watch(isMobile, () => {
 
 .loc-highlight {
   font-size: 11.5px;
-  color: #d32f2f;
+  color: #ef5654;
   background: rgba(211, 47, 47, 0.08);
   padding: 5px 12px;
   border-radius: 16px;
@@ -2266,7 +2275,7 @@ watch(isMobile, () => {
 .loc-btn-checkin {
   flex: 1;
   padding: 13px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -2285,8 +2294,8 @@ watch(isMobile, () => {
 
 .loc-btn-checkin.done,
 .loc-btn-checkin:disabled {
-  background: #e8ebef;
-  color: #9aa5b4;
+  background: #efe4da;
+  color: #a79599;
   box-shadow: none;
   cursor: default;
 }
@@ -2301,9 +2310,9 @@ watch(isMobile, () => {
   flex-shrink: 0;
   padding: 13px 16px;
   background: #fff;
-  border: 1.5px solid #e5e9ef;
+  border: 1.5px solid #eadfd6;
   border-radius: 12px;
-  color: #7a8599;
+  color: #79636a;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -2316,9 +2325,9 @@ watch(isMobile, () => {
 
 .loc-btn-nav:hover,
 .loc-btn-more:hover {
-  border-color: #d32f2f;
-  color: #d32f2f;
-  background: #fff5f5;
+  border-color: #ef5654;
+  color: #ef5654;
+  background: #feeee1;
 }
 
 /* 移动端弹窗 */
@@ -2392,7 +2401,7 @@ watch(isMobile, () => {
   background:
     radial-gradient(circle at 92% 10%, rgba(255, 255, 255, 0.9) 0 7%, transparent 7.3%),
     radial-gradient(circle at 80% 20%, rgba(197, 34, 55, 0.08), transparent 25%),
-    linear-gradient(135deg, #fffaf7 0%, #fff0ed 55%, #f8dde2 100%);
+    linear-gradient(135deg, #fef5ea 0%, #fcefe5 55%, #f1d4c8 100%);
   box-shadow: 0 16px 42px rgba(101, 35, 48, 0.07);
 }
 
@@ -2415,7 +2424,7 @@ watch(isMobile, () => {
 
 .pc-header-desc,
 .m-header-desc {
-  color: #77717a;
+  color: #746469;
 }
 
 .pc-stat-card,
@@ -2468,7 +2477,7 @@ watch(isMobile, () => {
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, #c52237, #941629);
+  background: linear-gradient(135deg, #ef5654, #81021f);
   box-shadow: 0 6px 18px rgba(145, 25, 44, 0.2);
 }
 
@@ -2496,7 +2505,7 @@ watch(isMobile, () => {
 }
 
 .loc-btn-checkin {
-  background: linear-gradient(135deg, #c52237, #901528);
+  background: linear-gradient(135deg, #ef5654, #81021f);
 }
 
 .loc-btn-nav,
